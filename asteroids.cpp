@@ -44,6 +44,9 @@ const float gravity = -0.2f;
 const int MAX_BULLETS = 11;
 const Flt MINIMUM_ASTEROID_SIZE = 60.0;
 
+// Determinig game speed (player movement, enemy movement, etc.)
+const float gameSpeed = 2.0f;
+
 //-----------------------------------------------------------------------------
 //Setup timers
 const double physicsRate = 1.0 / 60.0;
@@ -75,6 +78,11 @@ public:
 	Vec acc;
 	float angle;
 	float color[3];
+    float colorAlt[3];
+
+    // Determining facing up or down
+    int pFlip;
+
 public:
 	Ship() {
 		pos[0] = (Flt)(gl.xres/2);
@@ -85,6 +93,9 @@ public:
 		VecZero(acc);
 		angle = 0.0;
 		color[0] = color[1] = color[2] = 1.0;
+		colorAlt[0] = colorAlt[1] = colorAlt[2] = 0.1;
+    
+        pFLip = 0;
 	}
 };
 
@@ -135,7 +146,8 @@ public:
 		nbullets = 0;
 		mouseThrustOn = false;
 		//build 10 asteroids...
-		for (int j=0; j<10; j++) {
+		/*
+        for (int j=0; j<10; j++) {
 			Asteroid *a = new Asteroid;
 			a->nverts = 8;
 			a->radius = rnd()*80.0 + 40.0;
@@ -165,6 +177,7 @@ public:
 			ahead = a;
 			++nasteroids;
 		}
+        */
 		clock_gettime(CLOCK_REALTIME, &bulletTimer);
 	}
 	~Game() {
@@ -573,10 +586,13 @@ void buildAsteroidFragment(Asteroid *ta, Asteroid *a)
 
 void physics()
 {
+    float xmove = 0.0, ymove = 0.0;
+    float newSpeed = sqrt(0.5);
+
 	Flt d0,d1,dist;
 	//Update ship position
-	g.ship.pos[0] += g.ship.vel[0];
-	g.ship.pos[1] += g.ship.vel[1];
+	//g.ship.pos[0] += g.ship.vel[0];
+	//g.ship.pos[1] += g.ship.vel[1];
 	//Check for collision with window edges
 	if (g.ship.pos[0] < 0.0) {
 		g.ship.pos[0] += (float)gl.xres;
@@ -707,34 +723,44 @@ void physics()
 	}
 	//---------------------------------------------------
 	//check keys pressed now
+	if (gl.keys[XK_Up]) {
+	    // player movement ~ upwards
+        ymove = 1.0;
+
+        g.ship.angle = 360.0f;
+        g.ship.pFlip = 1;
+    }
+	if (gl.keys[XK_Down]) {
+	    // player movement ~ downwards
+        ymove = -1.0;
+
+        g.ship.angle = 180.0f;
+        g.ship.pFlip = 0;
+    }
 	if (gl.keys[XK_Left]) {
-		g.ship.angle += 4.0;
-		if (g.ship.angle >= 360.0f)
-			g.ship.angle -= 360.0f;
+	    // player movement ~ left
+        ymove = -1.0;
+
+        g.ship.angle = 90.0f;
 	}
 	if (gl.keys[XK_Right]) {
-		g.ship.angle -= 4.0;
-		if (g.ship.angle < 0.0f)
-			g.ship.angle += 360.0f;
+	    // player movement ~ right
+        ymove = 1.0;
+
+        g.ship.angle = 270.0f;
 	}
-	if (gl.keys[XK_Up]) {
-		//apply thrust
-		//convert ship angle to radians
-		Flt rad = ((g.ship.angle+90.0) / 360.0f) * PI * 2.0;
-		//convert angle to a vector
-		Flt xdir = cos(rad);
-		Flt ydir = sin(rad);
-		g.ship.vel[0] += xdir*0.02f;
-		g.ship.vel[1] += ydir*0.02f;
-		Flt speed = sqrt(g.ship.vel[0]*g.ship.vel[0]+
-				g.ship.vel[1]*g.ship.vel[1]);
-		if (speed > 10.0f) {
-			speed = 10.0f;
-			normalize2d(g.ship.vel);
-			g.ship.vel[0] *= speed;
-			g.ship.vel[1] *= speed;
-		}
-	}
+    // Makes sure diagnol movement is not faster than if you were to go
+    // horizontal (left/right) OR vertical (up/down)
+    // xmove/ymove determine state of direction of movement
+    // gameSpeed determines base speed of player
+    // newSpeed reduces speed of player for going diagnol
+    if (pow(xmove, 2) + pow(ymove, 2) > 1) {
+        g.ship.pos[0] += 1.0f * xmove * gameSpeed * newSpeed;
+        g.ship.pos[1] += 1.0f * ymove * gameSpeed * newSpeed;
+    } else {
+        g.ship.pos[0] += 1.0f * xmove * gameSpeed;
+        g.ship.pos[1] += 1.0f * ymove * gameSpeed;
+    }
 	if (gl.keys[XK_space]) {
 		//a little time between each bullet
 		struct timespec bt;
@@ -791,7 +817,15 @@ void render()
 	ggprint8b(&r, 16, 0x00ffff00, "n asteroids: %i", g.nasteroids);
 	//-------------------------------------------------------------------------
 	//Draw the ship
-	glColor3fv(g.ship.color);
+
+    // Placeholder to test character sprite variations
+    // if going up/down probably have character actually looking in that
+    // direction
+    if (g.ship.Flip) {
+	    glColor3fv(g.ship.colorAlt);
+    } else {
+	    glColor3fv(g.ship.color);
+    }
 	glPushMatrix();
 	glTranslatef(g.ship.pos[0], g.ship.pos[1], g.ship.pos[2]);
 	//float angle = atan2(ship.dir[1], ship.dir[0]);
@@ -812,6 +846,8 @@ void render()
 	glVertex2f(0.0f, 0.0f);
 	glEnd();
 	glPopMatrix();
+
+    /*
 	if (gl.keys[XK_Up] || g.mouseThrustOn) {
 		int i;
 		//draw thrust
@@ -833,6 +869,7 @@ void render()
 		}
 		glEnd();
 	}
+    */
 	//-------------------------------------------------------------------------
 	//Draw the asteroids
 	{
