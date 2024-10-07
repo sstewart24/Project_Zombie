@@ -6,25 +6,12 @@
 //This program is a game starting point for a 3350 project.
 //
 //
-#include <iostream>
-#include <cstdlib>
-#include <cstring>
-#include <unistd.h>
-#include <ctime>
-#include <cmath>
-#include <X11/Xlib.h>
-//#include <X11/Xutil.h>
-//#include <GL/gl.h>
-//#include <GL/glu.h>
-#include <X11/keysym.h>
-#include <GL/glx.h>
-#include "log.h"
-#include "fonts.h"
 
-//defined types
-typedef float Flt;
-typedef float Vec[3];
-typedef Flt	Matrix[4][4];
+
+#include "header.h"
+
+//using namespace std;
+
 
 //macros
 #define rnd() (((Flt)rand())/(Flt)RAND_MAX)
@@ -35,29 +22,13 @@ typedef Flt	Matrix[4][4];
 #define VecDot(a,b)	((a)[0]*(b)[0]+(a)[1]*(b)[1]+(a)[2]*(b)[2])
 #define VecSub(a,b,c) (c)[0]=(a)[0]-(b)[0]; \
 						(c)[1]=(a)[1]-(b)[1]; \
-						(c)[2]=(a)[2]-(b)[2]
-//constants
-const float timeslice = 1.0f;
-const float gravity = -0.2f;
-#define PI 3.141592653589793
-#define ALPHA 1
-const int MAX_BULLETS = 11;
-const Flt MINIMUM_ASTEROID_SIZE = 60.0;
+						(c)[2]=(a)[2]-(b)[2];
 
-// Determinig game speed (player movement, enemy movement, etc.)
-const float gameSpeed = 2.0f;
+extern Room roomStart();
+extern Room swapRoom(int);
 
-//-----------------------------------------------------------------------------
-//Setup timers
-const double physicsRate = 1.0 / 60.0;
-const double oobillion = 1.0 / 1e9;
-extern struct timespec timeStart, timeCurrent;
-extern struct timespec timePause;
-extern double physicsCountdown;
-extern double timeSpan;
-extern double timeDiff(struct timespec *start, struct timespec *end);
-extern void timeCopy(struct timespec *dest, struct timespec *source);
-//-----------------------------------------------------------------------------
+int roomID = 0;
+int maxRooms = 2;
 
 class Global {
 public:
@@ -93,11 +64,71 @@ public:
 		VecZero(acc);
 		angle = 0.0;
 		color[0] = color[1] = color[2] = 1.0;
-		colorAlt[0] = colorAlt[1] = colorAlt[2] = 0.1;
+		colorAlt[0] = colorAlt[1] = colorAlt[2] = 0.658824;
     
-        pFLip = 0;
+        pFlip = 0;
 	}
 };
+/*
+class Wall {
+    public:
+        float xPos;
+        float yPos;
+        float xLen;
+        float yLen;
+		float color[3];
+    
+    public:
+        Wall(float x, float y, float x_l, float y_l) {
+            xPos = x;
+            yPos = y;
+            xLen = x_l;
+            yLen = y_l;
+		    color[0] = 0.0;
+            color[1] = 1.0;
+            color[2] = 1.0;
+        }
+
+};
+
+class Room {
+    public:
+		int id;
+        std::vector<Wall> walls;
+        int walls_count; // Counter for how many walls are in the room
+
+    public:
+        Room() {
+            walls.push_back( Wall(50.0f, 100.0f, 50.0f, 50.0f));
+            walls.push_back( Wall(75.0f, 200.0f, 100.0f, 50.0f));
+            walls.push_back( Wall(200.0f, 200.0f, 30.0f, 50.0f));
+            walls.push_back( Wall(400.0f, 50.0f, 200.0f, 100.0f));
+        
+        }
+
+		Room(std::vector<Wall> w, int i) {
+			id = i;
+			//while (i < size)
+			//{
+			walls = w;
+			//}
+
+		}
+
+        int checkWall(float newPos[2]) {
+            int blocked = 0;
+            int i = 0;
+            while (!blocked && i < (int)walls.size()) {
+                if (newPos[0] > walls[i].xPos && newPos[0] < walls[i].xPos + walls[i].xLen && newPos[1] > walls[i].yPos && newPos[1] < walls[i].yPos + walls[i].yLen) {
+                    blocked = 1;
+                }
+                i++;
+            }
+
+            return blocked;
+        }
+};
+*/
 
 class Bullet {
 public:
@@ -128,9 +159,26 @@ public:
 	}
 };
 
+
 class Game {
 public:
 	Ship ship;
+	Room room1;
+	
+	//int maxRooms = 2;
+	/*
+	Wall set[2][4] = {{Wall(50.0f, 100.0f, 50.0f, 50.0f), 
+							  Wall(75.0f, 200.0f, 100.0f, 50.0f),
+							  Wall(200.0f, 200.0f, 30.0f, 50.0f),
+							  Wall(400.0f, 50.0f, 200.0f, 100.0f)},
+							  {Wall(50.0f, 100.0f, 50.0f, 50.0f), 
+							  Wall(75.0f, 200.0f, 100.0f, 50.0f),
+							  Wall(200.0f, 200.0f, 30.0f, 50.0f),
+							  Wall(400.0f, 50.0f, 200.0f, 100.0f)}};
+    
+	std::vector<Room> rooms;
+	*/
+
 	Asteroid *ahead;
 	Bullet *barr;
 	int nasteroids;
@@ -140,11 +188,14 @@ public:
 	bool mouseThrustOn;
 public:
 	Game() {
+		// swapRoom(0) will create the starting room
+		Room room1 = swapRoom(0);
 		ahead = NULL;
 		barr = new Bullet[MAX_BULLETS];
 		nasteroids = 0;
 		nbullets = 0;
 		mouseThrustOn = false;
+
 		//build 10 asteroids...
 		/*
         for (int j=0; j<10; j++) {
@@ -327,7 +378,7 @@ void render();
 // M A I N
 //==========================================================================
 int main()
-{
+{ 
 	logOpen();
 	init_opengl();
 	srand(time(NULL));
@@ -400,7 +451,7 @@ void check_mouse(XEvent *e)
 	static int savex = 0;
 	static int savey = 0;
 	//
-	static int ct=0;
+	//static int ct=0;
 	//std::cout << "m" << std::endl << std::flush;
 	if (e->type == ButtonRelease) {
 		return;
@@ -445,13 +496,14 @@ void check_mouse(XEvent *e)
 	//keys[XK_Up] = 0;
 	if (savex != e->xbutton.x || savey != e->xbutton.y) {
 		//Mouse moved
-		int xdiff = savex - e->xbutton.x;
-		int ydiff = savey - e->xbutton.y;
-		if (++ct < 10)
-			return;		
+		//int xdiff = savex - e->xbutton.x;
+		//int ydiff = savey - e->xbutton.y;
+		//if (++ct < 10)
+			//return;		
 		//std::cout << "savex: " << savex << std::endl << std::flush;
 		//std::cout << "e->xbutton.x: " << e->xbutton.x << std::endl <<
 		//std::flush;
+        /*
 		if (xdiff > 0) {
 			//std::cout << "xdiff: " << xdiff << std::endl << std::flush;
 			g.ship.angle += 0.05f * (float)xdiff;
@@ -487,6 +539,7 @@ void check_mouse(XEvent *e)
 		x11.set_mouse_position(100,100);
 		savex = 100;
 		savey = 100;
+        */
 	}
 }
 
@@ -518,8 +571,13 @@ int check_keys(XEvent *e)
 		case XK_Escape:
 			return 1;
 		case XK_f:
+			
+			roomID = !roomID;
+			//delete *room1;
+			g.room1 = swapRoom(roomID);
+
 			break;
-		case XK_s:
+		case XK_g:
 			break;
 		case XK_Down:
 			break;
@@ -588,6 +646,7 @@ void physics()
 {
     float xmove = 0.0, ymove = 0.0;
     float newSpeed = sqrt(0.5);
+    float newPos[2] = {0.0, 0.0};
 
 	Flt d0,d1,dist;
 	//Update ship position
@@ -739,13 +798,13 @@ void physics()
     }
 	if (gl.keys[XK_Left]) {
 	    // player movement ~ left
-        ymove = -1.0;
+        xmove = -1.0;
 
         g.ship.angle = 90.0f;
 	}
 	if (gl.keys[XK_Right]) {
 	    // player movement ~ right
-        ymove = 1.0;
+        xmove = 1.0;
 
         g.ship.angle = 270.0f;
 	}
@@ -755,11 +814,16 @@ void physics()
     // gameSpeed determines base speed of player
     // newSpeed reduces speed of player for going diagnol
     if (pow(xmove, 2) + pow(ymove, 2) > 1) {
-        g.ship.pos[0] += 1.0f * xmove * gameSpeed * newSpeed;
-        g.ship.pos[1] += 1.0f * ymove * gameSpeed * newSpeed;
+        newPos[0] = g.ship.pos[0] + (1.0f * xmove * gameSpeed * newSpeed);
+        newPos[1] = g.ship.pos[1] + (1.0f * ymove * gameSpeed * newSpeed);
     } else {
-        g.ship.pos[0] += 1.0f * xmove * gameSpeed;
-        g.ship.pos[1] += 1.0f * ymove * gameSpeed;
+        newPos[0] = g.ship.pos[0] + (1.0f * xmove * gameSpeed);
+        newPos[1] = g.ship.pos[1] + (1.0f * ymove * gameSpeed);
+    }
+    if (!(g.room1.checkWall(newPos))) { 
+        g.ship.pos[0] = newPos[0];
+        g.ship.pos[1] = newPos[1];
+        
     }
 	if (gl.keys[XK_space]) {
 		//a little time between each bullet
@@ -815,13 +879,31 @@ void render()
 	ggprint8b(&r, 16, 0x00ff0000, "3350 - Asteroids");
 	ggprint8b(&r, 16, 0x00ffff00, "n bullets: %i", g.nbullets);
 	ggprint8b(&r, 16, 0x00ffff00, "n asteroids: %i", g.nasteroids);
+
+    for (int i = 0; i != (int)g.room1.walls.size(); i++) {
+        glPushMatrix();
+        glColor3fv(g.room1.walls[i].color);
+        glBegin(GL_TRIANGLES);
+
+        glVertex2f(g.room1.walls[i].xPos, g.room1.walls[i].yPos);
+        glVertex2f(g.room1.walls[i].xPos + g.room1.walls[i].xLen, g.room1.walls[i].yPos);
+        glVertex2f(g.room1.walls[i].xPos + g.room1.walls[i].xLen, 
+                    g.room1.walls[i].yPos + g.room1.walls[i].yLen);
+        glVertex2f(g.room1.walls[i].xPos, g.room1.walls[i].yPos);
+        glVertex2f(g.room1.walls[i].xPos, g.room1.walls[i].yPos + g.room1.walls[i].yLen);
+        glVertex2f(g.room1.walls[i].xPos + g.room1.walls[i].xLen, 
+                    g.room1.walls[i].yPos + g.room1.walls[i].yLen);
+        glEnd();
+        glPopMatrix();
+    }
+    
 	//-------------------------------------------------------------------------
 	//Draw the ship
 
     // Placeholder to test character sprite variations
     // if going up/down probably have character actually looking in that
     // direction
-    if (g.ship.Flip) {
+    if (g.ship.pFlip) {
 	    glColor3fv(g.ship.colorAlt);
     } else {
 	    glColor3fv(g.ship.color);
