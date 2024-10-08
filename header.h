@@ -69,17 +69,16 @@ class Room {
         std::vector<Wall> walls;
 
     public:
-    /*
         Room() {
+            //id = 0;          
+            //walls.push_back( Wall(50.0f, 100.0f, 50.0f, 50.0f));
+            //walls.push_back( Wall(75.0f, 200.0f, 100.0f, 50.0f));
+            //walls.push_back( Wall(200.0f, 200.0f, 30.0f, 50.0f));
+            //walls.push_back( Wall(400.0f, 50.0f, 200.0f, 100.0f));
             
-            walls.push_back( Wall(50.0f, 100.0f, 50.0f, 50.0f));
-            walls.push_back( Wall(75.0f, 200.0f, 100.0f, 50.0f));
-            walls.push_back( Wall(200.0f, 200.0f, 30.0f, 50.0f));
-            walls.push_back( Wall(400.0f, 50.0f, 200.0f, 100.0f));
-            
-        }*/
-/*
-		Room(std::vector<Wall> w, int i) {
+        }
+
+		Room(int i, std::vector<Wall> w) {
 			id = i;
 			//while (i < size)
 			//{
@@ -87,7 +86,7 @@ class Room {
 			//}
 
 		}
-*/
+
         int checkWall(float newPos[2]) {
             int blocked = 0;
             int i = 0;

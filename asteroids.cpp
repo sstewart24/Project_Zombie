@@ -24,8 +24,8 @@
 						(c)[1]=(a)[1]-(b)[1]; \
 						(c)[2]=(a)[2]-(b)[2];
 
-extern Room roomStart();
-extern Room swapRoom(int);
+extern Room startRooms(int);
+extern Room swapRoom(int, Room);
 
 int roomID = 0;
 int maxRooms = 2;
@@ -163,7 +163,7 @@ public:
 class Game {
 public:
 	Ship ship;
-	Room room1;
+	Room room;
 	
 	//int maxRooms = 2;
 	/*
@@ -188,8 +188,10 @@ public:
 	bool mouseThrustOn;
 public:
 	Game() {
-		// swapRoom(0) will create the starting room
-		Room room1 = swapRoom(0);
+		//room = swapRoom(0); //will create the starting room
+		//Room r = Room(startRooms(roomID).id, startRooms(roomID).walls);
+		//room = r; //Room(startRooms(roomID).id, startRooms(roomID).walls);
+
 		ahead = NULL;
 		barr = new Bullet[MAX_BULLETS];
 		nasteroids = 0;
@@ -369,6 +371,7 @@ public:
 
 //function prototypes
 void init_opengl(void);
+void roomInit(int);
 void check_mouse(XEvent *e);
 int check_keys(XEvent *e);
 void physics();
@@ -378,7 +381,9 @@ void render();
 // M A I N
 //==========================================================================
 int main()
-{ 
+{
+	roomInit(roomID);
+
 	logOpen();
 	init_opengl();
 	srand(time(NULL));
@@ -407,6 +412,12 @@ int main()
 	cleanup_fonts();
 	logClose();
 	return 0;
+}
+
+void roomInit(int rID)
+{
+	int id = rID;
+	g.room = startRooms(id);
 }
 
 void init_opengl(void)
@@ -573,8 +584,7 @@ int check_keys(XEvent *e)
 		case XK_f:
 			
 			roomID = !roomID;
-			//delete *room1;
-			g.room1 = swapRoom(roomID);
+			g.room = swapRoom(roomID, g.room);
 
 			break;
 		case XK_g:
@@ -820,7 +830,7 @@ void physics()
         newPos[0] = g.ship.pos[0] + (1.0f * xmove * gameSpeed);
         newPos[1] = g.ship.pos[1] + (1.0f * ymove * gameSpeed);
     }
-    if (!(g.room1.checkWall(newPos))) { 
+    if (!(g.room.checkWall(newPos))) { 
         g.ship.pos[0] = newPos[0];
         g.ship.pos[1] = newPos[1];
         
@@ -880,19 +890,19 @@ void render()
 	ggprint8b(&r, 16, 0x00ffff00, "n bullets: %i", g.nbullets);
 	ggprint8b(&r, 16, 0x00ffff00, "n asteroids: %i", g.nasteroids);
 
-    for (int i = 0; i != (int)g.room1.walls.size(); i++) {
+    for (int i = 0; i != (int)g.room.walls.size(); i++) {
         glPushMatrix();
-        glColor3fv(g.room1.walls[i].color);
+        glColor3fv(g.room.walls[i].color);
         glBegin(GL_TRIANGLES);
 
-        glVertex2f(g.room1.walls[i].xPos, g.room1.walls[i].yPos);
-        glVertex2f(g.room1.walls[i].xPos + g.room1.walls[i].xLen, g.room1.walls[i].yPos);
-        glVertex2f(g.room1.walls[i].xPos + g.room1.walls[i].xLen, 
-                    g.room1.walls[i].yPos + g.room1.walls[i].yLen);
-        glVertex2f(g.room1.walls[i].xPos, g.room1.walls[i].yPos);
-        glVertex2f(g.room1.walls[i].xPos, g.room1.walls[i].yPos + g.room1.walls[i].yLen);
-        glVertex2f(g.room1.walls[i].xPos + g.room1.walls[i].xLen, 
-                    g.room1.walls[i].yPos + g.room1.walls[i].yLen);
+        glVertex2f(g.room.walls[i].xPos, g.room.walls[i].yPos);
+        glVertex2f(g.room.walls[i].xPos + g.room.walls[i].xLen, g.room.walls[i].yPos);
+        glVertex2f(g.room.walls[i].xPos + g.room.walls[i].xLen, 
+                    g.room.walls[i].yPos + g.room.walls[i].yLen);
+        glVertex2f(g.room.walls[i].xPos, g.room.walls[i].yPos);
+        glVertex2f(g.room.walls[i].xPos, g.room.walls[i].yPos + g.room.walls[i].yLen);
+        glVertex2f(g.room.walls[i].xPos + g.room.walls[i].xLen, 
+                    g.room.walls[i].yPos + g.room.walls[i].yLen);
         glEnd();
         glPopMatrix();
     }

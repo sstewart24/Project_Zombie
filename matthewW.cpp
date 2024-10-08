@@ -6,31 +6,32 @@
 
 
 // Good for objects that won't change, this isn't having info actually stored
-Room r0( 0, {Wall(50.0f, 100.0f, 50.0f, 50.0f),
+Room rooms[] = { 
+    Room(0, {Wall(50.0f, 100.0f, 50.0f, 50.0f),
              Wall(75.0f, 200.0f, 100.0f, 50.0f),
              Wall(200.0f, 200.0f, 30.0f, 50.0f),
-             Wall(400.0f, 50.0f, 200.0f, 100.0f)}); 
-Room r1( 0, {Wall(100.0f, 100.0f, 50.0f, 50.0f),
+             Wall(400.0f, 50.0f, 200.0f, 100.0f)}), 
+    Room(1, {Wall(100.0f, 100.0f, 50.0f, 50.0f),
              Wall(175.0f, 200.0f, 100.0f, 50.0f),
              Wall(300.0f, 100.0f, 30.0f, 50.0f),
-             Wall(400.0f, 450.0f, 75.0f, 100.0f)});
-Room r2;           
-void roomSave(Room prev)
-{
-    
+             Wall(400.0f, 450.0f, 75.0f, 100.0f)})
+};
+
+Room startRooms(int roomID) {
+    Room r = rooms[roomID];
+    //Room r = Room(rooms[roomID].id, rooms[roomID].walls);
+    return r;
 }
 
-Room swapRoom(int roomID) {
-    Room next;
-    switch (roomID) {
-        case 0:
-            
-            next = r0;
-            break;
-            case 1:
-            next = r1;
+void roomSave(Room cur)
+{
+    rooms[cur.id] = cur;
+}
 
-            break;
-    }
+Room swapRoom(int roomID, Room current) {
+    Room next;
+    roomSave(current);
+    next = rooms[roomID];
     return next;
 }
+
