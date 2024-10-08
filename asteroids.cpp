@@ -4,7 +4,7 @@
 //date:    2014 - 2021
 //mod spring 2015: added constructors
 //This program is a game starting point for a 3350 project.
-//
+//ur mum
 //
 
 
@@ -26,6 +26,7 @@
 
 extern Room startRooms(int);
 extern Room swapRoom(int, Room);
+extern Health healthInit(int, int);
 
 int roomID = 0;
 int maxRooms = 2;
@@ -47,6 +48,7 @@ public:
 	Vec dir;
 	Vec vel;
 	Vec acc;
+    double health;
 	float angle;
 	float color[3];
     float colorAlt[3];
@@ -372,6 +374,7 @@ public:
 //function prototypes
 void init_opengl(void);
 void roomInit(int);
+//void healthInit(int, int);
 void check_mouse(XEvent *e);
 int check_keys(XEvent *e);
 void physics();
@@ -382,6 +385,7 @@ void render();
 //==========================================================================
 int main()
 {
+    healthInit(gl.xres, gl.yres);
 	roomInit(roomID);
 
 	logOpen();
