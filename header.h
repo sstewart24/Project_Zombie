@@ -97,9 +97,10 @@ public:
         //walls.push_back( Wall(400.0f, 50.0f, 200.0f, 100.0f));            
     }
 
-	Room(int i, std::vector<Wall> w) {
+	Room(int i, std::vector<Wall> w, std::vector<Door> d) {
 		id = i;
 		walls = w;
+        doors = d;
     }
 
     ~Room() {}

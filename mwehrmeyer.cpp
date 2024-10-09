@@ -15,7 +15,8 @@ Room rooms[] = {
              Wall(175.0f, 200.0f, 100.0f, 50.0f),
              Wall(300.0f, 100.0f, 30.0f, 50.0f),
              Wall(400.0f, 450.0f, 75.0f, 100.0f),
-             Wall(400.0f, 150.0f, 75.0f, 100.0f)})
+             Wall(400.0f, 150.0f, 75.0f, 100.0f)},
+             {Door(50.0f, 150.0f, 50.0f, 50.0f, 1)})
 };
 
 // Initializes first room to make

@@ -26,6 +26,7 @@
 
 extern Room startRooms(int);
 extern Room swapRoom(int, Room);
+extern int checkWall(float*, Room);
 
 int roomID = 0;
 int maxRooms = 2;
@@ -830,7 +831,7 @@ void physics()
         newPos[0] = g.ship.pos[0] + (1.0f * xmove * gameSpeed);
         newPos[1] = g.ship.pos[1] + (1.0f * ymove * gameSpeed);
     }
-    if (!(g.room.checkWall(newPos))) { 
+    if (!(checkWall(newPos, g.room))) { 
         g.ship.pos[0] = newPos[0];
         g.ship.pos[1] = newPos[1];
         
