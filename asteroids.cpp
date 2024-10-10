@@ -25,8 +25,9 @@
 						(c)[2]=(a)[2]-(b)[2];
 
 extern Room startRooms(int);
-extern Room swapRoom(int, Room);
+extern Room swapRoom(int, Room); // float*);
 extern int checkWall(float*, Room);
+extern void renderDoor(Door);
 
 int roomID = 0;
 int maxRooms = 2;
@@ -583,7 +584,7 @@ int check_keys(XEvent *e)
 		case XK_Escape:
 			return 1;
 		case XK_f:
-			
+			//g.room = checkDoor(roomID, g.room, g.ship.pos);
 			roomID = !roomID;
 			g.room = swapRoom(roomID, g.room);
 
@@ -907,6 +908,10 @@ void render()
         glEnd();
         glPopMatrix();
     }
+
+	for (int i=0; i != (int)g.room.doors.size(); i++) {
+		renderDoor(g.room.doors[i]);
+	}
     
 	//-------------------------------------------------------------------------
 	//Draw the ship

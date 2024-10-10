@@ -65,19 +65,21 @@ public:
 class Door {
 public:
     //int id;
-    float doorPos[2];
-    float size[2];
+    float xPos;
+    float yPos;
+    float xLen;
+    float yLen;
     int toRoom;
     float color[3];
 public:
     Door (float x, float y, float x_l, float y_l, int rID) {
-        doorPos[0] = x;
-        doorPos[1] = y;
-        size[0] = x_l;
-        size[1] = y_l;
+        xPos = x;
+        yPos = y;
+        xLen = x_l;
+        yLen = y_l;
         toRoom = rID;
-        color[0] = 0.1f;
-        color[1] = color[2] = 0.0f;
+        color[0] = 0.647059f;
+        color[1] = color[2] = 0.164706f;
     }
 
 };
