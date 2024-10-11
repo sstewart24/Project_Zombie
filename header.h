@@ -121,7 +121,9 @@ public:
 
 class Zombie { //Zombie Class
     public: //Access specifier
-		int xPos, yPos;
+		int id; // Identification of the zombie
+        int room; // Which room it is in
+        int xPos, yPos;
 		Vec pos;
 	    Vec dir;
 	    float angle;
