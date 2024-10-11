@@ -5,40 +5,37 @@ Make zombies that roam around the room in a random way,
 look at asteroids and how it randomly moves around the room
 */
 
-class Zombie {
-    public:
-        float xPos, yPos;
-	    float dir;
+/*
+class Zombie { //Zombie Class
+    public: //Access specifier
+		int xPos, yPos;
+		Vec pos;
+	    Vec dir;
 	    float angle;
 	    float color[3];
 
     public:
-        Zombie(float x, float y, float d, float a) {
-			xPos = x;
-			yPos = y;
-			dir = d;
-			angle = a;
-		    color[0] = 0.0;
-			color[1] = 1.0;
-			color[2] = 0.0;
+        Zombie() { //Zombie Constructor 
+			xPos = 640;
+			yPos = 480;
+			pos[0] = (Flt)(xPos/2);
+			pos[1] = (Flt)(yPos/2);
+			pos[2] = 0.0f;
+			VecZero(dir);
+			angle = 0.0;
+			
+			//xPos = x;
+			//yPos = y;
+			//dir = d;
+			//angle = a;
+			
+		    color[0] = 0.0f;
+			color[1] = 1.0f;
+			color[2] = 0.0f;
         }
+
+		~Zombie() {}
 };
-
-/*
-//Goal: Zombie moves in a random direction on the screen
-float xmove, ymove = rnd();
-
-//Check for collision with window edges for zombies
-if (g.zombie.xPos < 0.0) {
-	g.zombie.xPos += (float)gl.xres;
-}
-else if (g.zombie.xPos > (float)gl.xres) {
-	g.zombie.Xpos -= (float)gl.xres;
-}
-else if (g.zombie.yPos < 0.0) {
-	g.zombie.yPos += (float)gl.yres;
-}
-else if (g.zombie.yPos > (float)gl.yres) {
-	g.zombie.yPos -= (float)gl.yres;
-}
 */
+
+//extern Zombie zombie;
