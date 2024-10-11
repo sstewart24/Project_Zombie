@@ -166,6 +166,7 @@ class Game {
 public:
 	Ship ship;
 	Room room;
+	Zombie zombie;
 	
 	//int maxRooms = 2;
 	/*
@@ -967,7 +968,28 @@ void render()
 		}
 		glEnd();
 	}
-    */
+   	 */
+
+	//-------------------------------------------------------------------------
+	//Draw Zombie
+	glPushMatrix();
+	glTranslatef(g.zombie.pos[0], g.zombie.pos[1], g.zombie.pos[2]);
+	//float angle = atan2(ship.dir[1], ship.dir[0]);
+	glRotatef(g.zombie.angle, 0.0f, 0.0f, 1.0f);
+	float size = 9.0f;
+	glBegin(GL_QUADS);
+		glColor3f(0.0f, 1.0f, 0.0f);
+		glVertex3f(size, size, 0.0f); //top right
+		glVertex3f(size, -size, 0.0f); //bottom right
+		glVertex3f(-size, -size, 0.0f); //bottom left
+		glVertex3f(-size, size, 0.0f); //top left
+	glEnd();
+
+	glBegin(GL_POINTS);
+	glVertex2f(0.0f, 0.0f);
+	glEnd();
+	glPopMatrix();
+	
 	//-------------------------------------------------------------------------
 	//Draw the asteroids
 	{
