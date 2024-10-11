@@ -14,6 +14,17 @@
 #include "fonts.h"
 #include <vector>
 
+//macros
+#define rnd() (((Flt)rand())/(Flt)RAND_MAX)
+#define random(a) (rand()%a)
+#define VecZero(v) (v)[0]=0.0,(v)[1]=0.0,(v)[2]=0.0
+#define MakeVector(x, y, z, v) (v)[0]=(x),(v)[1]=(y),(v)[2]=(z)
+#define VecCopy(a,b) (b)[0]=(a)[0];(b)[1]=(a)[1];(b)[2]=(a)[2]
+#define VecDot(a,b)	((a)[0]*(b)[0]+(a)[1]*(b)[1]+(a)[2]*(b)[2])
+#define VecSub(a,b,c) (c)[0]=(a)[0]-(b)[0]; \
+						(c)[1]=(a)[1]-(b)[1]; \
+						(c)[2]=(a)[2]-(b)[2];
+
 //-----------------------------------------------------------------------------
 //Setup timers
 const double physicsRate = 1.0 / 60.0;
@@ -63,10 +74,38 @@ class Wall {
 
 };
 
+class Door {
+public:
+    int id;
+    float xPos;
+    float yPos;
+    float xLen;
+    float yLen;
+    // Define which roomID that the door will go to
+    int toRoom;
+    // If there are multiple doors in that room, 
+    // it will put the player next to the right door it went through
+    int toDoor;
+    float color[3];
+public:
+    Door (int idD, float x, float y, float x_l, float y_l, int rID) {
+        id = idD;
+        xPos = x;
+        yPos = y;
+        xLen = x_l;
+        yLen = y_l;
+        toRoom = rID;
+        color[0] = 0.647059f;
+        color[1] = color[2] = 0.164706f;
+    }
+
+};
+
 class Room {
     public:
 		int id;
         std::vector<Wall> walls;
+        std::vector<Door> doors;
 
     public:
         Room() {
@@ -87,20 +126,40 @@ class Room {
 
 		}
 
-        int checkWall(float newPos[2]) {
-            int blocked = 0;
-            int i = 0;
-            while (!blocked && i < (int)walls.size()) {
-                if (newPos[0] > walls[i].xPos && newPos[0] < walls[i].xPos + walls[i].xLen && newPos[1] > walls[i].yPos && newPos[1] < walls[i].yPos + walls[i].yLen) {
-                    blocked = 1;
-                }
-                i++;
-            }
+        ~Room() {}
+};
 
-            return blocked;
+class Zombie { //Zombie Class
+    public: //Access specifier
+		int id; // Identification of the zombie
+        int room; // Which room it is in
+        int xPos, yPos;
+		Vec pos;
+	    Vec dir;
+	    float angle;
+	    float color[3];
+
+    public:
+        Zombie() { //Zombie Constructor 
+			xPos = 640;
+			yPos = 480;
+			pos[0] = (Flt)(xPos/2);
+			pos[1] = (Flt)(yPos/2);
+			pos[2] = 0.0f;
+			VecZero(dir);
+			angle = 0.0;
+			
+			//xPos = x;
+			//yPos = y;
+			//dir = d;
+			//angle = a;
+			
+		    color[0] = 0.0f;
+			color[1] = 1.0f;
+			color[2] = 0.0f;
         }
 
-        ~Room() {}
+		~Zombie() {}
 };
 
 class Health {
