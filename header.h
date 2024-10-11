@@ -14,6 +14,17 @@
 #include "fonts.h"
 #include <vector>
 
+//macros
+#define rnd() (((Flt)rand())/(Flt)RAND_MAX)
+#define random(a) (rand()%a)
+#define VecZero(v) (v)[0]=0.0,(v)[1]=0.0,(v)[2]=0.0
+#define MakeVector(x, y, z, v) (v)[0]=(x),(v)[1]=(y),(v)[2]=(z)
+#define VecCopy(a,b) (b)[0]=(a)[0];(b)[1]=(a)[1];(b)[2]=(a)[2]
+#define VecDot(a,b)	((a)[0]*(b)[0]+(a)[1]*(b)[1]+(a)[2]*(b)[2])
+#define VecSub(a,b,c) (c)[0]=(a)[0]-(b)[0]; \
+						(c)[1]=(a)[1]-(b)[1]; \
+						(c)[2]=(a)[2]-(b)[2];
+
 //-----------------------------------------------------------------------------
 //Setup timers
 const double physicsRate = 1.0 / 60.0;
@@ -106,4 +117,35 @@ public:
     }
 
     ~Room() {}
+};
+
+class Zombie { //Zombie Class
+    public: //Access specifier
+		int xPos, yPos;
+		Vec pos;
+	    Vec dir;
+	    float angle;
+	    float color[3];
+
+    public:
+        Zombie() { //Zombie Constructor 
+			xPos = 640;
+			yPos = 480;
+			pos[0] = (Flt)(xPos/2);
+			pos[1] = (Flt)(yPos/2);
+			pos[2] = 0.0f;
+			VecZero(dir);
+			angle = 0.0;
+			
+			//xPos = x;
+			//yPos = y;
+			//dir = d;
+			//angle = a;
+			
+		    color[0] = 0.0f;
+			color[1] = 1.0f;
+			color[2] = 0.0f;
+        }
+
+		~Zombie() {}
 };
