@@ -18,7 +18,7 @@ Room rooms[] = {
              Wall(590.0f, 0.0f, 50.0f, 480.0f),
              Wall(0.0f, 430.0f, 640.0f, 50.0f),
              Wall(400.0f, 150.0f, 75.0f, 100.0f)},
-             {Door(50.0f, 150.0f, 50.0f, 50.0f, 0)})
+             {Door(0.0f, 150.0f, 50.0f, 50.0f, 0)})
 };
 
 // Initializes first room to make
@@ -40,21 +40,36 @@ Room swapRoom(int roomID, Room current) {
     next = rooms[roomID];
     return next;
 }
-/*
-Room checkDoor(int id, Room current, float playerPos[2])
-{
-    float xDiff , yDiff;
-    for (int i=0; i!=(int)current.doors.size(); i++) {
-        xDiff = abs(playerPos[0]- current.doors[i].xPos);
-        yDiff = abs(playerPos[1]- current.doors[i].yPos);
 
-        if (xDiff < 25 && yDiff < 25) {
-            int nextRoomID = swapRoom(current.doors[i].toRoom, current);
-            return rooms[nextRoomID];
+int checkDoor(Room current, float playerPos[2])
+{
+    int i = 0, s = 0;
+    float xDiff = 50.0, yDiff = 50.0, xxDiff = 50.0, yyDiff = 50.0;
+    int size = (int)current.doors.size();
+    int nextID = -1;
+    float pl[2];
+    pl[0] = playerPos[0];
+    pl[1] = playerPos[1];
+    
+    while (i < size && !s) {
+        xDiff = abs(pl[0]- current.doors[i].xPos);
+        xxDiff = abs(current.doors[i].xPos + 50.0f - pl[0]);
+        yDiff = abs(pl[1]- current.doors[i].yPos);
+        yyDiff = abs(current.doors[i].yPos + 50.0f - pl[1] );
+
+        if ((xDiff < 25 && pl[1] > current.doors[i].yPos && pl[1] < current.doors[i].yPos + 50.0f) ||
+            (xxDiff < 25 && pl[1] > current.doors[i].yPos && pl[1] < current.doors[i].yPos + 50.0f) || 
+            (yDiff < 25 && pl[0] > current.doors[i].xPos && pl[0] < current.doors[i].xPos + 50.0f) || 
+            (yyDiff < 25 && pl[0] > current.doors[i].xPos && pl[0] < current.doors[i].xPos + 50.0f)) {
+            roomSave(current);
+            nextID = current.doors[i].toRoom;
+            s = 1;
         }
+        i++;
     }
+
+    return nextID;
 }
-*/
 
 // Will check if the player is colliding with a wall to block any movement
 int checkWall(float newPos[2], Room room) {
@@ -82,6 +97,22 @@ void renderDoor(Door door) {
         glVertex2f(door.xPos, door.yPos);
         glVertex2f(door.xPos, door.yPos + door.yLen);
         glVertex2f(door.xPos + door.xLen, door.yPos + door.yLen);
+        glEnd();
+        glPopMatrix();
+}
+
+void renderWall(Wall wall) {
+    glPushMatrix();
+        glColor3fv(wall.color);
+        glBegin(GL_TRIANGLES);
+
+        glVertex2f(wall.xPos, wall.yPos);
+        glVertex2f(wall.xPos + wall.xLen, wall.yPos);
+        glVertex2f(wall.xPos + wall.xLen, wall.yPos + wall.yLen);
+        glVertex2f(wall.xPos, wall.yPos);
+        glVertex2f(wall.xPos, wall.yPos + wall.yLen);
+        glVertex2f(wall.xPos + wall.xLen, wall.yPos + wall.yLen);
+        
         glEnd();
         glPopMatrix();
 }

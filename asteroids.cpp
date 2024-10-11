@@ -14,9 +14,11 @@
 
 
 extern Room startRooms(int);
-extern Room swapRoom(int, Room); // float*);
+extern Room swapRoom(int, Room);
+extern int checkDoor(Room, float*);
 extern int checkWall(float*, Room);
 extern void renderDoor(Door);
+extern void renderWall(Wall);
 
 int roomID = 0;
 int maxRooms = 2;
@@ -60,66 +62,7 @@ public:
         pFlip = 0;
 	}
 };
-/*
-class Wall {
-    public:
-        float xPos;
-        float yPos;
-        float xLen;
-        float yLen;
-		float color[3];
-    
-    public:
-        Wall(float x, float y, float x_l, float y_l) {
-            xPos = x;
-            yPos = y;
-            xLen = x_l;
-            yLen = y_l;
-		    color[0] = 0.0;
-            color[1] = 1.0;
-            color[2] = 1.0;
-        }
 
-};
-
-class Room {
-    public:
-		int id;
-        std::vector<Wall> walls;
-        int walls_count; // Counter for how many walls are in the room
-
-    public:
-        Room() {
-            walls.push_back( Wall(50.0f, 100.0f, 50.0f, 50.0f));
-            walls.push_back( Wall(75.0f, 200.0f, 100.0f, 50.0f));
-            walls.push_back( Wall(200.0f, 200.0f, 30.0f, 50.0f));
-            walls.push_back( Wall(400.0f, 50.0f, 200.0f, 100.0f));
-        
-        }
-
-		Room(std::vector<Wall> w, int i) {
-			id = i;
-			//while (i < size)
-			//{
-			walls = w;
-			//}
-
-		}
-
-        int checkWall(float newPos[2]) {
-            int blocked = 0;
-            int i = 0;
-            while (!blocked && i < (int)walls.size()) {
-                if (newPos[0] > walls[i].xPos && newPos[0] < walls[i].xPos + walls[i].xLen && newPos[1] > walls[i].yPos && newPos[1] < walls[i].yPos + walls[i].yLen) {
-                    blocked = 1;
-                }
-                i++;
-            }
-
-            return blocked;
-        }
-};
-*/
 
 class Bullet {
 public:
@@ -157,20 +100,6 @@ public:
 	Room room;
 	Zombie zombie;
 	
-	//int maxRooms = 2;
-	/*
-	Wall set[2][4] = {{Wall(50.0f, 100.0f, 50.0f, 50.0f), 
-							  Wall(75.0f, 200.0f, 100.0f, 50.0f),
-							  Wall(200.0f, 200.0f, 30.0f, 50.0f),
-							  Wall(400.0f, 50.0f, 200.0f, 100.0f)},
-							  {Wall(50.0f, 100.0f, 50.0f, 50.0f), 
-							  Wall(75.0f, 200.0f, 100.0f, 50.0f),
-							  Wall(200.0f, 200.0f, 30.0f, 50.0f),
-							  Wall(400.0f, 50.0f, 200.0f, 100.0f)}};
-    
-	std::vector<Room> rooms;
-	*/
-
 	Asteroid *ahead;
 	Bullet *barr;
 	int nasteroids;
@@ -180,10 +109,6 @@ public:
 	bool mouseThrustOn;
 public:
 	Game() {
-		//room = swapRoom(0); //will create the starting room
-		//Room r = Room(startRooms(roomID).id, startRooms(roomID).walls);
-		//room = r; //Room(startRooms(roomID).id, startRooms(roomID).walls);
-
 		ahead = NULL;
 		barr = new Bullet[MAX_BULLETS];
 		nasteroids = 0;
@@ -570,13 +495,19 @@ int check_keys(XEvent *e)
 		}
 	}
 	(void)shift;
+	int swap;
 	switch (key) {
 		case XK_Escape:
 			return 1;
 		case XK_f:
-			//g.room = checkDoor(roomID, g.room, g.ship.pos);
-			roomID = !roomID;
-			g.room = swapRoom(roomID, g.room);
+			swap = checkDoor(g.room, g.ship.pos);
+			// we have a blank room to make sure we swap to an actual room instead of a room
+			// with nothing
+			if (swap > -1) {
+				g.room = swapRoom(g.room.doors[swap].toRoom, g.room);
+			}
+			// bring it back to -1
+			swap = -1;
 
 			break;
 		case XK_g:
@@ -883,20 +814,7 @@ void render()
 	ggprint8b(&r, 16, 0x00ffff00, "n asteroids: %i", g.nasteroids);
 
     for (int i = 0; i != (int)g.room.walls.size(); i++) {
-        glPushMatrix();
-        glColor3fv(g.room.walls[i].color);
-        glBegin(GL_TRIANGLES);
-
-        glVertex2f(g.room.walls[i].xPos, g.room.walls[i].yPos);
-        glVertex2f(g.room.walls[i].xPos + g.room.walls[i].xLen, g.room.walls[i].yPos);
-        glVertex2f(g.room.walls[i].xPos + g.room.walls[i].xLen, 
-                    g.room.walls[i].yPos + g.room.walls[i].yLen);
-        glVertex2f(g.room.walls[i].xPos, g.room.walls[i].yPos);
-        glVertex2f(g.room.walls[i].xPos, g.room.walls[i].yPos + g.room.walls[i].yLen);
-        glVertex2f(g.room.walls[i].xPos + g.room.walls[i].xLen, 
-                    g.room.walls[i].yPos + g.room.walls[i].yLen);
-        glEnd();
-        glPopMatrix();
+        renderWall(g.room.walls[i]);
     }
 
 	for (int i=0; i != (int)g.room.doors.size(); i++) {
