@@ -4,7 +4,7 @@
 //date:    2014 - 2021
 //mod spring 2015: added constructors
 //This program is a game starting point for a 3350 project.
-//
+//ur mum
 //
 
 
@@ -13,12 +13,20 @@
 //using namespace std;
 
 
+//macros
+#define rnd() (((Flt)rand())/(Flt)RAND_MAX)
+#define random(a) (rand()%a)
+#define VecZero(v) (v)[0]=0.0,(v)[1]=0.0,(v)[2]=0.0
+#define MakeVector(x, y, z, v) (v)[0]=(x),(v)[1]=(y),(v)[2]=(z)
+#define VecCopy(a,b) (b)[0]=(a)[0];(b)[1]=(a)[1];(b)[2]=(a)[2]
+#define VecDot(a,b)	((a)[0]*(b)[0]+(a)[1]*(b)[1]+(a)[2]*(b)[2])
+#define VecSub(a,b,c) (c)[0]=(a)[0]-(b)[0]; \
+						(c)[1]=(a)[1]-(b)[1]; \
+						(c)[2]=(a)[2]-(b)[2];
+
 extern Room startRooms(int);
 extern Room swapRoom(int, Room);
-extern int checkDoor(Room, float*);
-extern int checkWall(float*, Room);
-extern void renderDoor(Door);
-extern void renderWall(Wall);
+extern Health healthInit(int, int);
 
 int roomID = 0;
 int maxRooms = 2;
@@ -40,6 +48,7 @@ public:
 	Vec dir;
 	Vec vel;
 	Vec acc;
+    double health;
 	float angle;
 	float color[3];
     float colorAlt[3];
@@ -62,7 +71,66 @@ public:
         pFlip = 0;
 	}
 };
+/*
+class Wall {
+    public:
+        float xPos;
+        float yPos;
+        float xLen;
+        float yLen;
+		float color[3];
+    
+    public:
+        Wall(float x, float y, float x_l, float y_l) {
+            xPos = x;
+            yPos = y;
+            xLen = x_l;
+            yLen = y_l;
+		    color[0] = 0.0;
+            color[1] = 1.0;
+            color[2] = 1.0;
+        }
 
+};
+
+class Room {
+    public:
+		int id;
+        std::vector<Wall> walls;
+        int walls_count; // Counter for how many walls are in the room
+
+    public:
+        Room() {
+            walls.push_back( Wall(50.0f, 100.0f, 50.0f, 50.0f));
+            walls.push_back( Wall(75.0f, 200.0f, 100.0f, 50.0f));
+            walls.push_back( Wall(200.0f, 200.0f, 30.0f, 50.0f));
+            walls.push_back( Wall(400.0f, 50.0f, 200.0f, 100.0f));
+        
+        }
+
+		Room(std::vector<Wall> w, int i) {
+			id = i;
+			//while (i < size)
+			//{
+			walls = w;
+			//}
+
+		}
+
+        int checkWall(float newPos[2]) {
+            int blocked = 0;
+            int i = 0;
+            while (!blocked && i < (int)walls.size()) {
+                if (newPos[0] > walls[i].xPos && newPos[0] < walls[i].xPos + walls[i].xLen && newPos[1] > walls[i].yPos && newPos[1] < walls[i].yPos + walls[i].yLen) {
+                    blocked = 1;
+                }
+                i++;
+            }
+
+            return blocked;
+        }
+};
+*/
 
 class Bullet {
 public:
@@ -98,8 +166,21 @@ class Game {
 public:
 	Ship ship;
 	Room room;
-	Zombie zombie;
 	
+	//int maxRooms = 2;
+	/*
+	Wall set[2][4] = {{Wall(50.0f, 100.0f, 50.0f, 50.0f), 
+							  Wall(75.0f, 200.0f, 100.0f, 50.0f),
+							  Wall(200.0f, 200.0f, 30.0f, 50.0f),
+							  Wall(400.0f, 50.0f, 200.0f, 100.0f)},
+							  {Wall(50.0f, 100.0f, 50.0f, 50.0f), 
+							  Wall(75.0f, 200.0f, 100.0f, 50.0f),
+							  Wall(200.0f, 200.0f, 30.0f, 50.0f),
+							  Wall(400.0f, 50.0f, 200.0f, 100.0f)}};
+    
+	std::vector<Room> rooms;
+	*/
+
 	Asteroid *ahead;
 	Bullet *barr;
 	int nasteroids;
@@ -109,6 +190,10 @@ public:
 	bool mouseThrustOn;
 public:
 	Game() {
+		//room = swapRoom(0); //will create the starting room
+		//Room r = Room(startRooms(roomID).id, startRooms(roomID).walls);
+		//room = r; //Room(startRooms(roomID).id, startRooms(roomID).walls);
+
 		ahead = NULL;
 		barr = new Bullet[MAX_BULLETS];
 		nasteroids = 0;
@@ -220,7 +305,7 @@ public:
 	void set_title() {
 		//Set the window title bar.
 		XMapWindow(dpy, win);
-		XStoreName(dpy, win, "Project_Zombie");
+		XStoreName(dpy, win, "Asteroids template");
 	}
 	void check_resize(XEvent *e) {
 		//The ConfigureNotify is sent by the
@@ -289,6 +374,7 @@ public:
 //function prototypes
 void init_opengl(void);
 void roomInit(int);
+//void healthInit(int, int);
 void check_mouse(XEvent *e);
 int check_keys(XEvent *e);
 void physics();
@@ -299,6 +385,7 @@ void render();
 //==========================================================================
 int main()
 {
+    healthInit(gl.xres, gl.yres);
 	roomInit(roomID);
 
 	logOpen();
@@ -495,19 +582,13 @@ int check_keys(XEvent *e)
 		}
 	}
 	(void)shift;
-	int swap;
 	switch (key) {
 		case XK_Escape:
 			return 1;
 		case XK_f:
-			swap = checkDoor(g.room, g.ship.pos);
-			// we have a blank room to make sure we swap to an actual room instead of a room
-			// with nothing
-			if (swap > -1) {
-				g.room = swapRoom(g.room.doors[swap].toRoom, g.room);
-			}
-			// bring it back to -1
-			swap = -1;
+			
+			roomID = !roomID;
+			g.room = swapRoom(roomID, g.room);
 
 			break;
 		case XK_g:
@@ -753,7 +834,7 @@ void physics()
         newPos[0] = g.ship.pos[0] + (1.0f * xmove * gameSpeed);
         newPos[1] = g.ship.pos[1] + (1.0f * ymove * gameSpeed);
     }
-    if (!(checkWall(newPos, g.room))) { 
+    if (!(g.room.checkWall(newPos))) { 
         g.ship.pos[0] = newPos[0];
         g.ship.pos[1] = newPos[1];
         
@@ -814,12 +895,21 @@ void render()
 	ggprint8b(&r, 16, 0x00ffff00, "n asteroids: %i", g.nasteroids);
 
     for (int i = 0; i != (int)g.room.walls.size(); i++) {
-        renderWall(g.room.walls[i]);
-    }
+        glPushMatrix();
+        glColor3fv(g.room.walls[i].color);
+        glBegin(GL_TRIANGLES);
 
-	for (int i=0; i != (int)g.room.doors.size(); i++) {
-		renderDoor(g.room.doors[i]);
-	}
+        glVertex2f(g.room.walls[i].xPos, g.room.walls[i].yPos);
+        glVertex2f(g.room.walls[i].xPos + g.room.walls[i].xLen, g.room.walls[i].yPos);
+        glVertex2f(g.room.walls[i].xPos + g.room.walls[i].xLen, 
+                    g.room.walls[i].yPos + g.room.walls[i].yLen);
+        glVertex2f(g.room.walls[i].xPos, g.room.walls[i].yPos);
+        glVertex2f(g.room.walls[i].xPos, g.room.walls[i].yPos + g.room.walls[i].yLen);
+        glVertex2f(g.room.walls[i].xPos + g.room.walls[i].xLen, 
+                    g.room.walls[i].yPos + g.room.walls[i].yLen);
+        glEnd();
+        glPopMatrix();
+    }
     
 	//-------------------------------------------------------------------------
 	//Draw the ship
@@ -875,28 +965,7 @@ void render()
 		}
 		glEnd();
 	}
-   	 */
-
-	//-------------------------------------------------------------------------
-	//Draw Zombie
-	glPushMatrix();
-	glTranslatef(g.zombie.pos[0], g.zombie.pos[1], g.zombie.pos[2]);
-	//float angle = atan2(ship.dir[1], ship.dir[0]);
-	glRotatef(g.zombie.angle, 0.0f, 0.0f, 1.0f);
-	float size = 9.0f;
-	glBegin(GL_QUADS);
-		glColor3f(0.0f, 1.0f, 0.0f);
-		glVertex3f(size, size, 0.0f); //top right
-		glVertex3f(size, -size, 0.0f); //bottom right
-		glVertex3f(-size, -size, 0.0f); //bottom left
-		glVertex3f(-size, size, 0.0f); //top left
-	glEnd();
-
-	glBegin(GL_POINTS);
-	glVertex2f(0.0f, 0.0f);
-	glEnd();
-	glPopMatrix();
-	
+    */
 	//-------------------------------------------------------------------------
 	//Draw the asteroids
 	{
