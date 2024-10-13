@@ -28,9 +28,10 @@ double get_health() // <-- Will need save state passed in
      */
 
     player_health = 200;
+    return player_health;
 }
 
 void healthInit(int x, int y)
 {
-     return 0;
+    //return 0;
 }

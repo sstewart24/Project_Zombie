@@ -117,11 +117,12 @@ class Room {
             
         }
 
-		Room(int i, std::vector<Wall> w) {
+		Room(int i, std::vector<Wall> w, std::vector<Door> d) {
 			id = i;
 			//while (i < size)
 			//{
 			walls = w;
+            doors = d;
 			//}
 
 		}
