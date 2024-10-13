@@ -164,7 +164,7 @@ class Zombie { //Zombie Class
 
 class Health {
     public: 
-    const int max = 200
+    const int max = 200;
     const int min = 0;
     const int z_unaware = 15;
     const int z_alert = 35;
