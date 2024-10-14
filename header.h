@@ -101,11 +101,50 @@ public:
 
 };
 
+class Zombie { //Zombie Class
+    public: //Access specifier
+		int id; // Identification of the zombie
+        int room; // Which room it is in
+        int xPos, yPos;
+		Vec pos;
+	    Vec dir;
+	    float angle;
+	    float color[3];
+        //static int numZombies; //num of Zombies
+        //std::vector<Zombie> zombies;
+
+
+    public:
+        Zombie() { //Zombie Constructor 
+			xPos = 640;
+			yPos = 480;
+			pos[0] = (Flt)(xPos/2);
+			pos[1] = (Flt)(yPos/2);
+			pos[2] = 0.0f;
+			VecZero(dir);
+			angle = 0.0;
+
+           
+			
+			//xPos = x;
+			//yPos = y;
+			//dir = d;
+			//angle = a;
+			
+		    color[0] = 0.0f;
+			color[1] = 1.0f;
+			color[2] = 0.0f;
+        }
+
+		~Zombie() {}
+};
+
 class Room {
     public:
 		int id;
         std::vector<Wall> walls;
         std::vector<Door> doors;
+        //std::vector<Zombie> zombies;
 
     public:
         Room() {
@@ -130,39 +169,6 @@ class Room {
         ~Room() {}
 };
 
-class Zombie { //Zombie Class
-    public: //Access specifier
-		int id; // Identification of the zombie
-        int room; // Which room it is in
-        int xPos, yPos;
-		Vec pos;
-	    Vec dir;
-	    float angle;
-	    float color[3];
-
-    public:
-        Zombie() { //Zombie Constructor 
-			xPos = 640;
-			yPos = 480;
-			pos[0] = (Flt)(xPos/2);
-			pos[1] = (Flt)(yPos/2);
-			pos[2] = 0.0f;
-			VecZero(dir);
-			angle = 0.0;
-			
-			//xPos = x;
-			//yPos = y;
-			//dir = d;
-			//angle = a;
-			
-		    color[0] = 0.0f;
-			color[1] = 1.0f;
-			color[2] = 0.0f;
-        }
-
-		~Zombie() {}
-};
-
 class Health {
     public: 
     const int max = 200;
@@ -173,4 +179,3 @@ class Health {
     const int hbuff_weak = 25;
     const int hbuff_strong = 75;
 };
-
