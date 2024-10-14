@@ -19,6 +19,8 @@ extern int checkDoor(Room, float*);
 extern int checkWall(float*, Room);
 extern void renderDoor(Door);
 extern void renderWall(Wall);
+extern void renderZombie(Zombie);
+extern void init_zombies(Zombie*, int);
 extern void healthInit(int, int);
 
 int roomID = 0;
@@ -100,6 +102,10 @@ public:
 	Ship ship;
 	Room room;
 	Zombie zombie;
+
+	static const int MAX_ZOMBIES = 2; 	//
+	Zombie zombies[MAX_ZOMBIES];	  	// Needed for init_zombies to work
+	int numZombies;						//
 	
 	Asteroid *ahead;
 	Bullet *barr;
@@ -115,6 +121,10 @@ public:
 		nasteroids = 0;
 		nbullets = 0;
 		mouseThrustOn = false;
+
+		numZombies = MAX_ZOMBIES; //Needed for init_zombies to work
+
+		init_zombies(zombies, numZombies); //function for spawning Zombies
 
 		//build 10 asteroids...
 		/*
@@ -822,7 +832,17 @@ void render()
 	for (int i=0; i != (int)g.room.doors.size(); i++) {
 		renderDoor(g.room.doors[i]);
 	}
-    
+	
+	for (int i = 0; i < g.numZombies; i++) {
+		renderZombie(g.zombies[i]);
+	}
+
+	/*
+	for (int i=0; i != (int)g.room.zombies.size(); i++) {
+		renderZombie(g.room.zombies[i]);
+	} 
+    */
+
 	//-------------------------------------------------------------------------
 	//Draw the ship
 
@@ -880,6 +900,7 @@ void render()
    	 */
 
 	//-------------------------------------------------------------------------
+	/*
 	//Draw Zombie
 	glPushMatrix();
 	glTranslatef(g.zombie.pos[0], g.zombie.pos[1], g.zombie.pos[2]);
@@ -898,7 +919,7 @@ void render()
 	glVertex2f(0.0f, 0.0f);
 	glEnd();
 	glPopMatrix();
-	
+	*/
 	//-------------------------------------------------------------------------
 	//Draw the asteroids
 	{
@@ -947,6 +968,5 @@ void render()
 		glEnd();
 	}
 }
-
 
 
