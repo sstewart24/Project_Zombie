@@ -5,37 +5,39 @@ Make zombies that roam around the room in a random way,
 look at asteroids and how it randomly moves around the room
 */
 
-/*
-class Zombie { //Zombie Class
-    public: //Access specifier
-		int xPos, yPos;
-		Vec pos;
-	    Vec dir;
-	    float angle;
-	    float color[3];
+void renderZombie(Zombie zombie) //Drawing/Rendering Zombies
+{
+	glPushMatrix();
+	glTranslatef(zombie.pos[0], zombie.pos[1], zombie.pos[2]);
+	glRotatef(zombie.angle, 0.0f, 0.0f, 1.0f);
+	float size = 9.0f;
+	glBegin(GL_QUADS);
+		glColor3f(0.0f, 1.0f, 0.0f);
+		glVertex3f(size, size, 0.0f); //top right
+		glVertex3f(size, -size, 0.0f); //bottom right
+		glVertex3f(-size, -size, 0.0f); //bottom left
+		glVertex3f(-size, size, 0.0f); //top left
+	glEnd();
 
-    public:
-        Zombie() { //Zombie Constructor 
-			xPos = 640;
-			yPos = 480;
-			pos[0] = (Flt)(xPos/2);
-			pos[1] = (Flt)(yPos/2);
-			pos[2] = 0.0f;
-			VecZero(dir);
-			angle = 0.0;
-			
-			//xPos = x;
-			//yPos = y;
-			//dir = d;
-			//angle = a;
-			
-		    color[0] = 0.0f;
-			color[1] = 1.0f;
-			color[2] = 0.0f;
-        }
+	glBegin(GL_POINTS);
+	glVertex2f(0.0f, 0.0f);
+	glEnd();
+	glPopMatrix();
+}
 
-		~Zombie() {}
-};
-*/
+const int MAX_ZOMBIES = 2; //number of zombies
+Zombie zombies[MAX_ZOMBIES];
+
+void init_zombies(Zombie zombies[], int numZombies) { //function for spawning zombies
+	for (int i = 0; i < numZombies; ++i) {
+		zombies[i].pos[0] = 100.0f + (i * 50.0f);
+		zombies[i].pos[1] = 200.0f;
+		zombies[i].angle = 10.0f;
+	}
+
+}
+
+//void roam_zombies() {}
 
 //extern Zombie zombie;
+
