@@ -22,7 +22,7 @@ extern void renderWall(Wall);
 extern void renderZombie(Zombie);
 extern void init_zombies(Zombie*, int);
 extern void healthInit(int, int);
-
+extern void renderInventory(Inventory);
 int roomID = 0;
 int maxRooms = 2;
 
@@ -102,11 +102,13 @@ public:
 	Ship ship;
 	Room room;
 	Zombie zombie;
+    Inventory box;
 
 	static const int MAX_ZOMBIES = 2; 	//
 	Zombie zombies[MAX_ZOMBIES];	  	// Needed for init_zombies to work
 	int numZombies;						//
 	
+
 	Asteroid *ahead;
 	Bullet *barr;
 	int nasteroids;
@@ -125,7 +127,7 @@ public:
 		numZombies = MAX_ZOMBIES; //Needed for init_zombies to work
 
 		init_zombies(zombies, numZombies); //function for spawning Zombies
-
+        
 		//build 10 asteroids...
 		/*
         for (int j=0; j<10; j++) {
@@ -231,7 +233,7 @@ public:
 	void set_title() {
 		//Set the window title bar.
 		XMapWindow(dpy, win);
-		XStoreName(dpy, win, "Asteroids template");
+		XStoreName(dpy, win, "Project_Zombie");
 	}
 	void check_resize(XEvent *e) {
 		//The ConfigureNotify is sent by the
@@ -836,12 +838,15 @@ void render()
 	for (int i = 0; i < g.numZombies; i++) {
 		renderZombie(g.zombies[i]);
 	}
-
 	/*
 	for (int i=0; i != (int)g.room.zombies.size(); i++) {
 		renderZombie(g.room.zombies[i]);
 	} 
     */
+	//-------------------------------------------------------------------------
+	//Draw Inventory Box 
+    
+    renderInventory(g.box);
 
 	//-------------------------------------------------------------------------
 	//Draw the ship
