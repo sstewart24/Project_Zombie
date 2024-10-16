@@ -179,3 +179,17 @@ class Health {
     const int hbuff_weak = 25;
     const int hbuff_strong = 75;
 };
+
+class Inventory {
+    public:
+        float pos[2];
+        int w,h;
+        Inventory(){
+            int winx = 640;
+            int winy = 480;
+            w = 25;
+            h = 25;
+            pos[0] = winx / 24; 
+            pos[1] = winy / 18;
+        }
+};
