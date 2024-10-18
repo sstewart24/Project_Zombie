@@ -17,7 +17,8 @@ extern Room startRooms(int);
 extern Room swapRoom(int, Room);
 extern int checkDoor(Room, float*);
 extern int checkWall(float*, Room);
-extern void renderDoor(Door);
+extern float movePlayerToRoom(int);
+extern void renderDoorEvent(Door);
 extern void renderWall(Wall);
 extern void renderZombie(Zombie);
 extern void init_zombies(Zombie*, int);
@@ -519,7 +520,11 @@ int check_keys(XEvent *e)
 			// with nothing
 			if (swap > -1) {
 				g.room = swapRoom(g.room.doors[swap].toRoom, g.room);
+				for (int i=0; i<2; i++) {
+					g.ship.pos[i] = movePlayerToRoom(i);
+				}
 			}
+			// g.ship.pos = 
 			// bring it back to -1
 			swap = -1;
 
@@ -832,7 +837,7 @@ void render()
     }
 
 	for (int i=0; i != (int)g.room.doors.size(); i++) {
-		renderDoor(g.room.doors[i]);
+		renderDoorEvent(g.room.doors[i]);
 	}
 	
 	for (int i = 0; i < g.numZombies; i++) {

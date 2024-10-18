@@ -79,22 +79,22 @@ public:
     int id;
     float xPos;
     float yPos;
-    float xLen;
-    float yLen;
+    
     // Define which roomID that the door will go to
     int toRoom;
     // If there are multiple doors in that room, 
     // it will put the player next to the right door it went through
     int toDoor;
+    int facing;
     float color[3];
 public:
-    Door (int idD, float x, float y, float x_l, float y_l, int rID) {
+    Door (int idD, float x, float y, int dID, int rID, int direction) {
         id = idD;
         xPos = x;
         yPos = y;
-        xLen = x_l;
-        yLen = y_l;
+        toDoor = dID;
         toRoom = rID;
+        facing = direction;
         color[0] = 0.647059f;
         color[1] = color[2] = 0.164706f;
     }
