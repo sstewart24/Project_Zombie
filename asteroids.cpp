@@ -101,7 +101,7 @@ public:
 	Ship ship;
 	Room room;
 	Zombie zombie;
-    Inventory box;
+    Inventory ibox;
     Health hbox;
 
 	//static const int MAX_ZOMBIES = 2; 	//
@@ -849,7 +849,7 @@ void render()
 	//-------------------------------------------------------------------------
 	//Draw Inventory Box 
     
-    renderInventory(g.box);
+    renderInventory(g.ibox);
 
 	//-------------------------------------------------------------------------
 	
