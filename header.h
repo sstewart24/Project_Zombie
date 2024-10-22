@@ -101,14 +101,17 @@ public:
 
 };
 
+//number of max Zombies
+#define MAX_ZOMBIES 2 
+
 class Zombie { //Zombie Class
     public: //Access specifier
 		int id; // Identification of the zombie
         int room; // Which room it is in
         int xPos, yPos;
 		Vec pos;
-	    Vec dir;
-	    float angle;
+	    //Vec dir;
+	    //float angle;
 	    float color[3];
         //static int numZombies; //num of Zombies
         //std::vector<Zombie> zombies;
@@ -121,8 +124,8 @@ class Zombie { //Zombie Class
 			pos[0] = (Flt)(xPos/2);
 			pos[1] = (Flt)(yPos/2);
 			pos[2] = 0.0f;
-			VecZero(dir);
-			angle = 0.0;
+			//VecZero(dir);
+			//angle = 0.0;
 
            
 			
