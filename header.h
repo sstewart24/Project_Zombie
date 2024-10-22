@@ -111,7 +111,7 @@ class Zombie { //Zombie Class
         int xPos, yPos;
 		Vec pos;
 	    //Vec dir;
-	    //float angle;
+	    float angle;
 	    float color[3];
         //static int numZombies; //num of Zombies
         //std::vector<Zombie> zombies;
