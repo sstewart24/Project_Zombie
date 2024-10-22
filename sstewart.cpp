@@ -13,25 +13,32 @@
 #define HBUFF_STRONG 75
 
 //function defs
-double get_health();
-double health_modifier(double player_health);
-void healthInit(int, int);
+//double get_health();
+//double health_modifier(double player_health);
+void renderHealth(Health hbox);
 
+//double player_health = get_health();
 
-double player_health = get_health();
-
-double get_health() // <-- Will need save state passed in
+/*double get_health() // <-- Will need save state passed in
 {
-    /* Will load player's health on loading game save state,
-     * if a save state has not been created or a new game is launched
-     * player's health will start at max health
-     */
+    // Will load player's health on loading game save state,
+    // if a save state has not been created or a new game is launched
+    // player's health will start at max health
 
     player_health = 200;
     return player_health;
-}
+}*/
 
-void healthInit(int x, int y)
+void renderHealth(Health hbox)
 {
-    //return 0;
+    glPushMatrix();
+        glColor3ub(23, 252, 42);
+        glTranslatef(hbox.pos[0], hbox.pos[1], 0.0f);
+        glBegin(GL_QUADS);
+            glVertex2f(-hbox.w, -hbox.h);
+            glVertex2f(-hbox.w,  hbox.h);
+            glVertex2f( hbox.w,  hbox.h);
+            glVertex2f( hbox.w, -hbox.h);
+        glEnd();
+        glPopMatrix();
 }
