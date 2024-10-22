@@ -12,7 +12,6 @@
 
 //using namespace std;
 
-
 extern Room startRooms(int);
 extern Room swapRoom(int, Room);
 extern int checkDoor(Room, float*);
@@ -22,7 +21,7 @@ extern void renderDoorEvent(Door);
 extern void renderWall(Wall);
 extern void renderZombie(Zombie);
 extern void init_zombies(Zombie*, int);
-extern void healthInit(int, int);
+extern void renderHealth(Health);
 extern void renderInventory(Inventory);
 int roomID = 0;
 int maxRooms = 2;
@@ -97,13 +96,13 @@ public:
 	}
 };
 
-
 class Game {
 public:
 	Ship ship;
 	Room room;
 	Zombie zombie;
     Inventory box;
+    Health hbox;
 
 	//static const int MAX_ZOMBIES = 2; 	//
 	Zombie zombies[MAX_ZOMBIES];	  	// Needed for init_zombies to work
@@ -313,7 +312,6 @@ void render();
 //==========================================================================
 int main()
 {
-	healthInit(gl.xres, gl.yres);
 	roomInit(roomID);
 
 	logOpen();
@@ -854,7 +852,11 @@ void render()
     renderInventory(g.box);
 
 	//-------------------------------------------------------------------------
-	//Draw the ship
+	
+    //Draw Health Box
+    renderHealth(g.hbox);
+    
+    //Draw the ship
 
     // Placeholder to test character sprite variations
     // if going up/down probably have character actually looking in that
