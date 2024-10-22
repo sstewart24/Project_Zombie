@@ -5,6 +5,8 @@ Make zombies that roam around the room in a random way,
 look at asteroids and how it randomly moves around the room
 */
 
+extern Zombie zombie;
+
 void renderZombie(Zombie zombie) //Drawing/Rendering Zombies
 {
 	glPushMatrix();
@@ -25,14 +27,15 @@ void renderZombie(Zombie zombie) //Drawing/Rendering Zombies
 	glPopMatrix();
 }
 
-const int MAX_ZOMBIES = 2; //number of zombies
+//const int MAX_ZOMBIES = 2; //number of zombies
 Zombie zombies[MAX_ZOMBIES];
 
 void init_zombies(Zombie zombies[], int numZombies) { //function for spawning zombies
 	for (int i = 0; i < numZombies; ++i) {
 		zombies[i].pos[0] = 100.0f + (i * 50.0f);
 		zombies[i].pos[1] = 200.0f;
-		zombies[i].angle = 10.0f;
+		//zombies[i].angle = 10.0f;
+		zombies[i].id = i;
 	}
 
 }
