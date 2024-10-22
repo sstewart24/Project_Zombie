@@ -105,7 +105,7 @@ public:
 	Zombie zombie;
     Inventory box;
 
-	static const int MAX_ZOMBIES = 2; 	//
+	//static const int MAX_ZOMBIES = 2; 	//
 	Zombie zombies[MAX_ZOMBIES];	  	// Needed for init_zombies to work
 	int numZombies;						//
 	
