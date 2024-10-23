@@ -176,12 +176,28 @@ class Room {
 class Health {
     public: 
         float pos[2];
-        float w, h;
+        float basepos[2];
+        float backpos[2];
+        float basew, baseh, backw, backh, w, h;
         Health() {
             float winx = 680.0f;
             float winy = 480.0f;
+            
+            basew = 20.0f;
+            baseh = 185.0f;
+
+            backw = 15.0f;
+            backh = 180.0f;
+            
             w = 15.0f;
             h = 180.0f;
+
+            basepos[0] = winx / 26;
+            basepos[1] = (winy / 3) + 80;
+
+            backpos[0] = winx / 26;
+            backpos[1] = (winy / 3) + 80;
+            
             pos[0] = winx / 26;
             pos[1] = (winy / 3) + 80;
         }
