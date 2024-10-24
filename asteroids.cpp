@@ -12,6 +12,7 @@
 
 //using namespace std;
 
+
 extern Room startRooms(int);
 extern Room swapRoom(int, Room);
 extern int checkDoor(Room, float*);
@@ -19,12 +20,13 @@ extern int checkWall(float*, Room);
 extern float movePlayerToRoom(int);
 extern void renderDoorEvent(Door);
 extern void renderWall(Wall);
-extern void renderZombie(Zombie);
-extern void init_zombies(Zombie*, int);
+extern void renderZombie(int, Room);
+//extern void init_zombies(Zombie*, int, Room);
 extern void renderHealth(Health);
 extern void renderInventory(Inventory);
 int roomID = 0;
 int maxRooms = 2;
+int numZombies;
 
 class Global {
 public:
@@ -96,17 +98,14 @@ public:
 	}
 };
 
+
 class Game {
 public:
 	Ship ship;
 	Room room;
 	Zombie zombie;
     Inventory ibox;
-    Health hbox;
-
-	//static const int MAX_ZOMBIES = 2; 	//
-	Zombie zombies[MAX_ZOMBIES];	  	// Needed for init_zombies to work
-	int numZombies;						//
+	Health hbox;
 	
 
 	Asteroid *ahead;
@@ -123,10 +122,6 @@ public:
 		nasteroids = 0;
 		nbullets = 0;
 		mouseThrustOn = false;
-
-		numZombies = MAX_ZOMBIES; //Needed for init_zombies to work
-
-		init_zombies(zombies, numZombies); //function for spawning Zombies
         
 		//build 10 asteroids...
 		/*
@@ -522,7 +517,6 @@ int check_keys(XEvent *e)
 					g.ship.pos[i] = movePlayerToRoom(i);
 				}
 			}
-			// g.ship.pos = 
 			// bring it back to -1
 			swap = -1;
 
@@ -775,6 +769,9 @@ void physics()
         g.ship.pos[1] = newPos[1];
         
     }
+
+	//Zcollision maybe goes?
+
 	if (gl.keys[XK_space]) {
 		//a little time between each bullet
 		struct timespec bt;
@@ -838,9 +835,9 @@ void render()
 		renderDoorEvent(g.room.doors[i]);
 	}
 	
-	for (int i = 0; i < g.numZombies; i++) {
-		renderZombie(g.zombies[i]);
-	}
+	numZombies = MAX_ZOMBIES;
+	renderZombie(numZombies, g.room);
+	
 	/*
 	for (int i=0; i != (int)g.room.zombies.size(); i++) {
 		renderZombie(g.room.zombies[i]);
@@ -852,11 +849,11 @@ void render()
     renderInventory(g.ibox);
 
 	//-------------------------------------------------------------------------
-	
     //Draw Health Box
     renderHealth(g.hbox);
-    
-    //Draw the ship
+
+	//-------------------------------------------------------------------------
+	//Draw the ship
 
     // Placeholder to test character sprite variations
     // if going up/down probably have character actually looking in that
@@ -980,5 +977,3 @@ void render()
 		glEnd();
 	}
 }
-
-
