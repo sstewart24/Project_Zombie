@@ -20,13 +20,11 @@ extern int checkWall(float*, Room);
 extern float movePlayerToRoom(int);
 extern void renderDoorEvent(Door);
 extern void renderWall(Wall);
-extern void renderZombie(int, Room);
-//extern void init_zombies(Zombie*, int, Room);
+extern void renderZombie(Room);
 extern void renderHealth(Health);
 extern void renderInventory(Inventory);
 int roomID = 0;
 int maxRooms = 2;
-int numZombies;
 
 class Global {
 public:
@@ -104,7 +102,7 @@ public:
 	Ship ship;
 	Room room;
 	Zombie zombie;
-    Inventory ibox;
+    	Inventory ibox;
 	Health hbox;
 	
 
@@ -770,8 +768,6 @@ void physics()
         
     }
 
-	//Zcollision maybe goes?
-
 	if (gl.keys[XK_space]) {
 		//a little time between each bullet
 		struct timespec bt;
@@ -835,8 +831,7 @@ void render()
 		renderDoorEvent(g.room.doors[i]);
 	}
 	
-	numZombies = MAX_ZOMBIES;
-	renderZombie(numZombies, g.room);
+	renderZombie(g.room);
 	
 	/*
 	for (int i=0; i != (int)g.room.zombies.size(); i++) {
