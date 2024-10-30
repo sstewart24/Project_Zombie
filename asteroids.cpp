@@ -101,7 +101,7 @@ class Game {
 public:
 	Ship ship;
 	Room room;
-	Zombie zombie;
+	//Zombie zombie;
     	Inventory ibox;
 	Health hbox;
 	
