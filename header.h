@@ -100,56 +100,6 @@ public:
 
 };
 
-//number of max Zombies
-#define MAX_ZOMBIES 10
-
-//Zombie Class
-class Zombie { 
-    public: //Access specifier
-		int id; // Identification of the zombie
-        int room; // Which room it is in
-        int xPos, yPos;
-		Vec pos;
-	    //Vec dir;
-	    float angle;
-	    float color[3];
-        
-        //std::vector<Zombie> zombies;
-
-
-    public:
-        //Zombie Constructor 
-        
-        Zombie() { 
-        
-			//xPos = 640;
-			//yPos = 480;
-			//pos[0] = (Flt)(xPos/2);
-			//pos[1] = (Flt)(yPos/2);
-			//pos[2] = 0.0f;
-
-		    //color[0] = 0.0f;
-			//color[1] = 1.0f;
-			//color[2] = 0.0f;
-         
-        }
-        
-        //Zombie Constructor
-        Zombie(int idZ, float x, float y, int r) {
-            id = idZ;
-			pos[0] = x;
-			pos[1] = y;
-            //pos[2] = 0.0f;
-            //angle = a;
-            room = r;
-		    color[0] = 0.0f;
-			color[1] = 1.0f;
-			color[2] = 0.0f;
-        }
-
-		~Zombie() {}
-};
-
 class Room {
     public:
 		int id;
