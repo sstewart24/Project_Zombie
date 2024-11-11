@@ -7,12 +7,10 @@
 //
 //
 
-
 #include "header.h"
+Global gl;
 
 //using namespace std;
-
-
 extern Room startRooms(int);
 extern Room swapRoom(int, Room);
 extern int checkDoor(Room, float*);
@@ -26,7 +24,7 @@ extern void renderInventory(Inventory);
 int roomID = 0;
 int maxRooms = 2;
 
-class Global {
+/*class Global {
 public:
 	int xres, yres;
 	char keys[65536];
@@ -35,9 +33,9 @@ public:
 		yres = 480;
 		memset(keys, 0, 65536);
 	}
-} gl;
+} gl;*/
 
-class Ship {
+/*class Ship {
 public:
 	Vec pos;
 	Vec dir;
@@ -64,7 +62,7 @@ public:
     
         pFlip = 0;
 	}
-};
+};*/
 
 
 class Bullet {
@@ -102,9 +100,8 @@ public:
 	Ship ship;
 	Room room;
 	//Zombie zombie;
-    	Inventory ibox;
+    Inventory ibox;
 	Health hbox;
-	
 
 	Asteroid *ahead;
 	Bullet *barr;
@@ -607,9 +604,8 @@ void physics()
 	else if (g.ship.pos[1] > (float)gl.yres) {
 		g.ship.pos[1] -= (float)gl.yres;
 	}
-	//
-	//
-	//Update bullet positions
+	
+    //Update bullet positions
 	struct timespec bt;
 	clock_gettime(CLOCK_REALTIME, &bt);
 	int i = 0;
@@ -665,7 +661,8 @@ void physics()
 		a->angle += a->rotate;
 		a = a->next;
 	}
-	//
+    
+    //
 	//Asteroid collision with bullets?
 	//If collision detected:
 	//     1. delete the bullet

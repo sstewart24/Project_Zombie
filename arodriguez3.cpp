@@ -34,7 +34,7 @@
 
 
 //Zombie Class
-class Zombie { 
+/*class Zombie { 
     public: //Access specifier
 	int id; // Identification of the zombie
         int room; // Which room it is in
@@ -60,7 +60,7 @@ class Zombie {
         }
 
 	~Zombie() {}
-};
+};*/
 
 //Vector for Zombies 
 std::vector<Zombie> zombies = {
