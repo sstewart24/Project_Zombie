@@ -21,6 +21,7 @@ extern void renderWall(Wall);
 extern void renderZombie(Room);
 extern void renderHealth(Health);
 extern void renderInventory(Inventory);
+extern bool pCollision(Ship, int);
 int roomID = 0;
 int maxRooms = 2;
 
@@ -605,6 +606,8 @@ void physics()
 		g.ship.pos[1] -= (float)gl.yres;
 	}
 	
+
+
     //Update bullet positions
 	struct timespec bt;
 	clock_gettime(CLOCK_REALTIME, &bt);
@@ -764,6 +767,9 @@ void physics()
         g.ship.pos[1] = newPos[1];
         
     }
+
+    pCollision(g.ship, g.room.id);
+
 
 	if (gl.keys[XK_space]) {
 		//a little time between each bullet

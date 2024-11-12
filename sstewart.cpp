@@ -16,8 +16,8 @@ const float hBuffStrong = 75.0f;
 //double get_health();
 float updateHealth(void);
 void renderHealth(Health hbox);
-bool Pcollision(const Zombie& zombie, const Ship& ship);
-
+bool Pcollision(Ship ship, int rid);
+extern int getVectorSize();
 //double player_health = get_health();
 
 float updateHealth(void) // <-- Will need save state passed in
@@ -71,20 +71,28 @@ void renderHealth(Health hbox)
     glPopMatrix();
 }
 
-/*bool Pcollision(const Zombie& zombies, const Ship& ship) {
-    for (int i = 0; i < zombies.size(); i++) {    
-        if (zombies[i].pos[0] != ship.pos[0]) {
 
-            // Calculate the distance between the zombie and other zombies
-            float x = ship.pos[0] - zombies[i].pos[0];
-            float y = ship.pos[1] - zombies[i].pos[1];
-            float distance = std::sqrt(x * x + y * y);
+/*bool pCollision(Ship ship, int rid) {
+    extern Zombie getZombies(int); 
+    extern int getVectorSize();
+    int zombieAmount = getVectorSize();
 
-            // if the distance is smaller than the threshold, it is a collision
-            if (distance < 18.0f) { // the threshold is 18.0f because of the zombies size in render (2 * 9.0f)
-                updateHealth();    
-                printf("Collision!\n");
-                return true;
+    for (int i = 0; i < zombieAmount; i++) {
+        zom = getZombies(i);
+        if (zom.room == rid) {    
+            if (zom.pos[0] != ship.pos[0]) {
+
+                // Calculate the distance between the zombie and other zombies
+                float x = ship.pos[0] - zom.pos[0];
+                float y = ship.pos[1] - zom.pos[1];
+                float distance = std::sqrt(x * x + y * y);
+
+                // if the distance is smaller than the threshold, it is a collision
+                if (distance < 18.0f) { // the threshold is 18.0f because of the zombies size in render (2 * 9.0f)
+                    updateHealth();    
+                    printf("Collision!\n");
+                    return true;
+                }
             }
         }
     }
