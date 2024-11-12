@@ -180,17 +180,19 @@ class Zombie {
         int room; // Which room it is in
         int xPos, yPos;
         Vec pos;
+        float angle;
         float color[3];
         float moveDistance; // Distance moved so far
         float maxDistance; // Maximum distance before turning
         int direction; // 0: up, 1: right, 2: down, 3: left
     public:
         //Zombie Constructor
-        Zombie(int idZ, float x, float y, int r)
+        Zombie(int idZ, float x, float y, float a, int r)
             : moveDistance(0.0f), maxDistance(100.0f), direction(1) { //member initializer list
                 id = idZ;
                 pos[0] = x;
                 pos[1] = y;
+                angle = a;
                 room = r;
                 color[0] = 0.0f;
                 color[1] = 1.0f;
