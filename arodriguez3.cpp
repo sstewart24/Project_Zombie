@@ -32,52 +32,62 @@
 *====================================================================*/
 #include "header.h"
 
-
+extern int checkWall(float*, Room);
+extern void physics();
+/*
 //Zombie Class
-/*class Zombie { 
+class Zombie { 
     public: //Access specifier
 	int id; // Identification of the zombie
-        int room; // Which room it is in
-        int xPos, yPos;
+    int room; // Which room it is in
+    int xPos, yPos;
 	Vec pos;
+	float angle;
 	float color[3];
 
 	float moveDistance; // Distance moved so far
-    	float maxDistance; // Maximum distance before turning
+    float maxDistance; // Maximum distance before turning
 	int direction; // 0: up, 1: right, 2: down, 3: left
 
     public:
         //Zombie Constructor
         Zombie(int idZ, float x, float y, int r) 
 		: moveDistance(0.0f), maxDistance(100.0f), direction(1) { //member initializer list
-            	id = idZ;
+        id = idZ;
 		pos[0] = x;
 		pos[1] = y;
-            	room = r;
+        room = r;
 		color[0] = 0.0f;
 		color[1] = 1.0f;
 		color[2] = 0.0f;
         }
 
 	~Zombie() {}
-};*/
+};
+*/
 
 //Vector for Zombies 
 std::vector<Zombie> zombies = {
-	Zombie(0, 575.0f, 400.0f, 0),
-	Zombie(1, 75.0f, 100.0f, 0),
-	Zombie(2, 575.0f, 200.0f, 0),
-	Zombie(3, 75.0f, 50.0f, 0),
-	Zombie(0, 575.0f, 300.0f, 1),
-	Zombie(1, 375.0f, 200.0f, 1)
+	Zombie(0, 575.0f, 400.0f, 0, 0),
+	Zombie(1, 75.0f, 100.0f, 0, 0),
+	Zombie(2, 575.0f, 200.0f, 0, 0),
+	Zombie(3, 75.0f, 50.0f, 0, 0),
+	Zombie(0, 575.0f, 300.0f, 0, 1),
+	Zombie(1, 375.0f, 200.0f, 0, 1)
 };
+
+int getVectorSize() { 
+	return zombies.size(); 
+}
+
+Zombie getZombies(int index) {
+	return zombies[index];
+}
 
 // Function to get a random direction
 int getRandomDirection() {
     return rand() % 4; // Returns a random integer between 0 and 3
 }
-
-extern int checkWall(float*, Room);
 
 bool Zcollision(float newPos[2], const Zombie& zombie) {
 	for (size_t i = 0; i < zombies.size(); i++) {
@@ -99,20 +109,25 @@ bool Zcollision(float newPos[2], const Zombie& zombie) {
 void Zroam(Zombie& zombie, Room current) {
     float moveStep = 2.0f; // how much to move each update
     float newPos[2] = {zombie.pos[0], zombie.pos[1]};
+	//float distance = newPos[2]; 
 	
     // Update position based on current direction
     switch (zombie.direction) {
         case 0: // Moving up
             newPos[1] += moveStep;
+			zombie.angle = 360.0f;
             break;
         case 1: // Moving right
             newPos[0] += moveStep;
+			zombie.angle = 270.0f;
             break;
         case 2: // Moving down
             newPos[1] -= moveStep;
+			zombie.angle = 180.0f;
             break;
         case 3: // Moving left
             newPos[0] -= moveStep;
+			zombie.angle = 90.0f;
             break;
     }
 
@@ -158,7 +173,12 @@ void renderZombie(Room current)
 			glRotatef(0.0f, 0.0f, 0.0f, 1.0f);
 			float size = 9.0f; //size of zombie
 			glBegin(GL_QUADS);
-				glColor3f(0.0f, 1.0f, 0.0f); //green color
+				if (zombies[i].angle == 360.0f) {
+					glColor3f(0.0f, 0.0f, 1.0f); //green color
+
+				}else {
+					glColor3f(0.0f, 1.0f, 0.0f); //green color
+				}
 				glVertex3f(size, size, 0.0f); //top right
 				glVertex3f(size, -size, 0.0f); //bottom right
 				glVertex3f(-size, -size, 0.0f); //bottom left
