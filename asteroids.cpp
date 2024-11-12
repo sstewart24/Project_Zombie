@@ -768,7 +768,7 @@ void physics()
         
     }
 
-    pCollision(g.ship, g.room.id);
+    //pCollision(g.ship, g.room.id);
 
 
 	if (gl.keys[XK_space]) {
