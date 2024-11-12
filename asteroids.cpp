@@ -20,11 +20,11 @@ extern void renderDoorEvent(Door);
 extern void renderWall(Wall);
 extern void renderZombie(Room);
 extern void renderHealth(Health);
-extern void renderInventory(Inventory);
+extern void renderInventory(Inventory, int, int);
 extern bool pCollision(Ship, int);
 int roomID = 0;
 int maxRooms = 2;
-
+const int IBOX = 5;
 /*class Global {
 public:
 	int xres, yres;
@@ -101,7 +101,7 @@ public:
 	Ship ship;
 	Room room;
 	//Zombie zombie;
-    Inventory ibox;
+    Inventory ibox[IBOX];
 	Health hbox;
 
 	Asteroid *ahead;
@@ -843,10 +843,17 @@ void render()
     */
 	//-------------------------------------------------------------------------
 	//Draw Inventory Box 
-    
-    renderInventory(g.ibox);
-
-	//-------------------------------------------------------------------------
+     for (int i=0; i<IBOX; i++) {
+        int iboxX = g.ibox[i].pos[0];
+        if (i > 0) {
+            g.ibox[i].w = 90;
+            g.ibox[i].pos[0] = (g.ibox[i].xres - 100)
+                             + (g.ibox[i].w / 2)
+                             + (iboxX + i * 60);
+        }
+        renderInventory(g.ibox[i], i, iboxX);
+    }
+     //-------------------------------------------------------------------------
     //Draw Health Box
     renderHealth(g.hbox);
 
