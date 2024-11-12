@@ -236,9 +236,9 @@ class Inventory {
         Inventory(){
             int winx = 640;
             int winy = 480;
-            w = 25;
-            h = 25;
-            pos[0] = winx / 24; 
+            w = 60;
+            h = 20;
+            pos[0] = winx / 2; 
             pos[1] = winy / 18;
         }
 };
