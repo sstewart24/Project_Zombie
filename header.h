@@ -235,12 +235,13 @@ class Inventory {
     public:
         float pos[2];
         int w,h;
+        int xres,yres;
         Inventory(){
-            int winx = 640;
-            int winy = 480;
+            xres = 640;
+            yres = 480;
             w = 60;
             h = 20;
-            pos[0] = winx / 2; 
-            pos[1] = winy / 18;
+            pos[0] = xres / 2;
+            pos[1] = yres / 18;
         }
 };
