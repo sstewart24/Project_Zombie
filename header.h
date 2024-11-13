@@ -239,9 +239,9 @@ class Inventory {
         Inventory(){
             xres = 640;
             yres = 480;
-            w = 60;
+            w = 100;
             h = 20;
-            pos[0] = xres / 2;
+            pos[0] = 0;
             pos[1] = yres / 18;
         }
 };
