@@ -59,6 +59,7 @@ const float gameSpeed = 2.0f;
 class Global {
     public:
         int xres, yres;
+        int see_wall;
         char keys[65536];
         Global() {
             xres = 640;
@@ -76,7 +77,7 @@ class Wall {
         float yPos;
         float xLen;
         float yLen;
-        float color[3];
+        float color[4];
 
     public:
         Wall (float x, float y, float x_l, float y_l) {
@@ -87,6 +88,7 @@ class Wall {
             color[0] = 0.0;
             color[1] = 1.0;
             color[2] = 1.0;
+            color[3] = 0.25f;
         }
 
 };
@@ -102,7 +104,7 @@ class Door {
         // it will put the player next to the right door it went through
         int toDoor;
         int facing;
-        float color[3];
+        float color[4];
     public:
         Door (int idD, float x, float y, int dID, int rID, int direction) {
             id = idD;
@@ -113,6 +115,7 @@ class Door {
             facing = direction;
             color[0] = 0.647059f;
             color[1] = color[2] = 0.164706f;
+            color[3] = 0.25f;
         }
 
 };
@@ -122,6 +125,7 @@ class Room {
         int id;
         std::vector<Wall> walls;
         std::vector<Door> doors;
+        std::string imagefile;
         //std::vector<Zombie> zombies;
 
     public:
@@ -134,12 +138,13 @@ class Room {
 
         }
 
-        Room(int i, std::vector<Wall> w, std::vector<Door> d) {
+        Room(int i, std::vector<Wall> w, std::vector<Door> d, std::string f) {
             id = i;
             //while (i < size)
             //{
             walls = w;
             doors = d;
+            imagefile = f;
             //zombies = z;
             //}
 
@@ -148,7 +153,7 @@ class Room {
         ~Room() {}
 };
 
-class Ship {
+class Player {
     public:
         Vec pos;
         Vec dir;
@@ -160,7 +165,7 @@ class Ship {
         // Determining facing up or down
         int pFlip;
     public:
-        Ship() {
+        Player() {
             pos[0] = (Flt)(gl.xres/2);
             pos[1] = (Flt)(gl.yres/2);
             pos[2] = 0.0f;
@@ -244,4 +249,45 @@ class Inventory {
             pos[0] = 0;
             pos[1] = yres / 18;
         }
+};
+
+class Image {
+public:
+	int width, height;
+	unsigned char *data;
+	~Image() { delete [] data; }
+	Image(const char *fname) {
+		if (fname[0] == '\0')
+			return;
+		char name[40];
+		strcpy(name, fname);
+		int slen = strlen(name);
+		name[slen-4] = '\0';
+		char ppmname[80];
+		sprintf(ppmname,"%s.ppm", name);
+		char ts[100];
+		sprintf(ts, "convert %s %s", fname, ppmname);
+		system(ts);
+		FILE *fpi = fopen(ppmname, "r");
+		if (fpi) {
+			char line[200];
+			fgets(line, 200, fpi);
+			fgets(line, 200, fpi);
+			//skip comments and blank lines
+			while (line[0] == '#' || strlen(line) < 2)
+				fgets(line, 200, fpi);
+			sscanf(line, "%i %i", &width, &height);
+			fgets(line, 200, fpi);
+			//get pixel data
+			int n = width * height * 3;			
+			data = new unsigned char[n];			
+			for (int i=0; i<n; i++)
+				data[i] = fgetc(fpi);
+			fclose(fpi);
+		} else {
+			printf("ERROR opening image: %s\n", ppmname);
+			exit(0);
+		}
+		unlink(ppmname);
+	}
 };

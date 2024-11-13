@@ -16,7 +16,7 @@ const float hBuffStrong = 75.0f;
 //double get_health();
 float updateHealth(void);
 void renderHealth(Health hbox);
-bool Pcollision(Ship ship, int rid);
+bool Pcollision(Player player, int rid);
 extern int getVectorSize();
 //double player_health = get_health();
 
@@ -72,7 +72,7 @@ void renderHealth(Health hbox)
 }
 
 
-/*bool pCollision(Ship ship, int rid) {
+/*bool pCollision(Player player, int rid) {
     extern Zombie getZombies(int); 
     extern int getVectorSize();
     int zombieAmount = getVectorSize();
@@ -80,11 +80,11 @@ void renderHealth(Health hbox)
     for (int i = 0; i < zombieAmount; i++) {
         zom = getZombies(i);
         if (zom.room == rid) {    
-            if (zom.pos[0] != ship.pos[0]) {
+            if (zom.pos[0] != player.pos[0]) {
 
                 // Calculate the distance between the zombie and other zombies
-                float x = ship.pos[0] - zom.pos[0];
-                float y = ship.pos[1] - zom.pos[1];
+                float x = player.pos[0] - zom.pos[0];
+                float y = player.pos[1] - zom.pos[1];
                 float distance = std::sqrt(x * x + y * y);
 
                 // if the distance is smaller than the threshold, it is a collision

@@ -21,9 +21,12 @@ extern void renderWall(Wall);
 extern void renderZombie(Room);
 extern void renderHealth(Health);
 extern void renderInventory(Inventory, int, int, int);
-extern bool pCollision(Ship, int);
+extern bool pCollision(Player, int);
+extern void backGl();
+extern void roomRender(int, int, int);
 int roomID = 0;
 int maxRooms = 2;
+int see_wall;
 const int IBOX = 4;
 /*class Global {
 public:
@@ -36,7 +39,7 @@ public:
 	}
 } gl;*/
 
-/*class Ship {
+/*class Player {
 public:
 	Vec pos;
 	Vec dir;
@@ -50,7 +53,7 @@ public:
     int pFlip;
 
 public:
-	Ship() {
+	Player() {
 		pos[0] = (Flt)(gl.xres/2);
 		pos[1] = (Flt)(gl.yres/2);
 		pos[2] = 0.0f;
@@ -98,7 +101,7 @@ public:
 
 class Game {
 public:
-	Ship ship;
+	Player player;
 	Room room;
 	//Zombie zombie;
     Inventory ibox[IBOX];
@@ -304,6 +307,7 @@ void render();
 //==========================================================================
 int main()
 {
+	see_wall = 1; // Shows the collision boxes of the walls
 	roomInit(roomID);
 
 	logOpen();
@@ -344,6 +348,7 @@ void roomInit(int rID)
 
 void init_opengl(void)
 {
+	backGl();
 	//OpenGL initialization
 	glViewport(0, 0, gl.xres, gl.yres);
 	//Initialize matrices
@@ -358,7 +363,7 @@ void init_opengl(void)
 	glDisable(GL_CULL_FACE);
 	//
 	//Clear the screen to black
-	glClearColor(0.0, 0.0, 0.0, 1.0);
+	glClearColor(1.0, 1.0, 1.0, 1.0);
 	//Do this to allow fonts
 	glEnable(GL_TEXTURE_2D);
 	initialize_fonts();
@@ -402,12 +407,12 @@ void check_mouse(XEvent *e)
 				if (g.nbullets < MAX_BULLETS) {
 					Bullet *b = &g.barr[g.nbullets];
 					timeCopy(&b->time, &bt);
-					b->pos[0] = g.ship.pos[0];
-					b->pos[1] = g.ship.pos[1];
-					b->vel[0] = g.ship.vel[0];
-					b->vel[1] = g.ship.vel[1];
-					//convert ship angle to radians
-					Flt rad = ((g.ship.angle+90.0) / 360.0f) * PI * 2.0;
+					b->pos[0] = g.player.pos[0];
+					b->pos[1] = g.player.pos[1];
+					b->vel[0] = g.player.vel[0];
+					b->vel[1] = g.player.vel[1];
+					//convert player angle to radians
+					Flt rad = ((g.player.angle+90.0) / 360.0f) * PI * 2.0;
 					//convert angle to a vector
 					Flt xdir = cos(rad);
 					Flt ydir = sin(rad);
@@ -439,32 +444,32 @@ void check_mouse(XEvent *e)
         /*
 		if (xdiff > 0) {
 			//std::cout << "xdiff: " << xdiff << std::endl << std::flush;
-			g.ship.angle += 0.05f * (float)xdiff;
-			if (g.ship.angle >= 360.0f)
-				g.ship.angle -= 360.0f;
+			g.player.angle += 0.05f * (float)xdiff;
+			if (g.player.angle >= 360.0f)
+				g.player.angle -= 360.0f;
 		}
 		else if (xdiff < 0) {
 			//std::cout << "xdiff: " << xdiff << std::endl << std::flush;
-			g.ship.angle += 0.05f * (float)xdiff;
-			if (g.ship.angle < 0.0f)
-				g.ship.angle += 360.0f;
+			g.player.angle += 0.05f * (float)xdiff;
+			if (g.player.angle < 0.0f)
+				g.player.angle += 360.0f;
 		}
 		if (ydiff > 0) {
 			//apply thrust
-			//convert ship angle to radians
-			Flt rad = ((g.ship.angle+90.0) / 360.0f) * PI * 2.0;
+			//convert player angle to radians
+			Flt rad = ((g.player.angle+90.0) / 360.0f) * PI * 2.0;
 			//convert angle to a vector
 			Flt xdir = cos(rad);
 			Flt ydir = sin(rad);
-			g.ship.vel[0] += xdir * (float)ydiff * 0.01f;
-			g.ship.vel[1] += ydir * (float)ydiff * 0.01f;
-			Flt speed = sqrt(g.ship.vel[0]*g.ship.vel[0]+
-												g.ship.vel[1]*g.ship.vel[1]);
+			g.player.vel[0] += xdir * (float)ydiff * 0.01f;
+			g.player.vel[1] += ydir * (float)ydiff * 0.01f;
+			Flt speed = sqrt(g.player.vel[0]*g.player.vel[0]+
+												g.player.vel[1]*g.player.vel[1]);
 			if (speed > 10.0f) {
 				speed = 10.0f;
-				normalize2d(g.ship.vel);
-				g.ship.vel[0] *= speed;
-				g.ship.vel[1] *= speed;
+				normalize2d(g.player.vel);
+				g.player.vel[0] *= speed;
+				g.player.vel[1] *= speed;
 			}
 			g.mouseThrustOn = true;
 			clock_gettime(CLOCK_REALTIME, &g.mouseThrustTimer);
@@ -505,20 +510,22 @@ int check_keys(XEvent *e)
 		case XK_Escape:
 			return 1;
 		case XK_f:
-			swap = checkDoor(g.room, g.ship.pos);
+			swap = checkDoor(g.room, g.player.pos);
 			// we have a blank room to make sure we swap to an actual room instead of a room
 			// with nothing
 			if (swap > -1) {
 				g.room = swapRoom(g.room.doors[swap].toRoom, g.room);
 				for (int i=0; i<2; i++) {
-					g.ship.pos[i] = movePlayerToRoom(i);
+					g.player.pos[i] = movePlayerToRoom(i);
 				}
 			}
 			// bring it back to -1
 			swap = -1;
 
 			break;
-		case XK_g:
+		case XK_l:
+			// For me to see where wall colissions will be
+			see_wall = !see_wall;
 			break;
 		case XK_Down:
 			break;
@@ -529,7 +536,7 @@ int check_keys(XEvent *e)
 	}
 	return 0;
 }
-
+/*
 void deleteAsteroid(Game *g, Asteroid *node)
 {
 	//Remove a node from doubly-linked list
@@ -582,33 +589,33 @@ void buildAsteroidFragment(Asteroid *ta, Asteroid *a)
 	ta->vel[1] = a->vel[1] + (rnd()*2.0-1.0);
 	//std::cout << "frag" << std::endl;
 }
-
+*/
 void physics()
 {
     float xmove = 0.0, ymove = 0.0;
     float newSpeed = sqrt(0.5);
     float newPos[2] = {0.0, 0.0};
 
-	Flt d0,d1,dist;
-	//Update ship position
-	//g.ship.pos[0] += g.ship.vel[0];
-	//g.ship.pos[1] += g.ship.vel[1];
+	//Flt d0,d1,dist;
+	//Update player position
+	//g.player.pos[0] += g.player.vel[0];
+	//g.player.pos[1] += g.player.vel[1];
 	//Check for collision with window edges
-	if (g.ship.pos[0] < 0.0) {
-		g.ship.pos[0] += (float)gl.xres;
+	if (g.player.pos[0] < 0.0) {
+		g.player.pos[0] += (float)gl.xres;
 	}
-	else if (g.ship.pos[0] > (float)gl.xres) {
-		g.ship.pos[0] -= (float)gl.xres;
+	else if (g.player.pos[0] > (float)gl.xres) {
+		g.player.pos[0] -= (float)gl.xres;
 	}
-	else if (g.ship.pos[1] < 0.0) {
-		g.ship.pos[1] += (float)gl.yres;
+	else if (g.player.pos[1] < 0.0) {
+		g.player.pos[1] += (float)gl.yres;
 	}
-	else if (g.ship.pos[1] > (float)gl.yres) {
-		g.ship.pos[1] -= (float)gl.yres;
+	else if (g.player.pos[1] > (float)gl.yres) {
+		g.player.pos[1] -= (float)gl.yres;
 	}
 	
 
-
+	/*
     //Update bullet positions
 	struct timespec bt;
 	clock_gettime(CLOCK_REALTIME, &bt);
@@ -723,33 +730,34 @@ void physics()
 			break;
 		a = a->next;
 	}
+	*/
 	//---------------------------------------------------
 	//check keys pressed now
 	if (gl.keys[XK_Up]) {
 	    // player movement ~ upwards
         ymove = 1.0;
 
-        g.ship.angle = 360.0f;
-        g.ship.pFlip = 1;
+        g.player.angle = 360.0f;
+        g.player.pFlip = 1;
     }
 	if (gl.keys[XK_Down]) {
 	    // player movement ~ downwards
         ymove = -1.0;
 
-        g.ship.angle = 180.0f;
-        g.ship.pFlip = 0;
+        g.player.angle = 180.0f;
+        g.player.pFlip = 0;
     }
 	if (gl.keys[XK_Left]) {
 	    // player movement ~ left
         xmove = -1.0;
 
-        g.ship.angle = 90.0f;
+        g.player.angle = 90.0f;
 	}
 	if (gl.keys[XK_Right]) {
 	    // player movement ~ right
         xmove = 1.0;
 
-        g.ship.angle = 270.0f;
+        g.player.angle = 270.0f;
 	}
     // Makes sure diagnol movement is not faster than if you were to go
     // horizontal (left/right) OR vertical (up/down)
@@ -757,21 +765,21 @@ void physics()
     // gameSpeed determines base speed of player
     // newSpeed reduces speed of player for going diagnol
     if (pow(xmove, 2) + pow(ymove, 2) > 1) {
-        newPos[0] = g.ship.pos[0] + (1.0f * xmove * gameSpeed * newSpeed);
-        newPos[1] = g.ship.pos[1] + (1.0f * ymove * gameSpeed * newSpeed);
+        newPos[0] = g.player.pos[0] + (1.0f * xmove * gameSpeed * newSpeed);
+        newPos[1] = g.player.pos[1] + (1.0f * ymove * gameSpeed * newSpeed);
     } else {
-        newPos[0] = g.ship.pos[0] + (1.0f * xmove * gameSpeed);
-        newPos[1] = g.ship.pos[1] + (1.0f * ymove * gameSpeed);
+        newPos[0] = g.player.pos[0] + (1.0f * xmove * gameSpeed);
+        newPos[1] = g.player.pos[1] + (1.0f * ymove * gameSpeed);
     }
     if (!(checkWall(newPos, g.room))) { 
-        g.ship.pos[0] = newPos[0];
-        g.ship.pos[1] = newPos[1];
+        g.player.pos[0] = newPos[0];
+        g.player.pos[1] = newPos[1];
         
     }
 
-    //pCollision(g.ship, g.room.id);
+    //pCollision(g.player, g.room.id);
 
-
+	/*
 	if (gl.keys[XK_space]) {
 		//a little time between each bullet
 		struct timespec bt;
@@ -784,12 +792,12 @@ void physics()
 				//Bullet *b = new Bullet;
 				Bullet *b = &g.barr[g.nbullets];
 				timeCopy(&b->time, &bt);
-				b->pos[0] = g.ship.pos[0];
-				b->pos[1] = g.ship.pos[1];
-				b->vel[0] = g.ship.vel[0];
-				b->vel[1] = g.ship.vel[1];
-				//convert ship angle to radians
-				Flt rad = ((g.ship.angle+90.0) / 360.0f) * PI * 2.0;
+				b->pos[0] = g.player.pos[0];
+				b->pos[1] = g.player.pos[1];
+				b->vel[0] = g.player.vel[0];
+				b->vel[1] = g.player.vel[1];
+				//convert player angle to radians
+				Flt rad = ((g.player.angle+90.0) / 360.0f) * PI * 2.0;
 				//convert angle to a vector
 				Flt xdir = cos(rad);
 				Flt ydir = sin(rad);
@@ -813,27 +821,22 @@ void physics()
 		if (tdif < -0.3)
 			g.mouseThrustOn = false;
 	}
+	*/
 }
 
 void render()
 {
-	Rect r;
+	//Rect r;
 	glClear(GL_COLOR_BUFFER_BIT);
 	//
-	r.bot = gl.yres - 20;
-	r.left = 10;
-	r.center = 0;
-	ggprint8b(&r, 16, 0x00ff0000, "3350 - Asteroids");
-	ggprint8b(&r, 16, 0x00ffff00, "n bullets: %i", g.nbullets);
-	ggprint8b(&r, 16, 0x00ffff00, "n asteroids: %i", g.nasteroids);
+	//r.bot = gl.yres - 20;
+	//r.left = 10;
+	//r.center = 0;
+	//ggprint8b(&r, 16, 0x00ff0000, "3350 - Asteroids");
+	//ggprint8b(&r, 16, 0x00ffff00, "n bullets: %i", g.nbullets);
+	//ggprint8b(&r, 16, 0x00ffff00, "n asteroids: %i", g.nasteroids);
 
-    for (int i = 0; i != (int)g.room.walls.size(); i++) {
-        renderWall(g.room.walls[i]);
-    }
-
-	for (int i=0; i != (int)g.room.doors.size(); i++) {
-		renderDoorEvent(g.room.doors[i]);
-	}
+	roomRender(gl.xres, gl.yres, g.room.id);
 	
 	renderZombie(g.room);
 	
@@ -859,20 +862,20 @@ void render()
     renderHealth(g.hbox);
 
 	//-------------------------------------------------------------------------
-	//Draw the ship
+	//Draw the player
 
     // Placeholder to test character sprite variations
     // if going up/down probably have character actually looking in that
     // direction
-    if (g.ship.pFlip) {
-	    glColor3fv(g.ship.colorAlt);
+    if (g.player.pFlip) {
+	    glColor3fv(g.player.colorAlt);
     } else {
-	    glColor3fv(g.ship.color);
+	    glColor3fv(g.player.color);
     }
 	glPushMatrix();
-	glTranslatef(g.ship.pos[0], g.ship.pos[1], g.ship.pos[2]);
-	//float angle = atan2(ship.dir[1], ship.dir[0]);
-	glRotatef(g.ship.angle, 0.0f, 0.0f, 1.0f);
+	glTranslatef(g.player.pos[0], g.player.pos[1], g.player.pos[2]);
+	//float angle = atan2(player.dir[1], player.dir[0]);
+	glRotatef(g.player.angle, 0.0f, 0.0f, 1.0f);
 	glBegin(GL_TRIANGLES);
 	//glVertex2f(-10.0f, -10.0f);
 	//glVertex2f(  0.0f, 20.0f);
@@ -894,7 +897,7 @@ void render()
 	if (gl.keys[XK_Up] || g.mouseThrustOn) {
 		int i;
 		//draw thrust
-		Flt rad = ((g.ship.angle+90.0) / 360.0f) * PI * 2.0;
+		Flt rad = ((g.player.angle+90.0) / 360.0f) * PI * 2.0;
 		//convert angle to a vector
 		Flt xdir = cos(rad);
 		Flt ydir = sin(rad);
@@ -907,8 +910,8 @@ void render()
 			xe = -xdir * r + rnd() * 18.0 - 9.0;
 			ye = -ydir * r + rnd() * 18.0 - 9.0;
 			glColor3f(rnd()*.3+.7, rnd()*.3+.7, 0);
-			glVertex2f(g.ship.pos[0]+xs,g.ship.pos[1]+ys);
-			glVertex2f(g.ship.pos[0]+xe,g.ship.pos[1]+ye);
+			glVertex2f(g.player.pos[0]+xs,g.player.pos[1]+ys);
+			glVertex2f(g.player.pos[0]+xe,g.player.pos[1]+ye);
 		}
 		glEnd();
 	}
@@ -919,7 +922,7 @@ void render()
 	//Draw Zombie
 	glPushMatrix();
 	glTranslatef(g.zombie.pos[0], g.zombie.pos[1], g.zombie.pos[2]);
-	//float angle = atan2(ship.dir[1], ship.dir[0]);
+	//float angle = atan2(player.dir[1], player.dir[0]);
 	glRotatef(g.zombie.angle, 0.0f, 0.0f, 1.0f);
 	float size = 9.0f;
 	glBegin(GL_QUADS);
@@ -937,6 +940,7 @@ void render()
 	*/
 	//-------------------------------------------------------------------------
 	//Draw the asteroids
+	/*
 	{
 		Asteroid *a = g.ahead;
 		while (a) {
@@ -981,5 +985,17 @@ void render()
 		glVertex2f(b->pos[0]+1.0f, b->pos[1]-1.0f);
 		glVertex2f(b->pos[0]+1.0f, b->pos[1]+1.0f);
 		glEnd();
+	}
+	*/
+	if (see_wall) {
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glEnable(GL_BLEND);
+		for (int i = 0; i != (int)g.room.walls.size(); i++) {
+        	renderWall(g.room.walls[i]);
+    	}
+
+		for (int i=0; i != (int)g.room.doors.size(); i++) {
+			renderDoorEvent(g.room.doors[i]);
+		}
 	}
 }

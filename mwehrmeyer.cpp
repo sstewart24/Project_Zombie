@@ -1,5 +1,5 @@
 #include "header.h"
-#define DOOR_WIDTH 50.0
+#define DOOR_WIDTH 60.0
 #define DOORMAT_WIDTH 25.0
 // Builds the room to be drawn for any objects in the room
 // This determines the rooms walls.
@@ -7,20 +7,60 @@
 // World mapping
 // Includes walls and other objects
 Room rooms[] = { 
-    Room(0, {Wall(0.0f, 0.0f, 50.0f, 480.0f),
-             Wall(0.0f, 0.0f, 640.0f, 50.0f),
-             Wall(590.0f, 0.0f, 50.0f, 480.0f),
-             Wall(0.0f, 430.0f, 640.0f, 50.0f),
-             Wall(200.0f, 100.0f, 440.0f, 50.0f)},
-            {Door(0, 590.0f, 50.0f, 0, 1, 3),
-             Door(1, 50.0f, 380.0f, 0, 1, 4)}), 
-    Room(1, {Wall(0.0f, 0.0f, 50.0f, 480.0f),
-             Wall(0.0f, 0.0f, 640.0f, 50.0f),
-             Wall(590.0f, 0.0f, 50.0f, 480.0f),
-             Wall(0.0f, 430.0f, 640.0f, 50.0f),
-             Wall(400.0f, 150.0f, 75.0f, 100.0f)},
-            {Door(0, 50.0f, 150.0f, 1, 0, 4)})
+    Room(0, {Wall(0.0f, 0.0f, 32.0f, 480.0f),
+             Wall(0.0f, 0.0f, 640.0f, 32.0f),
+             Wall(608.0f, 0.0f, 32.0f, 480.0f),
+             Wall(0.0f, 448.0f, 640.0f, 32.0f),
+             Wall(0.0f, 224.0f, 224.0f, 32.0f),
+             Wall(288.0f, 0.0f, 32.0f, 144.0f),
+             Wall(448.0f, 0.0f, 32.0f, 144.0f)},
+            {Door(0, 482.0f, 368.0f, 0, 1, 2),
+             Door(1, 98.0f, 368.0f, 0, 1, 2)}, "room1.png"), 
+    Room(1, {Wall(0.0f, 0.0f, 160.0f, 480.0f),
+             Wall(0.0f, 0.0f, 640.0f, 96.0f),
+             Wall(480.0f, 0.0f, 160.0f, 480.0f),
+             Wall(0.0f, 368.0f, 640.0f, 112.0f)},
+            {Door(0, 352.0f, 96.0f, 1, 0, 1)}, "officeroom.png") // shorten the door
 };
+
+class Texture {
+public:
+	Image *backImage;
+	GLuint backTexture;
+	float xc[2];
+	float yc[2];
+};
+
+Texture tex;
+std::vector<Texture> textures;
+int roomAmount = 2;
+void backGl()
+{
+    int i = 0;
+    while (i < roomAmount) {
+        const char *stringfile = rooms[i].imagefile.c_str();
+        Image img[1] = {stringfile};
+
+        //load the images file into a ppm structure.
+	    //
+	    tex.backImage = &img[0];
+	    //create opengl texture elements
+	    glGenTextures(1, &tex.backTexture);
+	    int w = tex.backImage->width;
+	    int h = tex.backImage->height;
+	    glBindTexture(GL_TEXTURE_2D, tex.backTexture);
+	    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_NEAREST);
+	    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
+	    glTexImage2D(GL_TEXTURE_2D, 0, 3, w, h, 0,
+							GL_RGB, GL_UNSIGNED_BYTE, tex.backImage->data);
+	    tex.xc[0] = 0.0;
+	    tex.xc[1] = 1.0;
+	    tex.yc[0] = 0.0;
+	    tex.yc[1] = 1.0;  
+        textures.push_back(tex);
+        i++;
+    }  
+}
 
 float jumpPlayerPos_to[2];
 
@@ -126,6 +166,7 @@ int checkWall(float newPos[2], Room room) {
         }
         i++;
     }
+
     return blocked;
 }
 /*
@@ -148,9 +189,25 @@ float movePlayerToRoom(int index) {
     return jumpPlayerPos_to[index];
 }
 
+void roomRender(int xres, int yres, int i) 
+{
+    //glClear(GL_COLOR_BUFFER_BIT);
+    glPushMatrix();
+	glColor3f(1.0, 1.0, 1.0);
+	glBindTexture(GL_TEXTURE_2D, textures[i].backTexture);
+	glBegin(GL_QUADS);
+		glTexCoord2f(tex.xc[0], tex.yc[1]); glVertex2i(0, 0);
+		glTexCoord2f(tex.xc[0], tex.yc[0]); glVertex2i(0, yres);
+		glTexCoord2f(tex.xc[1], tex.yc[0]); glVertex2i(xres, yres);
+		glTexCoord2f(tex.xc[1], tex.yc[1]); glVertex2i(xres, 0);
+	glEnd();
+    glPopMatrix();
+	glBindTexture(GL_TEXTURE_2D, 0);
+}
+
 void renderWall(Wall wall) {
     glPushMatrix();
-        glColor3fv(wall.color);
+        glColor4fv(wall.color);
         glBegin(GL_TRIANGLES);
 
         glVertex2f(wall.xPos, wall.yPos);
@@ -161,13 +218,14 @@ void renderWall(Wall wall) {
         glVertex2f(wall.xPos + wall.xLen, wall.yPos + wall.yLen);
         
         glEnd();
-        glPopMatrix();
+    glPopMatrix();
 }
 
 void renderDoorEvent(Door door)
 {
     Doormat door_mat = Doormat(door.facing, door.xPos, door.yPos);
-    glColor3fv(door.color);
+    glPushMatrix();
+        glColor4fv(door.color);
         glBegin(GL_TRIANGLES);
 
         glVertex2f(door_mat.x, door_mat.y);
@@ -177,5 +235,5 @@ void renderDoorEvent(Door door)
         glVertex2f(door_mat.x, door_mat.yy);
         glVertex2f(door_mat.xx, door_mat.yy);
         glEnd();
-        glPopMatrix();
+    glPopMatrix();
 }
