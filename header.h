@@ -13,6 +13,7 @@
 #include "log.h"
 #include "fonts.h"
 #include <vector>
+#include <cmath>
 
 //macros
 #define rnd() (((Flt)rand())/(Flt)RAND_MAX)
