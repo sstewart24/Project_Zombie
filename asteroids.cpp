@@ -18,7 +18,7 @@ extern int checkWall(float*, Room);
 extern float movePlayerToRoom(int);
 extern void renderDoorEvent(Door);
 extern void renderWall(Wall);
-extern void renderZombie(Room);
+extern void renderZombie(Room, Player); // Renders Zombies
 extern void renderHealth(Health);
 extern void renderInventory(Inventory, int, int, int);
 extern bool pCollision(Player, int);
@@ -838,7 +838,7 @@ void render()
 
 	roomRender(gl.xres, gl.yres, g.room.id);
 	
-	renderZombie(g.room);
+	renderZombie(g.room, g.player);
 	
 	/*
 	for (int i=0; i != (int)g.room.zombies.size(); i++) {
