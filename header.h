@@ -292,3 +292,22 @@ public:
 		unlink(ppmname);
 	}
 };
+
+class Axe {
+    public:
+        int damage;
+        float pos[2];
+        float w,h;
+        bool collected;
+        int axesAvailable;
+        Axe() {
+            //name = "Axe";
+            pos[0] = 640 / 2;
+            pos[1] = 480 / 2;
+            w = 5;
+            h = 5;
+            collected = false;
+            damage = 0;
+            axesAvailable = 0;
+        }
+};
