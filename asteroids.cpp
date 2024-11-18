@@ -20,14 +20,15 @@ extern void renderDoorEvent(Door);
 extern void renderWall(Wall);
 extern void renderZombie(Room, Player); // Renders Zombies
 extern void renderHealth(Health);
-extern void renderInventory(Inventory, int, int, int);
+extern void renderInventory();
 extern bool pCollision(Player, int);
 extern void backGl();
 extern void roomRender(int, int, int);
+extern void renderItem(Axe axe);
 int roomID = 0;
 int maxRooms = 2;
 int see_wall;
-const int IBOX = 4;
+//const int IBOX = 4;
 /*class Global {
 public:
 	int xres, yres;
@@ -104,9 +105,10 @@ public:
 	Player player;
 	Room room;
 	//Zombie zombie;
-    Inventory ibox[IBOX];
-    Inventory iboxbg;
+    //Inventory ibox[IBOX];
+    //Inventory iboxbg;
 	Health hbox;
+    Axe axe;
 
 	Asteroid *ahead;
 	Bullet *barr;
@@ -527,6 +529,11 @@ int check_keys(XEvent *e)
 			// For me to see where wall colissions will be
 			see_wall = !see_wall;
 			break;
+        case XK_e:
+            //will be used to collect items in the future
+            //only works to toggle the axe on and off for now.
+            g.axe.collected ^= 1; 
+            break;
 		case XK_Down:
 			break;
 		case XK_equal:
@@ -847,7 +854,8 @@ void render()
     */
 	//-------------------------------------------------------------------------
 	//Draw Inventory Box 
-    g.iboxbg.pos[0] = g.iboxbg.xres / 2;
+    renderInventory();
+    /*g.iboxbg.pos[0] = g.iboxbg.xres / 2;
     renderInventory(g.iboxbg,IBOX+1, g.iboxbg.pos[0], IBOX);
     for (int i=0; i<IBOX; i++) {
         float iboxX = g.ibox[i].pos[0];
@@ -856,7 +864,11 @@ void render()
         g.ibox[i].w = 20;
 
         renderInventory(g.ibox[i], i, iboxX, IBOX);
-    }
+    }*/
+    //-------------------------------------------------------------------------
+    //Draw Items 
+    renderItem(g.axe);
+      
      //-------------------------------------------------------------------------
     //Draw Health Box
     renderHealth(g.hbox);
