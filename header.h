@@ -13,7 +13,10 @@
 #include "log.h"
 #include "fonts.h"
 #include <vector>
-#include <cmath>
+#include <time.h>
+#include <stdio.h>
+#include <chrono>
+#include <thread>
 
 //macros
 #define rnd() (((Flt)rand())/(Flt)RAND_MAX)
