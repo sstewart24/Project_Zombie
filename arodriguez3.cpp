@@ -1,7 +1,7 @@
 /*=================================================================
 * Adrian's source file
 *
-* Updated: 11/15/2024
+* Updated: 11/18/2024
 *
 * Currently:
 *	- Defines for Zroam and Zfollow functions
@@ -20,7 +20,8 @@
 *	- A Bool function called Zcollision to check for collision between Zombies
 *
 *	- A Bool function called Zfollow to check if the zombie or player is at
-*	  a certain range, the zombie will follow the player
+*	  a certain range, the zombie will follow the player, also calling checkWall
+*	  so Zombies do not go through walls while following	
 *
 *	- Void function Zroam so zombies can roam around the rooms
 *
@@ -29,24 +30,16 @@
 *
 *
 * TO-DO:
-*	1) Make Zombie not go through walls while following player
+*	1) Give Zombie a delay before following player
 *
-*	2) Give Zombie a delay before following player
-*
-*	3) Maybe give zombie another delay before switching directions
-*
-*	
-*
-*
-*
+*	2) Maybe give zombie another delay before switching directions
 *====================================================================*/
 #include "header.h"
 
-#define MOVESTEP 2.0f // How fast the zombie moves
+#define MOVESTEP gameSpeed / 2 // How fast the zombie moves
 #define FOLLOW_RANGE 100.0f // The following range between zombie and player
 
 extern int checkWall(float*, Room);
-//extern Player player;
 
 // Vector for Zombies 
 std::vector<Zombie> zombies = {
@@ -88,7 +81,7 @@ bool Zcollision(float newPos[2], const Zombie& zombie) {
 	return false;
 }
 
-bool Zfollow(Zombie& zombie, Player& player) {
+bool Zfollow(Zombie& zombie, Player& player, Room current) {
 	float Ppos[2] = {player.pos[0], player.pos[1]}; // Player position
 	float Zpos[2] = {zombie.pos[0], zombie.pos[1]}; // Zombie position
 
@@ -103,10 +96,20 @@ bool Zfollow(Zombie& zombie, Player& player) {
 		float Ydir = dy / distance;
 
 		// Update zombie position toward the player
-		zombie.pos[0] += MOVESTEP * Xdir;
-       		zombie.pos[1] += MOVESTEP * Ydir;
+		float NewZpos[2];
+		NewZpos[0] = zombie.pos[0] + MOVESTEP * Xdir;
+        	NewZpos[1] = zombie.pos[1] + MOVESTEP * Ydir;
 
-      		return true; // Zombie follows player
+		// Checks to see if the Zombie is colliding with a wall
+		if (!checkWall(NewZpos, current)) {
+			zombie.pos[0] = NewZpos[0];
+			zombie.pos[1] = NewZpos[1];
+
+		} else {
+			// Zombie will not move because checkWall with return blocked
+		}
+
+      	return true; // Zombie follows player
     }
 	return false; // Zombie does not follow player
 }
@@ -149,15 +152,15 @@ void Zroam(Zombie& zombie, Room current) {
         zombie.moveDistance = 0; 
 
     }/* else if (Zcollision(newPos, zombie)) {
-	// Collision detected with another zombie, turn around
+		// Collision detected with another zombie, turn around
         zombie.direction = getRandomDirection();
         zombie.moveDistance = 0;
         return; 
 
 	}*/ else {
-        // Update position only if there's no collision
-        zombie.pos[0] = newPos[0];
-        zombie.pos[1] = newPos[1];
+        	// Update position only if there's no collision
+        	zombie.pos[0] = newPos[0];
+        	zombie.pos[1] = newPos[1];
     }
 }
 
@@ -169,7 +172,7 @@ void renderZombie(Room current, Player player)
 		
 		// If the zombies room # matches the current room id, draw the zombie
 		if (zombies[i].room == current.id) {
-			if(!Zfollow(zombies[i], player)) {
+			if(!Zfollow(zombies[i], player, current)) {
 				Zroam(zombies[i], current);
 			}
 
