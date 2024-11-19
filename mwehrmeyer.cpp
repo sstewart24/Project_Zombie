@@ -13,24 +13,31 @@ Room rooms[] = {
              Wall(608.0f, 0.0f, 32.0f, 480.0f),
              Wall(0.0f, 448.0f, 640.0f, 32.0f),
              Wall(0.0f, 240.0f, 224.0f, 32.0f),
-             Wall(288.0f, 0.0f, 32.0f, 160.0f),
-             Wall(448.0f, 0.0f, 32.0f, 160.0f),
+             Wall(288.0f, 0.0f, 32.0f, 192.0f),
+             Wall(448.0f, 0.0f, 32.0f, 192.0f),
              Wall(288.0f, 256.0f, 32.0f, 80.0f),
              Wall(288.0f, 256.0f, 192.0f, 48.0f),
              Wall(448.0f, 256.0f, 32.0f, 224.0f)},
-            {Door(0, 482.0f, 368.0f, 0, 2, 2),
-             Door(1, 98.0f, 368.0f, 0, 1, 2)}, "./images/lab-entrance.png"), 
+            {Eventspace(0, 0, 482.0f, 368.0f, 0, 2, 2, 0, 0),
+             Eventspace(1, 0, 98.0f, 368.0f, 0, 1, 2, 0, 0),
+             Eventspace(2, 0, 583.0f, 240.0f, 0, 2, 4, 0, 0)}, "./images/lab-entrance.png"), 
     Room(1, {Wall(0.0f, 0.0f, 160.0f, 480.0f),
              Wall(0.0f, 0.0f, 640.0f, 96.0f),
              Wall(480.0f, 0.0f, 160.0f, 480.0f),
              Wall(0.0f, 368.0f, 640.0f, 112.0f)},
-            {Door(0, 352.0f, 96.0f, 1, 0, 1)}, "./images/Lab-officeroom.png"),
+            {Eventspace(0, 0, 352.0f, 96.0f, 1, 0, 1, 0, 0)}, "./images/Lab-officeroom.png"),
     Room(2, {Wall(0.0f, 0.0f, 64.0f, 480.0f),
              Wall(0.0f, 0.0f, 640.0f, 80.0f),
              Wall(0.0f, 416.0f, 640.0f, 64.0f),
              Wall(576.0f, 0.0f, 64.0f, 480.0f),
              Wall(256.0f, 80.0f, 320.0f, 64.0f)},
-            {Door(0, 130.0f, 80.0f, 0, 0, 1)}, "./images/LabHall01.png")
+            {Eventspace(0, 0, 130.0f, 80.0f, 0, 0, 1, 0, 0),
+             Eventspace(1, 0, 64.0f, 210.0f, 0, 3, 4, 0, 0)}, "./images/LabHall01.png"),
+    Room(3, {Wall(0.0f, 0.0f, 256.0f, 480.0f),
+             Wall(0.0f, 0.0f, 640.0f, 80.0f),
+             Wall(384.0f, 0.0f, 256.0f, 480.0f),
+             Wall(0.0f, 352.0f, 640.0f, 128.0f)},
+            {Eventspace(0, 0, 358.0f, 146.0f, 1, 2, 4, 0, 0)}, "./images/Lab-closet.png")
 };
 
 class Texture {
@@ -43,7 +50,7 @@ public:
 
 Texture tex;
 std::vector<Texture> textures;
-int roomAmount = 3;
+int roomAmount = 4;
 void backGl()
 {
     int i = 0;
@@ -132,27 +139,28 @@ void roomSave(Room cur)
     rooms[cur.id] = cur;
 }
 // Sets the position of the player going into the next room
-/*
+
 void findDoor(int nextDoor, int nextRoom) {
     Room next_room = rooms[nextRoom];
-    Doormat next_door = Doormat(next_room.events[nextDoor].facing, next_room.events[nextDoor].xPos, next_room.events[nextDoor].yPos);
+    Doormat next_door = Doormat(next_room.ev[nextDoor].facing, next_room.ev[nextDoor].xPos, next_room.ev[nextDoor].yPos);
     jumpPlayerPos_to[0] = next_door.x + (next_door.xx - next_door.x)/2;
     jumpPlayerPos_to[1] = next_door.y + (next_door.yy - next_door.y)/2;
 }
-*/
+
 // Will from one room to the next based on interacting with a door
-/*
+
 Room swapRoom(int doorID, Room current){
-    int nextDoorID = current.doors[doorID].toDoor;
-    int nextRoomID = current.doors[doorID].toRoom;
+    int nextDoorID = current.ev[doorID].toDoor;
+    int nextRoomID = current.ev[doorID].toRoom;
     Room next;
     roomSave(current);
     findDoor(nextDoorID, nextRoomID);
     next = rooms[nextRoomID];
     return next;
 }
-*/
+
 // Will from one room to the next based on interacting with a door
+/*
 Room swapRoom(int roomID, Room current) {
     //int checkDoor(current, player_pos);
     Room next;
@@ -160,26 +168,28 @@ Room swapRoom(int roomID, Room current) {
     next = rooms[roomID];
     return next;
 }
+*/
 
-/*
 
+int interaction[2];
 //checks to see if the player is with an area of interaction
 //returns what type of interaction it is: (go to room, get item)
 int* checkEventSpace(Room current, float pl_pos[2]) {
     int i = 0, act = 0;
-    int size = (int)current.events.size();
+    int size = (int)current.ev.size();
     // [0] = type of interaction,  [1] = index of interaction space
     // set to -1 in the case where player is not within
     // interaction space
-    int interaction[2] = {-1, -1};
+    interaction[0] = -1;
+    interaction[1] = -1;
 
-    while (i < size && !s) {
-        Eventspace area = Eventspace(current.events[i].facing, current.events[i].xPos, current.events[i].yPos, current.events[i].width, current.events[i].height);
+    while (i < size && !act) {
+        Doormat area = Doormat(current.ev[i].facing, current.ev[i].xPos, current.ev[i].yPos);//, current.ev[i].width, current.ev[i].height);
 
-        if (playerPos[0] > area.x && playerPos[0] < area.xx && 
-                playerPos[1] > area.y && playerPos[1] < area.yy) {
+        if (pl_pos[0] > area.x && pl_pos[0] < area.xx && 
+                pl_pos[1] > area.y && pl_pos[1] < area.yy) {
             act = 1;
-            interaction[0] = current.events[i].type; 
+            interaction[0] = current.ev[i].etype; 
             interaction[1] = i;
         }
         i++;
@@ -187,8 +197,7 @@ int* checkEventSpace(Room current, float pl_pos[2]) {
 
     return interaction;
 }
-*/
-
+/**
 int checkDoor(Room current, float playerPos[2])
 {
     int i = 0, s = 0;
@@ -215,7 +224,7 @@ int checkDoor(Room current, float playerPos[2])
 
     return nextID;
 }
-
+*/
 // Will check if the player is colliding with a wall to block any movement
 int checkWall(float newPos[2], Room room) {
     std::vector<Wall> w = room.walls;
@@ -283,11 +292,11 @@ void renderWall(Wall wall) {
     glPopMatrix();
 }
 
-void renderDoorEvent(Door door)
+void renderEvent(Eventspace e)
 {
-    Doormat door_mat = Doormat(door.facing, door.xPos, door.yPos);
+    Doormat door_mat = Doormat(e.facing, e.xPos, e.yPos);
     glPushMatrix();
-        glColor4fv(door.color);
+        glColor4fv(e.color);
         glBegin(GL_TRIANGLES);
 
         glVertex2f(door_mat.x, door_mat.y);

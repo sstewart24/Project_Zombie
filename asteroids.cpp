@@ -13,10 +13,11 @@ Global gl;
 //using namespace std;
 extern Room startRooms(int);
 extern Room swapRoom(int, Room);
-extern int checkDoor(Room, float*);
+extern int *checkEventSpace(Room, float*);
+//extern int checkDoor(Room, float*);
 extern int checkWall(float*, Room);
 extern float movePlayerToRoom(int);
-extern void renderDoorEvent(Door);
+extern void renderEvent(Eventspace);
 extern void renderWall(Wall);
 extern void renderZombie(Room, Player); // Renders Zombies
 extern void renderHealth(Health);
@@ -26,7 +27,7 @@ extern void backGl();
 extern void roomRender(int, int, int);
 extern void renderLight(int, int);
 extern void renderItem(Axe axe);
-int roomID = 0;
+int roomID = 2;
 int see_wall;
 int see_darkness;
 //const int IBOX = 4;
@@ -310,7 +311,7 @@ void render();
 //==========================================================================
 int main()
 {
-	see_wall = 0; // Shows the collision boxes of the walls
+	see_wall = 1; // Shows the collision boxes of the walls
 	see_darkness = 0;
 	roomInit(roomID);
 
@@ -509,17 +510,19 @@ int check_keys(XEvent *e)
 		}
 	}
 	(void)shift;
-	int swap;
+	//int swap;
+	int interact_type = -1;
+	int interact_index = -1;
 	switch (key) {
 		case XK_Escape:
 			return 1;
 		case XK_f:
-			/*
+			
 			// Pointer to interaction array from individual file
 			int* act_ptr;
-			act_ptr = checkEventSpace();
-			int interact_type = act_ptr[0];
-			int interact_index = act_ptr[1];
+			act_ptr = checkEventSpace(g.room, g.player.pos);
+			interact_type = act_ptr[0];
+			interact_index = act_ptr[1];
 			
 			// Case 1 would be for the player to interact with doors
 			if(interact_type == 0) {
@@ -531,27 +534,28 @@ int check_keys(XEvent *e)
 			// Case 2 would be for the player to interact with storage/items
 			else if(interact_type == 1) {
 				// With limited items, we can set hotbar to specific items
-				Will take interact index and current room, return item type
+				//Will take interact index and current room, return item type
 
 				// Calls second function with item type integer and increases the value of that item
 				// Based on item, might do certain things
-				// Have lyanne do this one
 			}
 			
 			// Case 3 would be for the player to hide in something
 			else if(interact_type == 2) {
 				// Just need to create a flag that makes the player hidden
-				g.player.shown = != g.player.shown
+				g.player.shown = !g.player.shown;
+				g.player.can_move = !g.player.can_move;
 
 				// If time, create animation for each specific situation would make it require
 				// the interact space index or just call certain gif
 			}
 			
-			delete[] act_ptr;
+			// act_ptr;
 			interact_type = -1;
 			interact_index = -1;
-			*/
+			
 
+			/*
 			swap = checkDoor(g.room, g.player.pos);
 			// we have a blank room to make sure we swap to an actual room instead of a room
 			// with nothing
@@ -563,7 +567,7 @@ int check_keys(XEvent *e)
 			}
 			// bring it back to -1
 			swap = -1;
-
+			*/
 			break;
 		case XK_l:
 			// For me to see where wall colissions will be
@@ -959,8 +963,8 @@ void render()
         	renderWall(g.room.walls[i]);
     	}
 
-		for (int i=0; i != (int)g.room.doors.size(); i++) {
-			renderDoorEvent(g.room.doors[i]);
+		for (int i=0; i != (int)g.room.ev.size(); i++) {
+			renderEvent(g.room.ev[i]);
 		}
 	}
 

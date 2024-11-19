@@ -97,6 +97,73 @@ class Wall {
 
 };
 
+// redefine Door to Eventspace
+// - This way we can make one button as interact to go to new rooms
+// - As well as make it where the player can pick up items and hide
+
+class Eventspace {
+public:
+    int id;
+    int etype;
+    float xPos;
+    float yPos;
+    float color[4];
+    
+    // For door
+    int facing = -1;
+    int toRoom;
+    int toDoor;
+    int locked;
+    int isDouble;
+    
+    // For hiding
+    //--
+    // For item
+    int has_item;
+    int item_type;
+public:
+    // For door
+    Eventspace(int i, int t, float x, float y, int dID, int rID, int f, int l, int d) {
+        id = i;
+        etype = t;
+        xPos = x;
+        yPos = y;
+        facing = f;
+        toRoom = rID;
+        toDoor = dID;
+        locked = l;
+        isDouble = d;
+        color[0] = 0.647059f;
+        color[1] = color[2] = 0.164706f;
+        color[3] = 0.25f;
+    }
+
+    // For Hiding
+    Eventspace(int i, int t, float x, float y) {
+        id = i;
+        etype = t;
+        xPos = x;
+        yPos = y;
+        color[0] = 0.647059f;
+        color[1] = color[2] = 0.164706f;
+        color[3] = 0.25f;
+    }
+
+    // For Item
+    Eventspace(int i, int t, float x, float y, int has, int item) {
+        id = i;
+        etype = t;
+        xPos = x;
+        yPos = y;
+        has_item = has;
+        item_type = item;
+        color[0] = 0.164706f;
+        color[1] = color[2] = 0.647059f;
+        color[3] = 0.25f;
+    }
+};
+
+/*
 class Door {
     public:
         int id;
@@ -123,12 +190,13 @@ class Door {
         }
 
 };
-
+*/
 class Room {
     public:
         int id;
         std::vector<Wall> walls;
-        std::vector<Door> doors;
+        std::vector<Eventspace> ev;
+        //std::vector<Door> doors;
         std::string imagefile;
         //std::vector<Zombie> zombies;
 
@@ -142,12 +210,13 @@ class Room {
 
         }
 
-        Room(int i, std::vector<Wall> w, std::vector<Door> d, std::string f) {
+        Room(int i, std::vector<Wall> w, std::vector<Eventspace> e, std::string f) {
             id = i;
             //while (i < size)
             //{
             walls = w;
-            doors = d;
+            ev = e;
+            //doors = d;
             imagefile = f;
             //zombies = z;
             //}
@@ -168,6 +237,8 @@ class Player {
         float colorAlt[3];
         // Determining facing up or down
         int pFlip;
+        int shown;
+        int can_move;
     public:
         Player() {
             pos[0] = (Flt)(gl.xres/2);
@@ -180,6 +251,9 @@ class Player {
             color[0] = color[1] = color[2] = 1.0;
             colorAlt[0] = colorAlt[1] = colorAlt[2] = 0.658824;
             pFlip = 0;
+
+            shown = 1;
+            can_move = 1;
         }
 };
 
