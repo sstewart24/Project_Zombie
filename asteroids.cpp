@@ -766,6 +766,36 @@ void physics()
 
         g.player.angle = 270.0f;
 	}
+
+	//---------------------------------------------------
+	//WASD keys instead of only arrow keys
+	if (gl.keys[XK_w]) {
+	    // player movement ~ upwards
+        ymove = 1.0;
+
+        g.player.angle = 360.0f;
+        g.player.pFlip = 1;
+    	}
+	if (gl.keys[XK_s]) {
+	    // player movement ~ downwards
+        ymove = -1.0;
+
+        g.player.angle = 180.0f;
+        g.player.pFlip = 0;
+    	}
+	if (gl.keys[XK_a]) {
+	    // player movement ~ left
+        xmove = -1.0;
+
+        g.player.angle = 90.0f;
+	}
+	if (gl.keys[XK_d]) {
+	    // player movement ~ right
+        xmove = 1.0;
+
+        g.player.angle = 270.0f;
+	}
+	
     // Makes sure diagnol movement is not faster than if you were to go
     // horizontal (left/right) OR vertical (up/down)
     // xmove/ymove determine state of direction of movement
