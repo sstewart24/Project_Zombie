@@ -1,26 +1,36 @@
 #include "header.h"
 #define DOOR_WIDTH 60.0
 #define DOORMAT_WIDTH 25.0
+#define ITEM_INTERACT_WIDTH 45.0
 // Builds the room to be drawn for any objects in the room
 // This determines the rooms walls.
 
 // World mapping
 // Includes walls and other objects
 Room rooms[] = { 
-    Room(0, {Wall(0.0f, 0.0f, 32.0f, 480.0f),
-             Wall(0.0f, 0.0f, 640.0f, 32.0f),
+    Room(0, {Wall(0.0f, 0.0f, 48.0f, 480.0f),
+             Wall(0.0f, 0.0f, 640.0f, 64.0f),
              Wall(608.0f, 0.0f, 32.0f, 480.0f),
              Wall(0.0f, 448.0f, 640.0f, 32.0f),
-             Wall(0.0f, 224.0f, 224.0f, 32.0f),
-             Wall(288.0f, 0.0f, 32.0f, 144.0f),
-             Wall(448.0f, 0.0f, 32.0f, 144.0f)},
-            {Door(0, 482.0f, 368.0f, 0, 1, 2),
-             Door(1, 98.0f, 368.0f, 0, 1, 2)}, "room1.png"), 
+             Wall(0.0f, 240.0f, 224.0f, 32.0f),
+             Wall(288.0f, 0.0f, 32.0f, 160.0f),
+             Wall(448.0f, 0.0f, 32.0f, 160.0f),
+             Wall(288.0f, 256.0f, 32.0f, 80.0f),
+             Wall(288.0f, 256.0f, 192.0f, 48.0f),
+             Wall(448.0f, 256.0f, 32.0f, 224.0f)},
+            {Door(0, 482.0f, 368.0f, 0, 2, 2),
+             Door(1, 98.0f, 368.0f, 0, 1, 2)}, "./images/lab-entrance.png"), 
     Room(1, {Wall(0.0f, 0.0f, 160.0f, 480.0f),
              Wall(0.0f, 0.0f, 640.0f, 96.0f),
              Wall(480.0f, 0.0f, 160.0f, 480.0f),
              Wall(0.0f, 368.0f, 640.0f, 112.0f)},
-            {Door(0, 352.0f, 96.0f, 1, 0, 1)}, "officeroom.png") // shorten the door
+            {Door(0, 352.0f, 96.0f, 1, 0, 1)}, "./images/Lab-officeroom.png"),
+    Room(2, {Wall(0.0f, 0.0f, 64.0f, 480.0f),
+             Wall(0.0f, 0.0f, 640.0f, 80.0f),
+             Wall(0.0f, 416.0f, 640.0f, 64.0f),
+             Wall(576.0f, 0.0f, 64.0f, 480.0f),
+             Wall(256.0f, 80.0f, 320.0f, 64.0f)},
+            {Door(0, 130.0f, 80.0f, 0, 0, 1)}, "./images/LabHall01.png")
 };
 
 class Texture {
@@ -33,7 +43,7 @@ public:
 
 Texture tex;
 std::vector<Texture> textures;
-int roomAmount = 2;
+int roomAmount = 3;
 void backGl()
 {
     int i = 0;
@@ -75,6 +85,10 @@ public:
 public:
     Doormat(int facing, float door_x, float door_y)
     {
+        // Simplify facing to be to different directions: up-down & left-right
+        // . - Just need to tweak positions of where door interactions are
+        // .
+        // .
         // North - South, facing = 1 (North) or 2 (South)
         // West - East, facing = 3 (West) or 4 (East)
         if (facing < 3) {
@@ -117,7 +131,27 @@ void roomSave(Room cur)
 {
     rooms[cur.id] = cur;
 }
-
+// Sets the position of the player going into the next room
+/*
+void findDoor(int nextDoor, int nextRoom) {
+    Room next_room = rooms[nextRoom];
+    Doormat next_door = Doormat(next_room.events[nextDoor].facing, next_room.events[nextDoor].xPos, next_room.events[nextDoor].yPos);
+    jumpPlayerPos_to[0] = next_door.x + (next_door.xx - next_door.x)/2;
+    jumpPlayerPos_to[1] = next_door.y + (next_door.yy - next_door.y)/2;
+}
+*/
+// Will from one room to the next based on interacting with a door
+/*
+Room swapRoom(int doorID, Room current){
+    int nextDoorID = current.doors[doorID].toDoor;
+    int nextRoomID = current.doors[doorID].toRoom;
+    Room next;
+    roomSave(current);
+    findDoor(nextDoorID, nextRoomID);
+    next = rooms[nextRoomID];
+    return next;
+}
+*/
 // Will from one room to the next based on interacting with a door
 Room swapRoom(int roomID, Room current) {
     //int checkDoor(current, player_pos);
@@ -126,6 +160,34 @@ Room swapRoom(int roomID, Room current) {
     next = rooms[roomID];
     return next;
 }
+
+/*
+
+//checks to see if the player is with an area of interaction
+//returns what type of interaction it is: (go to room, get item)
+int* checkEventSpace(Room current, float pl_pos[2]) {
+    int i = 0, act = 0;
+    int size = (int)current.events.size();
+    // [0] = type of interaction,  [1] = index of interaction space
+    // set to -1 in the case where player is not within
+    // interaction space
+    int interaction[2] = {-1, -1};
+
+    while (i < size && !s) {
+        Eventspace area = Eventspace(current.events[i].facing, current.events[i].xPos, current.events[i].yPos, current.events[i].width, current.events[i].height);
+
+        if (playerPos[0] > area.x && playerPos[0] < area.xx && 
+                playerPos[1] > area.y && playerPos[1] < area.yy) {
+            act = 1;
+            interaction[0] = current.events[i].type; 
+            interaction[1] = i;
+        }
+        i++;
+    }
+
+    return interaction;
+}
+*/
 
 int checkDoor(Room current, float playerPos[2])
 {
@@ -234,6 +296,24 @@ void renderDoorEvent(Door door)
         glVertex2f(door_mat.x, door_mat.y);
         glVertex2f(door_mat.x, door_mat.yy);
         glVertex2f(door_mat.xx, door_mat.yy);
+        glEnd();
+    glPopMatrix();
+}
+
+void renderLight(int xres, int yres)
+{
+    // Basic sense of darkness of the game, should modify for light areas
+    // and light around the player
+    glPushMatrix();
+        glColor4f(0.0f, 0.0f, 0.0f, 0.96f);
+
+        glBegin(GL_TRIANGLES);
+        glVertex2f(0, 0);
+        glVertex2f(xres, 0);
+        glVertex2f(xres, yres);
+        glVertex2f(0, 0);
+        glVertex2f(0, yres);
+        glVertex2f(xres, yres);
         glEnd();
     glPopMatrix();
 }

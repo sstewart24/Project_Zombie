@@ -24,10 +24,11 @@ extern void renderInventory();
 extern bool pCollision(Player, int);
 extern void backGl();
 extern void roomRender(int, int, int);
+extern void renderLight(int, int);
 extern void renderItem(Axe axe);
 int roomID = 0;
-int maxRooms = 2;
 int see_wall;
+int see_darkness;
 //const int IBOX = 4;
 /*class Global {
 public:
@@ -309,7 +310,8 @@ void render();
 //==========================================================================
 int main()
 {
-	see_wall = 1; // Shows the collision boxes of the walls
+	see_wall = 0; // Shows the collision boxes of the walls
+	see_darkness = 0;
 	roomInit(roomID);
 
 	logOpen();
@@ -512,11 +514,49 @@ int check_keys(XEvent *e)
 		case XK_Escape:
 			return 1;
 		case XK_f:
+			/*
+			// Pointer to interaction array from individual file
+			int* act_ptr;
+			act_ptr = checkEventSpace();
+			int interact_type = act_ptr[0];
+			int interact_index = act_ptr[1];
+			
+			// Case 1 would be for the player to interact with doors
+			if(interact_type == 0) {
+				g.room = swapRoom(interact_index, g.room);
+				for (int i=0; i<2; i++) {
+					g.player.pos[i] = movePlayerToRoom(i);
+				}
+			}
+			// Case 2 would be for the player to interact with storage/items
+			else if(interact_type == 1) {
+				// With limited items, we can set hotbar to specific items
+				Will take interact index and current room, return item type
+
+				// Calls second function with item type integer and increases the value of that item
+				// Based on item, might do certain things
+				// Have lyanne do this one
+			}
+			
+			// Case 3 would be for the player to hide in something
+			else if(interact_type == 2) {
+				// Just need to create a flag that makes the player hidden
+				g.player.shown = != g.player.shown
+
+				// If time, create animation for each specific situation would make it require
+				// the interact space index or just call certain gif
+			}
+			
+			delete[] act_ptr;
+			interact_type = -1;
+			interact_index = -1;
+			*/
+
 			swap = checkDoor(g.room, g.player.pos);
 			// we have a blank room to make sure we swap to an actual room instead of a room
 			// with nothing
 			if (swap > -1) {
-				g.room = swapRoom(g.room.doors[swap].toRoom, g.room);
+				g.room = swapRoom(swap, g.room);
 				for (int i=0; i<2; i++) {
 					g.player.pos[i] = movePlayerToRoom(i);
 				}
@@ -528,6 +568,9 @@ int check_keys(XEvent *e)
 		case XK_l:
 			// For me to see where wall colissions will be
 			see_wall = !see_wall;
+			break;
+		case XK_g:
+			see_darkness = !see_darkness;
 			break;
         case XK_e:
             //will be used to collect items in the future
@@ -877,32 +920,6 @@ void render()
 	
 	renderZombie(g.room, g.player);
 	
-	/*
-	for (int i=0; i != (int)g.room.zombies.size(); i++) {
-		renderZombie(g.room.zombies[i]);
-	} 
-    */
-	//-------------------------------------------------------------------------
-	//Draw Inventory Box 
-    renderInventory();
-    /*g.iboxbg.pos[0] = g.iboxbg.xres / 2;
-    renderInventory(g.iboxbg,IBOX+1, g.iboxbg.pos[0], IBOX);
-    for (int i=0; i<IBOX; i++) {
-        float iboxX = g.ibox[i].pos[0];
-        iboxX = (g.ibox[i].xres / 2.75) + (iboxX / 2) + (i * 60);
-        g.ibox[i].h = 20;
-        g.ibox[i].w = 20;
-
-        renderInventory(g.ibox[i], i, iboxX, IBOX);
-    }*/
-    //-------------------------------------------------------------------------
-    //Draw Items 
-    renderItem(g.axe);
-      
-     //-------------------------------------------------------------------------
-    //Draw Health Box
-    renderHealth(g.hbox);
-
 	//-------------------------------------------------------------------------
 	//Draw the player
 
@@ -934,6 +951,48 @@ void render()
 	glVertex2f(0.0f, 0.0f);
 	glEnd();
 	glPopMatrix();
+
+	if (see_wall) {
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glEnable(GL_BLEND);
+		for (int i = 0; i != (int)g.room.walls.size(); i++) {
+        	renderWall(g.room.walls[i]);
+    	}
+
+		for (int i=0; i != (int)g.room.doors.size(); i++) {
+			renderDoorEvent(g.room.doors[i]);
+		}
+	}
+
+	if (see_darkness) {
+		renderLight(gl.xres, gl.yres);
+	}
+
+	/*
+	for (int i=0; i != (int)g.room.zombies.size(); i++) {
+		renderZombie(g.room.zombies[i]);
+	} 
+    */
+	//-------------------------------------------------------------------------
+	//Draw Inventory Box 
+    renderInventory();
+    /*g.iboxbg.pos[0] = g.iboxbg.xres / 2;
+    renderInventory(g.iboxbg,IBOX+1, g.iboxbg.pos[0], IBOX);
+    for (int i=0; i<IBOX; i++) {
+        float iboxX = g.ibox[i].pos[0];
+        iboxX = (g.ibox[i].xres / 2.75) + (iboxX / 2) + (i * 60);
+        g.ibox[i].h = 20;
+        g.ibox[i].w = 20;
+
+        renderInventory(g.ibox[i], i, iboxX, IBOX);
+    }*/
+    //-------------------------------------------------------------------------
+    //Draw Items 
+    renderItem(g.axe);
+      
+     //-------------------------------------------------------------------------
+    //Draw Health Box
+    renderHealth(g.hbox);
 
     /*
 	if (gl.keys[XK_Up] || g.mouseThrustOn) {
@@ -1029,15 +1088,5 @@ void render()
 		glEnd();
 	}
 	*/
-	if (see_wall) {
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        glEnable(GL_BLEND);
-		for (int i = 0; i != (int)g.room.walls.size(); i++) {
-        	renderWall(g.room.walls[i]);
-    	}
-
-		for (int i=0; i != (int)g.room.doors.size(); i++) {
-			renderDoorEvent(g.room.doors[i]);
-		}
-	}
+	
 }
