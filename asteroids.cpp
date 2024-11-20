@@ -27,7 +27,9 @@ extern void backGl();
 extern void roomRender(int, int, int);
 extern void renderLight(int, int);
 extern void renderItem(Axe axe);
-int roomID = 2;
+extern int storageInteract(int, Room);
+extern float holeInteract(int, Room, int);
+int roomID = 0;
 int see_wall;
 int see_darkness;
 //const int IBOX = 4;
@@ -524,30 +526,46 @@ int check_keys(XEvent *e)
 			interact_type = act_ptr[0];
 			interact_index = act_ptr[1];
 			
-			// Case 1 would be for the player to interact with doors
-			if(interact_type == 0) {
+			if (interact_type == 0) {
+				// Case 1 would be for the player to interact with doors
 				g.room = swapRoom(interact_index, g.room);
 				for (int i=0; i<2; i++) {
 					g.player.pos[i] = movePlayerToRoom(i);
 				}
-			}
-			// Case 2 would be for the player to interact with storage/items
-			else if(interact_type == 1) {
+			} else if (interact_type == 1) {
+				// Case 2 would be for the player to interact with storage/items
 				// With limited items, we can set hotbar to specific items
 				//Will take interact index and current room, return item type
-
+				int itemtype = storageInteract(interact_index, g.room);
+				if (itemtype == -1) {
+					printf("Storage empty\n");
+				} else {
+					switch(itemtype) {
+						case 1:
+							printf("Grabbed axe\n");
+							g.room.ev[interact_index].stor.hasItem = 0;
+							break;
+					}
+				}
+				fflush(stdout);
 				// Calls second function with item type integer and increases the value of that item
 				// Based on item, might do certain things
-			}
-			
-			// Case 3 would be for the player to hide in something
-			else if(interact_type == 2) {
+			} else if (interact_type == 2) {
+				// Case 3 would be for the player to hide in something
 				// Just need to create a flag that makes the player hidden
 				g.player.shown = !g.player.shown;
 				g.player.can_move = !g.player.can_move;
 
 				// If time, create animation for each specific situation would make it require
 				// the interact space index or just call certain gif
+			} else if (interact_type == 3) {
+				// Case 4 go through a point where endpoints are in the same room
+				float npos;
+				for (int i=0; i<2; i++) {
+					npos = holeInteract(interact_index, g.room, i);
+					if (npos != -1.0)
+						g.player.pos[i] = npos;
+				}
 			}
 			
 			// act_ptr;
@@ -786,61 +804,30 @@ void physics()
 	}
 	*/
 	//---------------------------------------------------
-	//check keys pressed now
-	if (gl.keys[XK_Up]) {
-	    // player movement ~ upwards
-        ymove = 1.0;
-
-        g.player.angle = 360.0f;
-        g.player.pFlip = 1;
-    }
-	if (gl.keys[XK_Down]) {
-	    // player movement ~ downwards
-        ymove = -1.0;
-
-        g.player.angle = 180.0f;
-        g.player.pFlip = 0;
-    }
-	if (gl.keys[XK_Left]) {
-	    // player movement ~ left
-        xmove = -1.0;
-
-        g.player.angle = 90.0f;
-	}
-	if (gl.keys[XK_Right]) {
-	    // player movement ~ right
-        xmove = 1.0;
-
-        g.player.angle = 270.0f;
-	}
-
-	//---------------------------------------------------
-	//WASD keys instead of only arrow keys
-	if (gl.keys[XK_w]) {
-	    // player movement ~ upwards
-        ymove = 1.0;
-
-        g.player.angle = 360.0f;
-        g.player.pFlip = 1;
+	//check keys pressed now with either: arrow keys or wasd
+	if(g.player.can_move) {
+		if (gl.keys[XK_Up] || gl.keys[XK_w]) {
+	   		// player movement ~ upwards
+        	ymove = 1.0;
+        	g.player.angle = 360.0f;
+        	g.player.pFlip = 1;
     	}
-	if (gl.keys[XK_s]) {
-	    // player movement ~ downwards
-        ymove = -1.0;
-
-        g.player.angle = 180.0f;
-        g.player.pFlip = 0;
+		if (gl.keys[XK_Down] || gl.keys[XK_s]) {
+	    	// player movement ~ downwards
+        	ymove = -1.0;
+        	g.player.angle = 180.0f;
+        	g.player.pFlip = 0;
     	}
-	if (gl.keys[XK_a]) {
-	    // player movement ~ left
-        xmove = -1.0;
-
-        g.player.angle = 90.0f;
-	}
-	if (gl.keys[XK_d]) {
-	    // player movement ~ right
-        xmove = 1.0;
-
-        g.player.angle = 270.0f;
+		if (gl.keys[XK_Left] || gl.keys[XK_a]) {
+	    	// player movement ~ left
+        	xmove = -1.0;
+        	g.player.angle = 90.0f;
+		}
+		if (gl.keys[XK_Right] || gl.keys[XK_d]) {
+	    	// player movement ~ right
+        	xmove = 1.0;
+        	g.player.angle = 270.0f;
+		}
 	}
 	
     // Makes sure diagnol movement is not faster than if you were to go
@@ -930,32 +917,33 @@ void render()
     // Placeholder to test character sprite variations
     // if going up/down probably have character actually looking in that
     // direction
-    if (g.player.pFlip) {
-	    glColor3fv(g.player.colorAlt);
-    } else {
-	    glColor3fv(g.player.color);
-    }
-	glPushMatrix();
-	glTranslatef(g.player.pos[0], g.player.pos[1], g.player.pos[2]);
-	//float angle = atan2(player.dir[1], player.dir[0]);
-	glRotatef(g.player.angle, 0.0f, 0.0f, 1.0f);
-	glBegin(GL_TRIANGLES);
-	//glVertex2f(-10.0f, -10.0f);
-	//glVertex2f(  0.0f, 20.0f);
-	//glVertex2f( 10.0f, -10.0f);
-	glVertex2f(-12.0f, -10.0f);
-	glVertex2f(  0.0f,  20.0f);
-	glVertex2f(  0.0f,  -6.0f);
-	glVertex2f(  0.0f,  -6.0f);
-	glVertex2f(  0.0f,  20.0f);
-	glVertex2f( 12.0f, -10.0f);
-	glEnd();
-	glColor3f(1.0f, 0.0f, 0.0f);
-	glBegin(GL_POINTS);
-	glVertex2f(0.0f, 0.0f);
-	glEnd();
-	glPopMatrix();
-
+	if(g.player.shown) {
+    	if (g.player.pFlip) {
+	    	glColor3fv(g.player.colorAlt);
+    	} else {
+	    	glColor3fv(g.player.color);
+    	}
+		glPushMatrix();
+		glTranslatef(g.player.pos[0], g.player.pos[1], g.player.pos[2]);
+		//float angle = atan2(player.dir[1], player.dir[0]);
+		glRotatef(g.player.angle, 0.0f, 0.0f, 1.0f);
+		glBegin(GL_TRIANGLES);
+		//glVertex2f(-10.0f, -10.0f);
+		//glVertex2f(  0.0f, 20.0f);
+		//glVertex2f( 10.0f, -10.0f);
+		glVertex2f(-12.0f, -10.0f);
+		glVertex2f(  0.0f,  20.0f);
+		glVertex2f(  0.0f,  -6.0f);
+		glVertex2f(  0.0f,  -6.0f);
+		glVertex2f(  0.0f,  20.0f);
+		glVertex2f( 12.0f, -10.0f);
+		glEnd();
+		glColor3f(1.0f, 0.0f, 0.0f);
+		glBegin(GL_POINTS);
+		glVertex2f(0.0f, 0.0f);
+		glEnd();
+		glPopMatrix();
+	}
 	if (see_wall) {
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glEnable(GL_BLEND);

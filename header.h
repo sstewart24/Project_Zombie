@@ -97,42 +97,90 @@ class Wall {
 
 };
 
+class Door {
+public:
+    int toRoom;
+    int toDoor;
+    int locked;
+    int isDouble;
+
+public:
+    Door() {
+        toRoom = -1;
+        toDoor = -1;
+        locked = -1;
+        isDouble = -1;
+    }
+    Door(int dID, int rID, int l, int d) {
+        toRoom = rID;
+        toDoor = dID;
+        locked = l;
+        isDouble = d;
+    }
+};
+
+class Hole {
+public:
+    int toHole;
+    int blocked;
+public:
+    Hole() {
+        toHole = -1;
+        blocked = -1;
+    }
+    Hole(int hID, int b) {
+        toHole = hID;
+        blocked = b;
+    }
+};
+
+class Storage {
+public:
+    int hasItem;
+    int type;
+public:
+    Storage(){
+        hasItem = -1;
+        type = -1;
+    }
+    Storage(int h, int t){
+        hasItem = h;
+        type = t;
+    }     
+};
+
 // redefine Door to Eventspace
 // - This way we can make one button as interact to go to new rooms
 // - As well as make it where the player can pick up items and hide
 
-class Eventspace {
+class Eventspace : public Door, public Hole, public Storage{
 public:
     int id;
     int etype;
     float xPos;
     float yPos;
     float color[4];
+    int facing = -1;
     
     // For door
-    int facing = -1;
-    int toRoom;
-    int toDoor;
-    int locked;
-    int isDouble;
+    Door door;
     
+    // For tunnels
+    Hole hole;
+
     // For hiding
     //--
     // For item
-    int has_item;
-    int item_type;
+    Storage stor;
 public:
     // For door
-    Eventspace(int i, int t, float x, float y, int dID, int rID, int f, int l, int d) {
+    Eventspace(int i, int t, float x, float y, Door dr, int f){
         id = i;
         etype = t;
         xPos = x;
         yPos = y;
         facing = f;
-        toRoom = rID;
-        toDoor = dID;
-        locked = l;
-        isDouble = d;
+        door = dr;
         color[0] = 0.647059f;
         color[1] = color[2] = 0.164706f;
         color[3] = 0.25f;
@@ -144,23 +192,37 @@ public:
         etype = t;
         xPos = x;
         yPos = y;
-        color[0] = 0.647059f;
-        color[1] = color[2] = 0.164706f;
+        color[0] = 0.8f;
+        color[1] = 0.498039f;
+        color[2] = 0.196078f;
         color[3] = 0.25f;
     }
 
     // For Item
-    Eventspace(int i, int t, float x, float y, int has, int item) {
+    Eventspace(int i, int t, float x, float y, Storage s) {
         id = i;
         etype = t;
         xPos = x;
         yPos = y;
-        has_item = has;
-        item_type = item;
+        stor = s;
+        color[0] = 1.0f;
+        color[1] = 0.5f;
+        color[2] = 0.0f;
+        color[3] = 0.25f;
+    }
+
+    // For tunnels in room
+    Eventspace(int i, int t, float x, float y, Hole h){
+        id = i;
+        etype = t;
+        xPos = x;
+        yPos = y;
+        hole = h;
         color[0] = 0.164706f;
         color[1] = color[2] = 0.647059f;
         color[3] = 0.25f;
     }
+    
 };
 
 /*
