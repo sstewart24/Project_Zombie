@@ -20,9 +20,10 @@ extern float movePlayerToRoom(int);
 extern void renderEvent(Eventspace);
 extern void renderWall(Wall);
 extern void renderZombie(Room, Player); // Renders Zombies
-extern void renderHealth(Health);
+extern void renderHealth(Health, float);
 extern void renderInventory();
 extern bool pCollision(Player, int);
+extern float updateHealth(float);
 extern void backGl();
 extern void roomRender(int, int, int);
 extern void renderLight(int, int);
@@ -32,6 +33,8 @@ extern float holeInteract(int, Room, int);
 int roomID = 0;
 int see_wall;
 int see_darkness;
+float pHealth = 180.0f;
+
 //const int IBOX = 4;
 /*class Global {
 public:
@@ -848,9 +851,14 @@ void physics()
         
     }
 
-    //pCollision(g.player, g.room.id);
+    
+    if (pCollision(g.player, g.room.id)) {
+        pHealth = updateHealth(pHealth);
+    }
 
-	/*
+    renderHealth(g.hbox, pHealth);
+	
+    /*
 	if (gl.keys[XK_space]) {
 		//a little time between each bullet
 		struct timespec bt;
@@ -984,7 +992,7 @@ void render()
       
      //-------------------------------------------------------------------------
     //Draw Health Box
-    renderHealth(g.hbox);
+    renderHealth(g.hbox, pHealth);
 
     /*
 	if (gl.keys[XK_Up] || g.mouseThrustOn) {
