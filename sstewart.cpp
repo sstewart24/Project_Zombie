@@ -4,35 +4,34 @@
  */
 #include "header.h"
 
-const float maxHealth = 200.0f;
+const float maxHealth = 180.0f;
 const float minHealth = 0.0f;
-const float zUnawareHit = 15.0f;
-const float zAlertHit = 35.0f;
-const float zHostileHit = 50.0f;
+const float zUnawareHit = 3.0f;
+const float zAlertHit = 6.0f;
+const float zHostileHit = 9.0f;
 const float hBuffWeak = 25.0f;
 const float hBuffStrong = 75.0f;
+float playerHealth = maxHealth;
 
 //function defs
-//double get_health();
-float updateHealth(void);
-void renderHealth(Health hbox);
-bool Pcollision(Player player, int rid);
+float updateHealth(float pHealth);
+void renderHealth(Health hbox, float pHealth);
+bool pCollision(Player player, int);
 extern int getVectorSize();
-//double player_health = get_health();
 
-float updateHealth(void) // <-- Will need save state passed in
+float updateHealth(float pHealth) // <-- Will need save state passed in
 {
-    int playerHealth = maxHealth;
-    // Will load player's health on loading game save state,
-    // if a save state has not been created or a new game is launched
-    // player's health will start at max health
+    pHealth = pHealth - zAlertHit;
 
+    if (pHealth <= 0) {
+        pHealth = 0;
+        return pHealth;
+    }
 
-
-    return playerHealth;
+    return pHealth;
 }
 
-void renderHealth(Health hbox)
+void renderHealth(Health hbox, float pHealth)
 {
     //box surrounding health bar
     glPushMatrix();
@@ -58,6 +57,10 @@ void renderHealth(Health hbox)
     glEnd();
     glPopMatrix();
 
+
+    //updating health bar based on damage
+    hbox.h = pHealth;
+
     //health bar box    
     glPushMatrix();
     glColor3ub(23, 252, 42);
@@ -71,25 +74,20 @@ void renderHealth(Health hbox)
     glPopMatrix();
 }
 
-
-/*bool pCollision(Player player, int rid) {
-    extern Zombie getZombies(int); 
+bool pCollision(Player player, int rid) {
+    extern Zombie getZombies(int);
     extern int getVectorSize();
     int zombieAmount = getVectorSize();
-
     for (int i = 0; i < zombieAmount; i++) {
-        zom = getZombies(i);
-        if (zom.room == rid) {    
+        Zombie zom = getZombies(i);
+        if (zom.room == rid) {
             if (zom.pos[0] != player.pos[0]) {
-
-                // Calculate the distance between the zombie and other zombies
+                // Calculate the distance between the player and other zombies
                 float x = player.pos[0] - zom.pos[0];
                 float y = player.pos[1] - zom.pos[1];
                 float distance = std::sqrt(x * x + y * y);
-
                 // if the distance is smaller than the threshold, it is a collision
                 if (distance < 18.0f) { // the threshold is 18.0f because of the zombies size in render (2 * 9.0f)
-                    updateHealth();    
                     printf("Collision!\n");
                     return true;
                 }
@@ -97,4 +95,4 @@ void renderHealth(Health hbox)
         }
     }
     return false;
-}*/
+}
