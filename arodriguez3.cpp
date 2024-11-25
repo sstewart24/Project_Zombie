@@ -1,7 +1,7 @@
 /*=================================================================
  * Adrian's source file
  *
- * Updated: 11/24/2024
+ * Updated: 11/25/2024
  *
  * Currently:
  *	- Defines for Zroam and Zfollow functions
@@ -38,7 +38,7 @@
 #include "header.h"
 using namespace std;
 
-#define MOVESTEP 2.0f // How fast the zombie moves
+#define MOVESTEP 1.0f // How fast the zombie moves
 //#define FOLLOW_RANGE 100.0f // The following range between zombie and player
 
 extern int checkWall(float*, Room);
@@ -51,7 +51,9 @@ std::vector<Zombie> zombies = {
 	Zombie(3, 75.0f, 150.0f, 0, 1, 0),
 	//Zombie(4, 575.0f, 300.0f, 0, 1, 1),
 	Zombie(4, 200.0f, 280.0f, 0, 1, 1),
+
 	Zombie(5, 500.0f, 280.0f, 0, 1, 2),
+
 	Zombie(6, 555.0f, 350.0f, 0, 1, 4),
 	Zombie(7, 120.0f, 350.0f, 0, 1, 4)
 };
@@ -69,11 +71,17 @@ int getRandomDirection() {
     return rand() % 4; // Returns a random integer between 0 and 3
 }
 
-/*
-void Zwait(int seconds) {
+void Zwait() {
+    time_t start, current; // start time and current time
+    start = time(NULL);
 
+    while (1) {
+		current = time(NULL);
+		if (current - start >= 1) {
+			break;
+		}
+    }
 }
-*/
 
 bool Zcollision(float newPos[2], const Zombie& zombie) { // newPos is the other zombie
 	for (size_t i = 0; i < zombies.size(); i++) {
@@ -85,6 +93,9 @@ bool Zcollision(float newPos[2], const Zombie& zombie) { // newPos is the other 
 			
 			// If the distance is smaller than the threshold, it is a collision
 			if (distance < 18.0f) { // the threshold is 18.0f because of the zombies size in render (2 * 9.0f)
+				if (!zombie.alive) {
+					return false;
+				}
 				if (distance <= 0.0f) {
 					return false; // No collision
 				}
@@ -107,10 +118,11 @@ bool Zfollow(Zombie& zombie, Player& player, Room current) {
 	float dy = Ppos[1] - Zpos[1];
 	float distance = sqrt(dx * dx + dy * dy);
 
-	// If the player is shown, follow
-	if (player.shown) {
+	// If the player is shown and zombie is alive, follow
+	if (player.shown && zombie.alive) {
 		// If the zombie is within the range of the player, follow the player
 		if (distance < follow_range) {
+			//Zwait();
 			// Calculate the direction towards the player
 			// Normalize the direction vector (dx, dy)
 			float Xdir = dx / distance;
@@ -197,32 +209,34 @@ void renderZombie(Room current, Player player)
 		
 		// If the zombies room # matches the current room id, draw the zombie
 		if (zombies[i].room == current.id) {
-			if(!Zfollow(zombies[i], player, current)) {
-				Zroam(zombies[i], current);
-			}
-			
-			//draws the zombies
-			glPushMatrix();
-			glTranslatef(zombies[i].pos[0], zombies[i].pos[1], 0.0f);
-			glRotatef(0.0f, 0.0f, 0.0f, 1.0f);
-			float size = 9.0f; // size of zombie
-			glBegin(GL_QUADS);
-				if (zombies[i].angle == 360.0f) {
-					glColor3f(0.0f, 0.0f, 1.0f); 	// blue color
-
-				}else {
-					glColor3f(0.0f, 1.0f, 0.0f); 	// green color
+            if (zombies[i].alive == 1) {
+				if(!Zfollow(zombies[i], player, current)) {
+					Zroam(zombies[i], current);
 				}
-				glVertex3f(size, size, 0.0f); 		// top right
-				glVertex3f(size, -size, 0.0f); 		// bottom right
-				glVertex3f(-size, -size, 0.0f); 	// bottom left
-				glVertex3f(-size, size, 0.0f); 		// top left
-			glEnd();
+				
+				//draws the zombies
+				glPushMatrix();
+				glTranslatef(zombies[i].pos[0], zombies[i].pos[1], 0.0f);
+				glRotatef(0.0f, 0.0f, 0.0f, 1.0f);
+				float size = 9.0f; // size of zombie
+				glBegin(GL_QUADS);
+					if (zombies[i].angle == 360.0f) {
+						glColor3f(0.0f, 0.0f, 1.0f); 	// blue color
 
-			glBegin(GL_POINTS);
-			glVertex2f(0.0f, 0.0f);
-			glEnd();
-			glPopMatrix();
+					}else {
+						glColor3f(0.0f, 1.0f, 0.0f); 	// green color
+					}
+					glVertex3f(size, size, 0.0f); 		// top right
+					glVertex3f(size, -size, 0.0f); 		// bottom right
+					glVertex3f(-size, -size, 0.0f); 	// bottom left
+					glVertex3f(-size, size, 0.0f); 		// top left
+				glEnd();
+
+				glBegin(GL_POINTS);
+				glVertex2f(0.0f, 0.0f);
+				glEnd();
+				glPopMatrix();
+            		}
 		}
 	}
 }
