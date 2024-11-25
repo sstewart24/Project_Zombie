@@ -78,6 +78,7 @@ bool pCollision(Player player, int rid) {
     extern Zombie getZombies(int);
     extern int getVectorSize();
     int zombieAmount = getVectorSize();
+    
     for (int i = 0; i < zombieAmount; i++) {
         Zombie zom = getZombies(i);
         if (zom.room == rid) {
@@ -88,6 +89,13 @@ bool pCollision(Player player, int rid) {
                 float distance = std::sqrt(x * x + y * y);
                 // if the distance is smaller than the threshold, it is a collision
                 if (distance < 18.0f) { // the threshold is 18.0f because of the zombies size in render (2 * 9.0f)
+                    if (!player.shown) {
+                        return false;
+                    }
+                    if (!zom.alive) {
+                        return false;
+                    } 
+
                     printf("Collision!\n");
                     return true;
                 }
