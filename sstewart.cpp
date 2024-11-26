@@ -5,13 +5,9 @@
 #include "header.h"
 
 const float maxHealth = 180.0f;
-const float minHealth = 0.0f;
-const float zUnawareHit = 3.0f;
 const float zAlertHit = 6.0f;
-const float zHostileHit = 9.0f;
-const float hBuffWeak = 25.0f;
-const float hBuffStrong = 75.0f;
-float playerHealth = maxHealth;
+const float hBuff = 60.0f;
+int col_count = 0;
 
 //function defs
 float updateHealth(float pHealth);
@@ -88,7 +84,7 @@ bool pCollision(Player player, int rid) {
     extern Zombie getZombies(int);
     extern int getVectorSize();
     int zombieAmount = getVectorSize();
-    
+
     for (int i = 0; i < zombieAmount; i++) {
         Zombie zom = getZombies(i);
         if (zom.room == rid) {
@@ -99,6 +95,7 @@ bool pCollision(Player player, int rid) {
                 float distance = std::sqrt(x * x + y * y);
                 // if the distance is smaller than the threshold, it is a collision
                 if (distance < 18.0f) { // the threshold is 18.0f because of the zombies size in render (2 * 9.0f)
+                    col_count++;
                     if (!player.shown) {
                         return false;
                     }
@@ -106,8 +103,19 @@ bool pCollision(Player player, int rid) {
                         return false;
                     } 
 
-                    printf("Collision!\n");
+                    //buffer to give player damage cooldown
+                    if (col_count == 1) {
                     return true;
+                    } 
+
+                    if (col_count > 1 && col_count < 10) {
+                    return false;
+                    } 
+
+                    if (col_count == 10) {
+                    col_count = 0;
+                    return true;
+                    }
                 }
             }
         }
@@ -120,35 +128,35 @@ void spritePlayerRender(Sprite sp, float xPos, float yPos)
 
     float zPos = 0.0f;
     float cx = sp.xres/8.0;
-	float cy = sp.yres;
+    float cy = sp.yres;
 
     int ix = sp.spriteFrame % 8;
-	int iy = 0;
+    int iy = 0;
     float tx = (float)ix / 8.0;
-	float ty = (float)iy;
+    float ty = (float)iy;
 
-	glPushMatrix();
-	glColor3f(1.0, 1.0, 1.0);
-	glBindTexture(GL_TEXTURE_2D, sp.spTex.spriteTexture);
-	//
-	glEnable(GL_ALPHA_TEST);
-	glAlphaFunc(GL_GREATER, 0.0f);
-	glColor4ub(255,255,255,255);
-	
+    glPushMatrix();
+    glColor3f(1.0, 1.0, 1.0);
+    glBindTexture(GL_TEXTURE_2D, sp.spTex.spriteTexture);
+    //
+    glEnable(GL_ALPHA_TEST);
+    glAlphaFunc(GL_GREATER, 0.0f);
+    glColor4ub(255,255,255,255);
+
     /*
-	if (sp.spriteFrame >= 8)
-		iy = 1;
-    */
-	
+       if (sp.spriteFrame >= 8)
+       iy = 1;
+       */
+
     glTranslatef(xPos, yPos, zPos);
     glRotatef(0.0f,0.0f,0.0f,0.0f);
-	glBegin(GL_QUADS);
-		glTexCoord2f(tx, ty+1.0);      glVertex2i(0, 0);
-		glTexCoord2f(tx, ty);         glVertex2i(0, cy);
-		glTexCoord2f(tx+0.125, ty);    glVertex2i(cx,cy);
-		glTexCoord2f(tx+0.125, ty+1.0); glVertex2i(cx, 0);
-	glEnd();
-	glPopMatrix();
-	glBindTexture(GL_TEXTURE_2D, 0);
-	glDisable(GL_ALPHA_TEST);
+    glBegin(GL_QUADS);
+    glTexCoord2f(tx, ty+1.0);      glVertex2i(0, 0);
+    glTexCoord2f(tx, ty);         glVertex2i(0, cy);
+    glTexCoord2f(tx+0.125, ty);    glVertex2i(cx,cy);
+    glTexCoord2f(tx+0.125, ty+1.0); glVertex2i(cx, 0);
+    glEnd();
+    glPopMatrix();
+    glBindTexture(GL_TEXTURE_2D, 0);
+    glDisable(GL_ALPHA_TEST);
 }
