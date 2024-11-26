@@ -21,6 +21,8 @@ extern void spriteInit(Sprite& ,std::string);
 // Give a sprite, then a string for where the image is
 Sprite healthpack = Sprite(40, 40);
 std::string hp_imagefile = "./images/Health-pack.png";
+Sprite axe_Inventory = Sprite(40, 40);
+std::string axeInv_imagefile = "./images/AxeSprite-Inventory.png";
 
 void init_Item_Images()
 {
@@ -28,6 +30,7 @@ void init_Item_Images()
     // For more items, just add another spriteInit()
     // With their respective item
     spriteInit(healthpack, hp_imagefile);
+    spriteInit(axe_Inventory, axeInv_imagefile);
 }
 
 // Render the item into an inventory slot
@@ -100,8 +103,9 @@ void renderInventory() {
             glVertex2f( box[i].w, -box[i].h);
        glEnd();
        glPopMatrix();
-
-       if(i==1) // Which inventory slot it is in
+        if (i==0) // Which inventory slot it is in
+            spriteItemRender(axe_Inventory, box[i].pos[0], box[i].pos[1]); // where spriteItemrender is called
+        if (i==1) 
             spriteItemRender(healthpack, box[i].pos[0], box[i].pos[1]); // where spriteItemrender is called
     }
 
