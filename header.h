@@ -31,14 +31,38 @@
 
 //-----------------------------------------------------------------------------
 //Setup timers
-const double physicsRate = 1.0 / 60.0;
-const double oobillion = 1.0 / 1e9;
-extern struct timespec timeStart, timeCurrent;
-extern struct timespec timePause;
-extern double physicsCountdown;
-extern double timeSpan;
-extern double timeDiff(struct timespec *start, struct timespec *end);
-extern void timeCopy(struct timespec *dest, struct timespec *source);
+//const double physicsRate = 1.0 / 60.0;
+//const double oobillion = 1.0 / 1e9;
+//extern struct timespec timeStart, timeCurrent;
+//extern struct timespec timePause;
+//extern double physicsCountdown;
+//extern double timeSpan;
+//extern double timeDiff(struct timespec *start, struct timespec *end);
+//extern void timeCopy(struct timespec *dest, struct timespec *source);
+class Timers {
+public:
+    double physicsCountdown = 0.0;
+    double timeSpan=0.0;
+	double physicsRate;
+	double oobillion;
+	struct timespec timeStart, timeEnd, timeCurrent;
+    struct timespec timePause;
+	struct timespec walkTime;
+	Timers() {
+		physicsRate = 1.0 / 60.0;
+		oobillion = 1.0 / 1e9;
+	}
+	double timeDiff(struct timespec *start, struct timespec *end) {
+		return (double)(end->tv_sec - start->tv_sec ) +
+				(double)(end->tv_nsec - start->tv_nsec) * oobillion;
+	}
+	void timeCopy(struct timespec *dest, struct timespec *source) {
+		memcpy(dest, source, sizeof(struct timespec));
+	}
+	void recordTime(struct timespec *t) {
+		clock_gettime(CLOCK_REALTIME, t);
+	}
+};
 //-----------------------------------------------------------------------------
 
 //defined types
@@ -225,34 +249,6 @@ public:
     
 };
 
-/*
-class Door {
-    public:
-        int id;
-        float xPos;
-        float yPos;
-        // Define which roomID that the door will go to
-        int toRoom;
-        // If there are multiple doors in that room, 
-        // it will put the player next to the right door it went through
-        int toDoor;
-        int facing;
-        float color[4];
-    public:
-        Door (int idD, float x, float y, int dID, int rID, int direction) {
-            id = idD;
-            xPos = x;
-            yPos = y;
-            toDoor = dID;
-            toRoom = rID;
-            facing = direction;
-            color[0] = 0.647059f;
-            color[1] = color[2] = 0.164706f;
-            color[3] = 0.25f;
-        }
-
-};
-*/
 class Room {
     public:
         int id;
@@ -263,14 +259,7 @@ class Room {
         //std::vector<Zombie> zombies;
 
     public:
-        Room() {
-            //id = 0;          
-            //walls.push_back( Wall(50.0f, 100.0f, 50.0f, 50.0f));
-            //walls.push_back( Wall(75.0f, 200.0f, 100.0f, 50.0f));
-            //walls.push_back( Wall(200.0f, 200.0f, 30.0f, 50.0f));
-            //walls.push_back( Wall(400.0f, 50.0f, 200.0f, 100.0f));
-
-        }
+        Room() {}
 
         Room(int i, std::vector<Wall> w, std::vector<Eventspace> e, std::string f) {
             id = i;
@@ -287,6 +276,79 @@ class Room {
 
         ~Room() {}
 };
+class Image {
+public:
+	int width, height;
+	unsigned char *data;
+	~Image() { delete [] data; }
+	Image(const char *fname) {
+		if (fname[0] == '\0')
+			return;
+		char name[40];
+		strcpy(name, fname);
+		int slen = strlen(name);
+		name[slen-4] = '\0';
+		char ppmname[80];
+		sprintf(ppmname,"%s.ppm", name);
+		char ts[100];
+		sprintf(ts, "convert %s %s", fname, ppmname);
+		system(ts);
+		FILE *fpi = fopen(ppmname, "r");
+		if (fpi) {
+			char line[200];
+			fgets(line, 200, fpi);
+			fgets(line, 200, fpi);
+			//skip comments and blank lines
+			while (line[0] == '#' || strlen(line) < 2)
+				fgets(line, 200, fpi);
+			sscanf(line, "%i %i", &width, &height);
+			fgets(line, 200, fpi);
+			//get pixel data
+			int n = width * height * 3;			
+			data = new unsigned char[n];			
+			for (int i=0; i<n; i++)
+				data[i] = fgetc(fpi);
+			fclose(fpi);
+		} else {
+			printf("ERROR opening image: %s\n", ppmname);
+			exit(0);
+		}
+		unlink(ppmname);
+	}
+};
+
+class SpriteTexture {
+public:
+    Image *spriteImage;
+    GLuint spriteTexture;
+
+    float xc[2];
+    float yc[2];
+};
+
+class Sprite {
+    public:
+        int xres, yres;
+        SpriteTexture spTex;
+        int spriteFrame;
+        double delay;
+        int wall;
+        Sprite() {}
+        // For character sprites (Player or zombies)
+        Sprite(int x, int y, int w) {
+            xres = x;
+            yres = y;
+            wall = w;
+            delay = 0.1;
+            spriteFrame = 0;
+        }
+
+        // For item sprites
+        Sprite(int x, int y) {
+            xres = x;
+            yres = y;
+        }
+};
 
 class Player {
     public:
@@ -301,6 +363,13 @@ class Player {
         int pFlip;
         int shown;
         int can_move;
+
+        int up_walk, down_walk, left_walk, right_walk;
+
+        Sprite sp;
+        int positionState;
+        int animationState;
+        int condition;
     public:
         Player() {
             pos[0] = (Flt)(gl.xres/2);
@@ -316,6 +385,14 @@ class Player {
 
             shown = 1;
             can_move = 1;
+            up_walk = down_walk = left_walk = right_walk = 0;
+
+            sp.xres = 256;
+            sp.yres = 64;
+            sp.spriteFrame = 0;
+            animationState = 0;    // Which frame
+            positionState = 0;     // Stance state
+            condition = 0;         // Health condition
         }
 };
 
@@ -391,47 +468,6 @@ class Inventory {
             pos[0] = 0;
             pos[1] = yres / 18;
         }
-};
-
-class Image {
-public:
-	int width, height;
-	unsigned char *data;
-	~Image() { delete [] data; }
-	Image(const char *fname) {
-		if (fname[0] == '\0')
-			return;
-		char name[40];
-		strcpy(name, fname);
-		int slen = strlen(name);
-		name[slen-4] = '\0';
-		char ppmname[80];
-		sprintf(ppmname,"%s.ppm", name);
-		char ts[100];
-		sprintf(ts, "convert %s %s", fname, ppmname);
-		system(ts);
-		FILE *fpi = fopen(ppmname, "r");
-		if (fpi) {
-			char line[200];
-			fgets(line, 200, fpi);
-			fgets(line, 200, fpi);
-			//skip comments and blank lines
-			while (line[0] == '#' || strlen(line) < 2)
-				fgets(line, 200, fpi);
-			sscanf(line, "%i %i", &width, &height);
-			fgets(line, 200, fpi);
-			//get pixel data
-			int n = width * height * 3;			
-			data = new unsigned char[n];			
-			for (int i=0; i<n; i++)
-				data[i] = fgetc(fpi);
-			fclose(fpi);
-		} else {
-			printf("ERROR opening image: %s\n", ppmname);
-			exit(0);
-		}
-		unlink(ppmname);
-	}
 };
 
 class Axe {

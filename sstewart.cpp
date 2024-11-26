@@ -19,6 +19,16 @@ void renderHealth(Health hbox, float pHealth);
 bool pCollision(Player player, int);
 extern int getVectorSize();
 
+extern void spriteInit(Sprite& ,std::string);
+Sprite playerHealthy;
+std::string sprite_image = "./images/Player-sprite-ss.png";
+
+void init_Player_Images(Sprite &sp)
+{
+    spriteInit(playerHealthy, sprite_image);
+    sp.spTex = playerHealthy.spTex;
+}
+
 float updateHealth(float pHealth) // <-- Will need save state passed in
 {
     pHealth = pHealth - zAlertHit;
@@ -103,4 +113,42 @@ bool pCollision(Player player, int rid) {
         }
     }
     return false;
+}
+
+void spritePlayerRender(Sprite sp, float xPos, float yPos)
+{
+
+    float zPos = 0.0f;
+    float cx = sp.xres/8.0;
+	float cy = sp.yres;
+
+    int ix = sp.spriteFrame % 8;
+	int iy = 0;
+    float tx = (float)ix / 8.0;
+	float ty = (float)iy;
+
+	glPushMatrix();
+	glColor3f(1.0, 1.0, 1.0);
+	glBindTexture(GL_TEXTURE_2D, sp.spTex.spriteTexture);
+	//
+	glEnable(GL_ALPHA_TEST);
+	glAlphaFunc(GL_GREATER, 0.0f);
+	glColor4ub(255,255,255,255);
+	
+    /*
+	if (sp.spriteFrame >= 8)
+		iy = 1;
+    */
+	
+    glTranslatef(xPos, yPos, zPos);
+    glRotatef(0.0f,0.0f,0.0f,0.0f);
+	glBegin(GL_QUADS);
+		glTexCoord2f(tx, ty+1.0);      glVertex2i(0, 0);
+		glTexCoord2f(tx, ty);         glVertex2i(0, cy);
+		glTexCoord2f(tx+0.125, ty);    glVertex2i(cx,cy);
+		glTexCoord2f(tx+0.125, ty+1.0); glVertex2i(cx, 0);
+	glEnd();
+	glPopMatrix();
+	glBindTexture(GL_TEXTURE_2D, 0);
+	glDisable(GL_ALPHA_TEST);
 }

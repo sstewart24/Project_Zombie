@@ -14,6 +14,54 @@ const int MAXINVENTORY = 4;
 Inventory box[MAXINVENTORY];
 Inventory bg;
 
+// Help load images into the ppm files opengl uses
+extern void spriteInit(Sprite& ,std::string);
+
+// This would be the setup for the item sprites
+// Give a sprite, then a string for where the image is
+Sprite healthpack = Sprite(40, 40);
+std::string hp_imagefile = "./images/Health-pack.png";
+
+void init_Item_Images()
+{
+    // One instance of an image for the inventory
+    // For more items, just add another spriteInit()
+    // With their respective item
+    spriteInit(healthpack, hp_imagefile);
+}
+
+// Render the item into an inventory slot
+// This needs a bit of tinkering since the item(s) are not aligned
+void spriteItemRender(Sprite sp, float xPos, float yPos)
+{
+    float zPos = 0.0f;
+    float cx = sp.xres / 2;
+	float cy = sp.yres / 2;
+
+    float tx = 0.0;
+	float ty = 0.0;
+
+	glPushMatrix();
+	glColor3f(1.0, 1.0, 1.0);
+	glBindTexture(GL_TEXTURE_2D, sp.spTex.spriteTexture);
+	//
+	glEnable(GL_ALPHA_TEST);
+	glAlphaFunc(GL_GREATER, 0.0f);
+	glColor4ub(255,255,255,255);
+	
+    glTranslatef(xPos, yPos, zPos);
+    //glRotatef(0.0f,0.0f,0.0f,0.0f);
+	glBegin(GL_QUADS);
+		glTexCoord2f(tx, ty+1.0);      glVertex2i(-cx, -cy);
+		glTexCoord2f(tx, ty);         glVertex2i(-cx, cy);
+		glTexCoord2f(tx+1.0, ty);    glVertex2i(cx, cy);
+		glTexCoord2f(tx+1.0, ty+1.0); glVertex2i(cx, -cy);
+	glEnd();
+	glPopMatrix();
+	glBindTexture(GL_TEXTURE_2D, 0);
+	glDisable(GL_ALPHA_TEST);
+}
+
 void init_inventory() {
     bg.pos[0] = bg.xres / 2;
     bg.w = 100;
@@ -52,6 +100,9 @@ void renderInventory() {
             glVertex2f( box[i].w, -box[i].h);
        glEnd();
        glPopMatrix();
+
+       if(i==1) // Which inventory slot it is in
+            spriteItemRender(healthpack, box[i].pos[0], box[i].pos[1]); // where spriteItemrender is called
     }
 
 }

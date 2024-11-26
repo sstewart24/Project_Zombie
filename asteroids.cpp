@@ -14,7 +14,7 @@ Global gl;
 extern Room startRooms(int);
 extern Room swapRoom(int, Room);
 extern int *checkEventSpace(Room, float*);
-//extern int checkDoor(Room, float*);
+
 extern int checkWall(float*, Room);
 extern float movePlayerToRoom(int);
 extern void renderEvent(Eventspace);
@@ -30,6 +30,9 @@ extern void renderLight(int, int);
 extern void renderItem(Axe axe);
 extern int storageInteract(int, Room);
 extern float holeInteract(int, Room, int);
+extern void init_Player_Images(Sprite&);
+extern void spritePlayerRender(Sprite, float, float);
+extern void init_Item_Images();
 int roomID = 0;
 int see_wall;
 int see_darkness;
@@ -76,6 +79,7 @@ public:
 	}
 };*/
 
+Timers timer;
 
 class Bullet {
 public:
@@ -124,6 +128,8 @@ public:
 	struct timespec bulletTimer;
 	struct timespec mouseThrustTimer;
 	bool mouseThrustOn;
+
+	double animationDelay;
 public:
 	Game() {
 		ahead = NULL;
@@ -132,6 +138,8 @@ public:
 		nbullets = 0;
 		mouseThrustOn = false;
         
+		animationDelay = 0.25;
+
 		//build 10 asteroids...
 		/*
         for (int j=0; j<10; j++) {
@@ -319,12 +327,14 @@ int main()
 	see_wall = 1; // Shows the collision boxes of the walls
 	see_darkness = 0;
 	roomInit(roomID);
+	init_Player_Images(g.player.sp);
+	init_Item_Images();
 
 	logOpen();
 	init_opengl();
 	srand(time(NULL));
-	clock_gettime(CLOCK_REALTIME, &timePause);
-	clock_gettime(CLOCK_REALTIME, &timeStart);
+	//clock_gettime(CLOCK_REALTIME, &timePause);
+	//clock_gettime(CLOCK_REALTIME, &timeStart);
 	x11.set_mouse_position(100,100);
 	int done=0;
 	while (!done) {
@@ -334,14 +344,14 @@ int main()
 			check_mouse(&e);
 			done = check_keys(&e);
 		}
-		clock_gettime(CLOCK_REALTIME, &timeCurrent);
-		timeSpan = timeDiff(&timeStart, &timeCurrent);
-		timeCopy(&timeStart, &timeCurrent);
-		physicsCountdown += timeSpan;
-		while (physicsCountdown >= physicsRate) {
-			physics();
-			physicsCountdown -= physicsRate;
-		}
+		//clock_gettime(CLOCK_REALTIME, &timeCurrent);
+		//timeSpan = timeDiff(&timeStart, &timeCurrent);
+		//timeCopy(&timeStart, &timeCurrent);
+		//physicsCountdown += timeSpan;
+		//while (physicsCountdown >= physicsRate) {
+		physics();
+			//physicsCountdown -= physicsRate;
+		//}
 		render();
 		x11.swapBuffers();
 	}
@@ -408,15 +418,16 @@ void check_mouse(XEvent *e)
 		if (e->xbutton.button==1) {
 			//Left button is down
 			//a little time between each bullet
-			struct timespec bt;
-			clock_gettime(CLOCK_REALTIME, &bt);
-			double ts = timeDiff(&g.bulletTimer, &bt);
+			//struct timespec bt;
+			//clock_gettime(CLOCK_REALTIME, &bt);
+			//double ts = timeDiff(&g.bulletTimer, &bt);
+			/**
 			if (ts > 0.1) {
-				timeCopy(&g.bulletTimer, &bt);
+				//timeCopy(&g.bulletTimer, &bt);
 				//shoot a bullet...
 				if (g.nbullets < MAX_BULLETS) {
 					Bullet *b = &g.barr[g.nbullets];
-					timeCopy(&b->time, &bt);
+					//timeCopy(&b->time, &bt);
 					b->pos[0] = g.player.pos[0];
 					b->pos[1] = g.player.pos[1];
 					b->vel[0] = g.player.vel[0];
@@ -436,6 +447,7 @@ void check_mouse(XEvent *e)
 					++g.nbullets;
 				}
 			}
+			*/
 		}
 		if (e->xbutton.button==3) {
 			//Right button is down
@@ -491,6 +503,8 @@ void check_mouse(XEvent *e)
 	}
 }
 
+void playerInteract();
+
 int check_keys(XEvent *e)
 {
 	static int shift=0;
@@ -502,9 +516,22 @@ int check_keys(XEvent *e)
 	//Log("key: %i\n", key);
 	if (e->type == KeyRelease) {
 		gl.keys[key] = 0;
-		if (key == XK_Shift_L || key == XK_Shift_R)
+		if (key == XK_Shift_L || key == XK_Shift_R) {
 			shift = 0;
-		return 0;
+			return 0;
+		}
+		if (key == XK_w) {
+			g.player.up_walk = 0;
+		}
+		if (key == XK_s) {
+			g.player.down_walk = 0;
+		}
+		if (key == XK_a) {
+			g.player.left_walk = 0;
+		}
+		if (key == XK_d) {
+			g.player.right_walk = 0;
+		}
 	}
 	if (e->type == KeyPress) {
 		//std::cout << "press" << std::endl;
@@ -513,86 +540,34 @@ int check_keys(XEvent *e)
 			shift = 1;
 			return 0;
 		}
+		if (key == XK_w) {
+			g.player.up_walk = 1;
+		}
+		if (key == XK_s) {
+			g.player.down_walk = 1;
+		}
+		if (key == XK_a) {
+			g.player.left_walk = 1;
+		}
+		if (key == XK_d) {
+			g.player.right_walk = 1;
+		}
+		if (key == XK_f) {
+			playerInteract();
+		}
+		if (key == XK_l) {
+			// For me to see where wall colissions will be
+			see_wall = !see_wall;
+		}
 	}
 	(void)shift;
-	//int swap;
-	int interact_type = -1;
-	int interact_index = -1;
+	
 	switch (key) {
 		case XK_Escape:
 			return 1;
 		case XK_f:
-			
-			// Pointer to interaction array from individual file
-			int* act_ptr;
-			act_ptr = checkEventSpace(g.room, g.player.pos);
-			interact_type = act_ptr[0];
-			interact_index = act_ptr[1];
-			
-			if (interact_type == 0) {
-				// Case 1 would be for the player to interact with doors
-				g.room = swapRoom(interact_index, g.room);
-				for (int i=0; i<2; i++) {
-					g.player.pos[i] = movePlayerToRoom(i);
-				}
-			} else if (interact_type == 1) {
-				// Case 2 would be for the player to interact with storage/items
-				// With limited items, we can set hotbar to specific items
-				//Will take interact index and current room, return item type
-				int itemtype = storageInteract(interact_index, g.room);
-				if (itemtype == -1) {
-					printf("Storage empty\n");
-				} else {
-					switch(itemtype) {
-						case 1:
-							printf("Grabbed axe\n");
-							g.room.ev[interact_index].stor.hasItem = 0;
-							break;
-					}
-				}
-				fflush(stdout);
-				// Calls second function with item type integer and increases the value of that item
-				// Based on item, might do certain things
-			} else if (interact_type == 2) {
-				// Case 3 would be for the player to hide in something
-				// Just need to create a flag that makes the player hidden
-				g.player.shown = !g.player.shown;
-				g.player.can_move = !g.player.can_move;
-
-				// If time, create animation for each specific situation would make it require
-				// the interact space index or just call certain gif
-			} else if (interact_type == 3) {
-				// Case 4 go through a point where endpoints are in the same room
-				float npos;
-				for (int i=0; i<2; i++) {
-					npos = holeInteract(interact_index, g.room, i);
-					if (npos != -1.0)
-						g.player.pos[i] = npos;
-				}
-			}
-			
-			// act_ptr;
-			interact_type = -1;
-			interact_index = -1;
-			
-
-			/*
-			swap = checkDoor(g.room, g.player.pos);
-			// we have a blank room to make sure we swap to an actual room instead of a room
-			// with nothing
-			if (swap > -1) {
-				g.room = swapRoom(swap, g.room);
-				for (int i=0; i<2; i++) {
-					g.player.pos[i] = movePlayerToRoom(i);
-				}
-			}
-			// bring it back to -1
-			swap = -1;
-			*/
 			break;
 		case XK_l:
-			// For me to see where wall colissions will be
-			see_wall = !see_wall;
 			break;
 		case XK_g:
 			see_darkness = !see_darkness;
@@ -611,6 +586,67 @@ int check_keys(XEvent *e)
 	}
 	return 0;
 }
+
+int interact_type = -1;
+int interact_index = -1;
+
+void playerInteract()
+{
+	// Pointer to interaction array from individual file
+	int* act_ptr;
+	act_ptr = checkEventSpace(g.room, g.player.pos);
+	interact_type = act_ptr[0];
+	interact_index = act_ptr[1];
+			
+	if (interact_type == 0) {
+		// Case 1 would be for the player to interact with doors
+		g.room = swapRoom(interact_index, g.room);
+		for (int i=0; i<2; i++) {
+			g.player.pos[i] = movePlayerToRoom(i);
+			g.player.sp.spriteFrame = 0;
+		}
+	} else if (interact_type == 1) {
+		// Case 2 would be for the player to interact with storage/items
+		// With limited items, we can set hotbar to specific items
+		//Will take interact index and current room, return item type
+		int itemtype = storageInteract(interact_index, g.room);
+		if (itemtype == -1) {
+			printf("Storage empty\n");
+		} else {
+			switch(itemtype) {
+				case 1:
+					printf("Grabbed axe\n");
+					g.room.ev[interact_index].stor.hasItem = 0;
+					break;
+			}
+		}
+		fflush(stdout);
+		// Calls second function with item type integer and increases the value of that item
+		// Based on item, might do certain things
+	} else if (interact_type == 2) {
+		// Case 3 would be for the player to hide in something
+		// Just need to create a flag that makes the player hidden
+		g.player.shown = !g.player.shown;
+		g.player.can_move = !g.player.can_move;
+
+		// If time, create animation for each specific situation would make it require
+		// the interact space index or just call certain gif
+	} else if (interact_type == 3) {
+		// Case 4 go through a point where endpoints are in the same room
+		float npos;
+		for (int i=0; i<2; i++) {
+			npos = holeInteract(interact_index, g.room, i);
+			if (npos != -1.0) {
+				g.player.pos[i] = npos;
+				g.player.sp.spriteFrame = 0;
+			}
+		}
+	}
+			
+	interact_type = -1;
+	interact_index = -1;
+}
+
 /*
 void deleteAsteroid(Game *g, Asteroid *node)
 {
@@ -670,6 +706,20 @@ void physics()
     float xmove = 0.0, ymove = 0.0;
     float newSpeed = sqrt(0.5);
     float newPos[2] = {0.0, 0.0};
+
+	if((g.player.up_walk || g.player.down_walk || 
+						   g.player.left_walk || g.player.right_walk) 
+						   && g.player.shown) {
+		timer.recordTime(&timer.timeCurrent);
+		double timeSpan = timer.timeDiff(&timer.walkTime, &timer.timeCurrent);
+		if (timeSpan > g.animationDelay) {
+			//advance
+			++g.player.sp.spriteFrame;
+			if (g.player.sp.spriteFrame >= 8)
+				g.player.sp.spriteFrame = 0;
+			timer.recordTime(&timer.walkTime);
+		} 
+	}
 
 	//Flt d0,d1,dist;
 	//Update player position
@@ -952,6 +1002,8 @@ void render()
 		glVertex2f(0.0f, 0.0f);
 		glEnd();
 		glPopMatrix();
+
+		spritePlayerRender(g.player.sp, g.player.pos[0], g.player.pos[1]);
 	}
 	if (see_wall) {
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -963,6 +1015,7 @@ void render()
 		for (int i=0; i != (int)g.room.ev.size(); i++) {
 			renderEvent(g.room.ev[i]);
 		}
+		glDisable(GL_BLEND);
 	}
 
 	if (see_darkness) {

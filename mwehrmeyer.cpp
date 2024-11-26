@@ -58,6 +58,8 @@ Room rooms[] = {
             {Eventspace(0, 0, 370.0f, 80.0f, Door(3, 2, 0, 0), 1)}, "./images/Lab-restroom.png")
 };
 
+float jumpPlayerPos_to[2];
+
 class Texture {
 public:
 	Image *backImage;
@@ -97,7 +99,75 @@ void backGl()
     }  
 }
 
-float jumpPlayerPos_to[2];
+SpriteTexture spr;
+
+unsigned char *buildAlphaData(Image *img)
+{
+	//add 4th component to RGB stream...
+	int i;
+	unsigned char *newdata, *ptr;
+	unsigned char *data = (unsigned char *)img->data;
+	newdata = (unsigned char *)malloc(img->width * img->height * 4);
+	ptr = newdata;
+	unsigned char a,b,c;
+	//use the first pixel in the image as the transparent color.
+	unsigned char t0 = *(data+0);
+	unsigned char t1 = *(data+1);
+	unsigned char t2 = *(data+2);
+	for (i=0; i<img->width * img->height * 3; i+=3) {
+		a = *(data+0);
+		b = *(data+1);
+		c = *(data+2);
+		*(ptr+0) = a;
+		*(ptr+1) = b;
+		*(ptr+2) = c;
+		*(ptr+3) = 1;
+		if (a==t0 && b==t1 && c==t2)
+			*(ptr+3) = 0;
+		//-----------------------------------------------
+		ptr += 4;
+		data += 3;
+	}
+
+	return newdata;
+}
+//SpriteTexture spTex;
+void spriteGl(std::string imagefile)//Sprite &sp, std::string imagefile)
+{
+    const char *stringfile = imagefile.c_str();
+    Image img[1] = {stringfile};
+
+    spr.spriteImage = &img[0];
+    //load the images file into a ppm structure.
+	//
+	//create opengl texture elements
+	glGenTextures(1, &spr.spriteTexture);
+    int w = spr.spriteImage->width;
+    int h = spr.spriteImage->height;
+	//-------------------------------------------------------------------------
+	//silhouette
+	//this is similar to a sprite graphic
+	//
+	glBindTexture(GL_TEXTURE_2D, spr.spriteTexture);
+	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
+	//
+	//must build a new set of data...
+	unsigned char *spriteData = buildAlphaData(&img[0]);	
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0,
+		GL_RGBA, GL_UNSIGNED_BYTE, spriteData);
+
+    spr.xc[0] = 0.0;
+	spr.xc[1] = 1.0;
+	spr.yc[0] = 0.0;
+	spr.yc[1] = 1.0;
+}
+
+void spriteInit(Sprite &sp, std::string image_file)
+{
+    spriteGl(image_file);
+    sp.spTex = spr;
+}
 
 class Doormat 
 {
@@ -212,16 +282,6 @@ float holeInteract(int holeID, Room current, int i)
 
     return nextPos;
 }
-// Will from one room to the next based on interacting with a door
-/*
-Room swapRoom(int roomID, Room current) {
-    //int checkDoor(current, player_pos);
-    Room next;
-    roomSave(current);
-    next = rooms[roomID];
-    return next;
-}
-*/
 
 
 int interaction[2];
@@ -250,38 +310,7 @@ int* checkEventSpace(Room current, float pl_pos[2]) {
 
     return interaction;
 }
-/**
-int checkDoor(Room current, float playerPos[2])
-{
-    int i = 0, s = 0;
-    int size = (int)current.doors.size();
-    int nextID = -1;
-    
-    while (i < size && !s) {
-        Doormat door_mat = Doormat(current.doors[i].facing, current.doors[i].xPos, current.doors[i].yPos);
 
-        if (playerPos[0] > door_mat.x && playerPos[0] < door_mat.xx && 
-                playerPos[1] > door_mat.y && playerPos[1] < door_mat.yy) {
-            roomSave(current);
-            nextID = current.doors[i].toRoom;
-            s = 1;
-
-            int d = current.doors[i].toDoor;
-            Doormat next_door = Doormat(rooms[nextID].doors[d].facing, rooms[nextID].doors[d].xPos, rooms[nextID].doors[d].yPos);
-            jumpPlayerPos_to[0] = next_door.x + (next_door.xx - next_door.x)/2;
-            jumpPlayerPos_to[1] = next_door.y + (next_door.yy - next_door.y)/2;
-
-        }
-        i++;
-    }
-
-    return nextID;
-}
-*/
-
-/*
-int checkWall(float newPos[2], Room room)
-*/
 
 // Will check if the player is colliding with a wall to block any movement
 int checkWall(float newPos[2], Room room) {
@@ -298,22 +327,7 @@ int checkWall(float newPos[2], Room room) {
 
     return blocked;
 }
-/*
-void renderDoor(Door door) {
-    glPushMatrix();
-        glColor3fv(door.color);
-        glBegin(GL_TRIANGLES);
 
-        glVertex2f(door.xPos, door.yPos);
-        glVertex2f(door.xPos + door.xLen, door.yPos);
-        glVertex2f(door.xPos + door.xLen, door.yPos + door.yLen);
-        glVertex2f(door.xPos, door.yPos);
-        glVertex2f(door.xPos, door.yPos + door.yLen);
-        glVertex2f(door.xPos + door.xLen, door.yPos + door.yLen);
-        glEnd();
-        glPopMatrix();
-}
-*/
 float movePlayerToRoom(int index) {
     return jumpPlayerPos_to[index];
 }
