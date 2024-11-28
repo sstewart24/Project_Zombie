@@ -27,7 +27,7 @@ extern float updateHealth(float);
 extern void backGl();
 extern void roomRender(int, int, int);
 extern void renderLight(int, int);
-extern void renderItem(Axe axe);
+extern void renderItem(Player, Room);
 extern int storageInteract(int, Room);
 extern float holeInteract(int, Room, int);
 extern void init_Player_Images(Sprite&);
@@ -119,7 +119,7 @@ public:
     //Inventory ibox[IBOX];
     //Inventory iboxbg;
 	Health hbox;
-    Axe axe;
+    //Axe axe;
 
 	Asteroid *ahead;
 	Bullet *barr;
@@ -572,11 +572,11 @@ int check_keys(XEvent *e)
 		case XK_g:
 			see_darkness = !see_darkness;
 			break;
-        case XK_e:
+        /*case XK_e:
             //will be used to collect items in the future
             //only works to toggle the axe on and off for now.
             g.axe.collected ^= 1; 
-            break;
+            break;*/
 		case XK_Down:
 			break;
 		case XK_equal:
@@ -1042,8 +1042,8 @@ void render()
     }*/
     //-------------------------------------------------------------------------
     //Draw Items 
-    renderItem(g.axe);
-      
+    //renderItem(g.axe);
+    renderItem(g.player, g.room); 
      //-------------------------------------------------------------------------
     //Draw Health Box
     renderHealth(g.hbox, pHealth);
