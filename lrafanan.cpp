@@ -1,70 +1,77 @@
 /* Lyanne Rafanan's Source File
- * last updated: 18 NOV 24
+ * last updated: 28 NOV 24
  * What's in here?
- *  - function to render and initialize values for Inventory Box
- *  - function to render Collectable Items (just an axe for right now)
- *
- * Ideas:
- *  - When itemA pos = player pos and itemA room = player room:
- *      collected = true and +1 itemA into inventory
- *
- */
+ *  - Render and initialize values for Inventory Box
+ *  - Render Collectable Items:
+ *      - axe(1): stun/kill zombies
+ *      - healthpack(in progress, multiple around the map): incr player health
+ * TODO:
+ * - add more items:
+ *      - cure: unzombie the zombies
+ *      - map pieces? : collect to find the cure
+ * - fix item alignment inside of inventory slots
+ * */
 #include "header.h"
+// Funtion Prototypes:
+extern void spriteInit(Sprite& ,std::string); // loads images into the ppm
+                                              // files opengl uses
+void init_Item_Images();
+void spriteItemRender(Sprite sp, float xPos, float yPos);
+void init_inventory();
+void renderInventory();
+void renderItem(Player player);
+
+//Globals
+//Healthpack healthpack;
+Axe axe;
 const int MAXINVENTORY = 4;
 Inventory box[MAXINVENTORY];
 Inventory bg;
-
-// Help load images into the ppm files opengl uses
-extern void spriteInit(Sprite& ,std::string);
-
-// This would be the setup for the item sprites
-// Give a sprite, then a string for where the image is
-Sprite healthpack = Sprite(40, 40);
-std::string hp_imagefile = "./images/Health-pack.png";
+Sprite healthpack_img = Sprite(40, 40); // setup for the item sprites
+std::string hp_imagefile = "./images/Health-pack.png"; // string for where the
+                                                       // image is
 Sprite axe_Inventory = Sprite(40, 40);
 std::string axeInv_imagefile = "./images/AxeSprite-Inventory.png";
 
-void init_Item_Images()
-{
+// Initializing Images for render
+void init_Item_Images() {
     // One instance of an image for the inventory
-    // For more items, just add another spriteInit()
-    // With their respective item
-    spriteInit(healthpack, hp_imagefile);
+    spriteInit(healthpack_img, hp_imagefile);
     spriteInit(axe_Inventory, axeInv_imagefile);
 }
 
-// Render the item into an inventory slot
-// This needs a bit of tinkering since the item(s) are not aligned
-void spriteItemRender(Sprite sp, float xPos, float yPos)
-{
+// Render the item into an inventory slot, called in renderInventory()
+//TODO: Fix item alignment
+void spriteItemRender(Sprite sp, float xPos, float yPos) {
     float zPos = 0.0f;
     float cx = sp.xres / 2;
-	float cy = sp.yres / 2;
+        float cy = sp.yres / 2;
 
     float tx = 0.0;
-	float ty = 0.0;
+        float ty = 0.0;
 
-	glPushMatrix();
-	glColor3f(1.0, 1.0, 1.0);
-	glBindTexture(GL_TEXTURE_2D, sp.spTex.spriteTexture);
-	//
-	glEnable(GL_ALPHA_TEST);
-	glAlphaFunc(GL_GREATER, 0.0f);
-	glColor4ub(255,255,255,255);
-	
+        glPushMatrix();
+        glColor3f(1.0, 1.0, 1.0);
+        glBindTexture(GL_TEXTURE_2D, sp.spTex.spriteTexture);
+        //
+        glEnable(GL_ALPHA_TEST);
+        glAlphaFunc(GL_GREATER, 0.0f);
+        glColor4ub(255,255,255,255);
+
     glTranslatef(xPos, yPos, zPos);
     //glRotatef(0.0f,0.0f,0.0f,0.0f);
-	glBegin(GL_QUADS);
-		glTexCoord2f(tx, ty+1.0);      glVertex2i(-cx, -cy);
-		glTexCoord2f(tx, ty);         glVertex2i(-cx, cy);
-		glTexCoord2f(tx+1.0, ty);    glVertex2i(cx, cy);
-		glTexCoord2f(tx+1.0, ty+1.0); glVertex2i(cx, -cy);
-	glEnd();
-	glPopMatrix();
-	glBindTexture(GL_TEXTURE_2D, 0);
-	glDisable(GL_ALPHA_TEST);
+        glBegin(GL_QUADS);
+                glTexCoord2f(tx, ty+1.0);      glVertex2i(-cx, -cy);
+                glTexCoord2f(tx, ty);         glVertex2i(-cx, cy);
+                glTexCoord2f(tx+1.0, ty);    glVertex2i(cx, cy);
+                glTexCoord2f(tx+1.0, ty+1.0); glVertex2i(cx, -cy);
+        glEnd();
+        glPopMatrix();
+        glBindTexture(GL_TEXTURE_2D, 0);
+        glDisable(GL_ALPHA_TEST);
 }
 
+// Initializing Positions for the Inventory Box
 void init_inventory() {
     bg.pos[0] = bg.xres / 2;
     bg.w = 100;
@@ -76,9 +83,10 @@ void init_inventory() {
     }
 }
 
+// Rendering the inventory box and its slots for collectable items
 void renderInventory() {
     init_inventory();
-//background box -----------------------------------------------------
+    //background box
     glPushMatrix();
         glColor3ub(74, 78, 105);
         glTranslatef(bg.pos[0], bg.pos[1], 0.0f);
@@ -89,7 +97,8 @@ void renderInventory() {
             glVertex2f( bg.w, -bg.h);
        glEnd();
        glPopMatrix();
-//main boxes ---------------------------------------------------------
+
+    //inventory slots
     for (int i=0; i<MAXINVENTORY; i++) {
     glPushMatrix();
         glColor3ub(34, 34, 59);
@@ -103,27 +112,45 @@ void renderInventory() {
             glVertex2f( box[i].w, -box[i].h);
        glEnd();
        glPopMatrix();
-        if (i==0) // Which inventory slot it is in
-            spriteItemRender(axe_Inventory, box[i].pos[0], box[i].pos[1]); // where spriteItemrender is called
-        if (i==1) 
-            spriteItemRender(healthpack, box[i].pos[0], box[i].pos[1]); // where spriteItemrender is called
+       // i = inventory slot
+        if (i==0 && axe.collected)
+            spriteItemRender(axe_Inventory, box[i].pos[0], box[i].pos[1]);
+        if (i==1 /*&& healthpack.collected*/)
+            spriteItemRender(healthpack_img, box[i].pos[0], box[i].pos[1]);
     }
 
 }
 
-//TODO: change later to work for multiple items
-void renderItem(Axe axe) {
-    if (!axe.collected) {
-    glPushMatrix();
-            glColor3ub(0, 0, 0);
-        glTranslatef(axe.pos[0], axe.pos[1], 0.0f);
-        glBegin(GL_QUADS);
-            glVertex2f(-axe.w, -axe.h);
-            glVertex2f(-axe.w,  axe.h);
-            glVertex2f( axe.w,  axe.h);
-            glVertex2f( axe.w, -axe.h);
-       glEnd();
-       glPopMatrix();
+// Rendering Items to Collect on the Map
+//TODO: Make it work for multiple items
+int xres = 640;
+int yres = 480;
+void renderItem(Player player, Room currentRoom) {
+    //Axe - inside of main lobby
+    axe.pos[0] = (640 / 2) + 50;
+    axe.pos[1] = (480 / 2);
+    if (!axe.collected  && axe.room == currentRoom.id) {
+        spriteItemRender(axe_Inventory, axe.pos[0], axe.pos[1]);
     }
+    if ((player.pos[0] == axe.pos[0]) &&
+         (player.pos[1] == axe.pos[1])) {
+        axe.collected = true;
+        axe.available += 1;
+        printf("axe collected\n");
+    }
+   /*
+    //Health pack
+    if (!healthpack.collected) {
+        healthpack.pos[0] = (640 / 2) + 50;
+        healthpack.pos[1] = (480 / 2) - 30;
+        spriteItemRender(healthpack_img, healthpack.pos[0],
+                         healthpack.pos[1]);
+           }
+    if ((player.pos[0] == healthpack.pos[0]) &&
+         (player.pos[1] == healthpack.pos[1])) {
+        healthpack.collected = true;
+        healthpack.available += 1;
+        printf("health pack collected\n");
+    }
+    */
 }
-
