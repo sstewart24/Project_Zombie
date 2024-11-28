@@ -478,21 +478,43 @@ class Inventory {
         }
 };
 
+
 class Axe {
     public:
         int damage;
         float pos[2];
         float w,h;
         bool collected;
-        int axesAvailable;
+        int available;
+        int room;
         Axe() {
             //name = "Axe";
-            pos[0] = 640 / 2;
-            pos[1] = 480 / 2;
+            pos[0] = 0; //640 / 2;
+            pos[1] = 0; //480 / 2;
             w = 5;
             h = 5;
             collected = false;
             damage = 0;
-            axesAvailable = 0;
+            available = 0;
+            room = 0; //main lobby
         }
 };
+/*
+class Healthpack {
+    public:
+        int heal;
+        float pos[2];
+        float w,h;
+        bool collected;
+        int available;
+        Healthpack() {
+            //name = "Health Pack";
+            pos[0] = 0; //640 / 2;
+            pos[1] = 0; //480 / 2;
+            w = 5;
+            h = 5;
+            collected = false;
+            heal = 0;
+            available = 0;
+        }
+};*/
