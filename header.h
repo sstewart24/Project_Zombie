@@ -405,13 +405,21 @@ class Zombie {
         float angle;
         int alive;
         float color[3];
+
         float moveDistance; // Distance moved so far
         float maxDistance; // Maximum distance before turning
         int direction; // 0: up, 1: right, 2: down, 3: left
+
+        int count; // Countdown for zombies
+        bool waiting; // See if zombie is waiting
+        bool following; // Chek to see if the zombie was following
+        //bool sus;
+
     public:
         //Zombie Constructor
         Zombie(int idZ, float x, float y, float a, int l, int r)
-            : moveDistance(0.0f), maxDistance(100.0f), direction(1) { //member initializer list
+            : moveDistance(0.0f), maxDistance(100.0f), direction(1),
+              count(0), waiting(1), following(false) { //member initializer list
                 id = idZ;
                 pos[0] = x;
                 pos[1] = y;
