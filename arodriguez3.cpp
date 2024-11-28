@@ -193,6 +193,10 @@ void Zroam(Zombie& zombie, Room current)
         zombie.moveDistance = 0;
         return; 
 
+	} else if (zombie.count != 0) {
+		// Check if zombie is suspicious of player, stop moving
+		zombie.moveDistance = 0;
+		//printf("Zombie paused\n");
 	} else {
         // Update position only if there's no collision
         zombie.pos[0] = newPos[0];
@@ -219,18 +223,20 @@ void renderZombie(Room current, Player player)
 				glRotatef(0.0f, 0.0f, 0.0f, 1.0f);
 				float size = 9.0f; // size of zombie
 				glBegin(GL_QUADS);
-					glColor3f(0.0f, 1.0f, 0.0f); 	// green color
 					if (Zfollow(zombies[i], player, current)) {
-						if (zombies[i].count < 50) {
-							glColor3f(0.0f, 0.0f, 1.0f); // blue color
-						}
-						glColor3f(1.0f, 0.0f, 0.0f); // red color
+						// When following player (red)
+						glColor3f(1.0f, 0.0f, 0.0f);
+					} else if (zombies[i].count > 0) {
+						// When Zombie is suspicious of player (blue)
+						glColor3f(0.0f, 0.0f, 1.0f);
+					} else {
+						// When Zombie is just roaming (green)
+						glColor3f(0.0f, 1.0f, 0.0f);
 					}
-					
-					glVertex3f(size, size, 0.0f); 		// top right
-					glVertex3f(size, -size, 0.0f); 		// bottom right
-					glVertex3f(-size, -size, 0.0f); 	// bottom left
-					glVertex3f(-size, size, 0.0f); 		// top left
+					glVertex3f(size, size, 0.0f); 	// top right
+					glVertex3f(size, -size, 0.0f); 	// bottom right
+					glVertex3f(-size, -size, 0.0f); // bottom left
+					glVertex3f(-size, size, 0.0f); 	// top left
 				glEnd();
 
 				glBegin(GL_POINTS);
