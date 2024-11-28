@@ -1,40 +1,3 @@
-/*=================================================================
- * Adrian's source file
- *
- * Updated: 11/25/2024
- *
- * Currently:
- *	- Defines for Zroam and Zfollow functions
- *
- *	- Extern of checkWall function from Mathew's source file 
- *	  for zombie hitting walls
- *
- *	- Vector for Zombies
- *
- *	- int function that is made for Sophia to get the size of the Zombie vector
- *
- *	- Another function that is made for Sophia to work on player to zombie collision
- *
- *	- Int function getRandomDirection to get a random direction for zombies
- *	
- *	- A Bool function called Zcollision to check for collision between Zombies
- *
- *	- A Bool function called Zfollow to check if the zombie or player is at
- *	  a certain range, the zombie will follow the player, also calling checkWall
- * 	  so Zombies do not go through walls while following	
- *
- *	- Void function Zroam so zombies can roam around the rooms
- *
- *	- Void renderZombie function to render Zombies into rooms 
- *	  and have them in different positions depending on what room they're in.
- *
- * TO-DO:
- *	1) Give Zombie a delay before following player
- *
- *	2) Maybe give zombie another delay before switching directions
- *
- *	3) Make zombie dissapear when they are killed with axe
- *====================================================================*/
 #include "header.h"
 using namespace std;
 
@@ -43,47 +6,43 @@ using namespace std;
 
 extern int checkWall(float*, Room);
 
+int Zcol_count = 0; // For zombie collision countdown
+
 // Vector for Zombies 
 std::vector<Zombie> zombies = {
-	Zombie(0, 575.0f, 400.0f, 0, 1, 0),
+	Zombie(0, 575.0f, 400.0f, 0, 1, 0), // Entrance
 	Zombie(1, 75.0f, 100.0f, 0, 1, 0),
 	Zombie(2, 575.0f, 200.0f, 0, 1, 0),
 	Zombie(3, 75.0f, 150.0f, 0, 1, 0),
-	//Zombie(4, 575.0f, 300.0f, 0, 1, 1),
-	Zombie(4, 200.0f, 280.0f, 0, 1, 1),
+	
+	Zombie(4, 200.0f, 280.0f, 0, 1, 1), // Office
 
-	Zombie(5, 500.0f, 280.0f, 0, 1, 2),
+	Zombie(5, 500.0f, 280.0f, 0, 1, 2), // Hall
 
-	Zombie(6, 555.0f, 350.0f, 0, 1, 4),
-	Zombie(7, 120.0f, 350.0f, 0, 1, 4)
+	Zombie(6, 555.0f, 350.0f, 0, 1, 4), // Lab
+	Zombie(7, 120.0f, 350.0f, 0, 1, 4),
+	
+	Zombie(8, 200.0f, 260.0f, 0, 1, 5) // Restroom
 };
 
-int getVectorSize() { // function for Sophia
+int getVectorSize()
+{ // function for Sophia
 	return zombies.size(); 
 }
 
-Zombie getZombies(int index) { // function for Sophia
+Zombie getZombies(int index)
+{ // function for Sophia
 	return zombies[index];
 }
 
 // Function to get a random direction
-int getRandomDirection() {
+int getRandomDirection()
+{
     return rand() % 4; // Returns a random integer between 0 and 3
 }
 
-void Zwait() {
-    time_t start, current; // start time and current time
-    start = time(NULL);
-
-    while (1) {
-		current = time(NULL);
-		if (current - start >= 1) {
-			break;
-		}
-    }
-}
-
-bool Zcollision(float newPos[2], const Zombie& zombie) { // newPos is the other zombie
+bool Zcollision(float newPos[2], const Zombie& zombie)
+{ // newPos is the other zombie
 	for (size_t i = 0; i < zombies.size(); i++) {
 		if (zombies[i].id != zombie.id) {
 			// Calculate the distance between the zombie and other zombies
@@ -91,24 +50,35 @@ bool Zcollision(float newPos[2], const Zombie& zombie) { // newPos is the other 
 			float y = newPos[1] - zombies[i].pos[1];
 			float distance = sqrt(x * x + y * y);
 			
-			// If the distance is smaller than the threshold, it is a collision
-			if (distance < 18.0f) { // the threshold is 18.0f because of the zombies size in render (2 * 9.0f)
+			
+			if (distance < 18.0f) { // the threshold is 18.0f (2 * 9// If the distance is smaller than the threshold, it is a collision.0f)
+				Zcol_count++;
 				if (!zombie.alive) {
 					return false;
 				}
-				if (distance <= 0.0f) {
+				if (distance == 0.0f) {
 					return false; // No collision
+				}
+				if (Zcol_count == 0) {
+					return true;
+				}
+				if (Zcol_count >= 1 && Zcol_count < 30) {
+					//printf("Counting: %i\n", count);
+					return false;
+				}
+				if (Zcol_count == 30) {
+					Zcol_count = 0;
+					return true;
 				}
                 return true; // Collission
 			}
-
 		}
 	}
 	return false; // No collision
 }
 
-bool Zfollow(Zombie& zombie, Player& player, Room current) {
-	//static int count = 0;
+bool Zfollow(Zombie& zombie, Player& player, Room current)
+{
 	float follow_range = 100.0f;
 	float Ppos[2] = {player.pos[0], player.pos[1]}; 	// Player position
 	float Zpos[2] = {zombie.pos[0], zombie.pos[1]}; 	// Zombie position
@@ -120,43 +90,60 @@ bool Zfollow(Zombie& zombie, Player& player, Room current) {
 
 	// If the player is shown and zombie is alive, follow
 	if (player.shown && zombie.alive) {
+		// If the zombie was following the player and the player is out of range
+		if (zombie.following && distance >= follow_range) {
+			zombie.count = 0;			// reset count
+			zombie.waiting = 1;			// reset waiting
+			zombie.following = false;	// stopped following
+			//printf("Counter reset\n");
+			return false;
+		}
 		// If the zombie is within the range of the player, follow the player
 		if (distance < follow_range) {
-			//Zwait();
-			// Calculate the direction towards the player
-			// Normalize the direction vector (dx, dy)
-			float Xdir = dx / distance;
-			float Ydir = dy / distance;
+			if(!zombie.waiting) {
+				// Calculate the direction towards the player
+				// Normalize the direction vector (dx, dy)
+				float Xdir = dx / distance;
+				float Ydir = dy / distance;
 
-			// Update zombie position toward the player
-			float NewZpos[2];
-			NewZpos[0] = zombie.pos[0] + MOVESTEP * Xdir;
-			NewZpos[1] = zombie.pos[1] + MOVESTEP * Ydir;
+				// Update zombie position toward the player
+				float NewZpos[2];
+				NewZpos[0] = zombie.pos[0] + MOVESTEP * Xdir;
+				NewZpos[1] = zombie.pos[1] + MOVESTEP * Ydir;
 
-			// Checks to see if the Zombie is colliding with a wall
-			if (!checkWall(NewZpos, current)) {
-				zombie.pos[0] = NewZpos[0];
-				zombie.pos[1] = NewZpos[1];
+				// Checks to see if the Zombie is colliding with a wall
+				if (!checkWall(NewZpos, current)) {
+					zombie.pos[0] = NewZpos[0];
+					zombie.pos[1] = NewZpos[1];
 
+				}
+				zombie.following = true; 	// marked as following
+				return true; 				// Zombie follows player
 			} else {
-				// Zombie will not move because checkWall with return blocked
+				zombie.count++;
+				if (zombie.count > 1 && zombie.count < 50) {
+					//printf("Counting: %i\n", zombie.count);
+					return false;
+				}
+				if (zombie.count == 50) {
+					//printf("Count is now: %i\n", zombie.count);
+					zombie.waiting = 0;
+				}
 			}
-
-
-			return true; // Zombie follows player
 		}
 	}
-		
 	return false; // Zombie does not follow player
 }
 
-void Zroam(Zombie& zombie, Room current) {
+void Zroam(Zombie& zombie, Room current)
+{
     // Float moveStep = 2.0f; // how much to move each update
     float newPos[2] = {zombie.pos[0], zombie.pos[1]};
 	
     // Update position based on current direction
     switch (zombie.direction) {
         case 0: // Moving up
+			//Zwait();
             newPos[1] += MOVESTEP;
 			zombie.angle = 360.0f;
             break;
@@ -202,7 +189,7 @@ void Zroam(Zombie& zombie, Room current) {
 }
 
 //Drawing/Rendering Zombies
-void renderZombie(Room current, Player player) 
+void renderZombie(Room current, Player player)
 {
 	// Uses for loop to make zombies based on the size of the zombie vector
 	for (size_t i = 0; i < zombies.size(); i++) {
@@ -210,8 +197,10 @@ void renderZombie(Room current, Player player)
 		// If the zombies room # matches the current room id, draw the zombie
 		if (zombies[i].room == current.id) {
             if (zombies[i].alive == 1) {
-				if(!Zfollow(zombies[i], player, current)) {
+				if (!Zfollow(zombies[i], player, current)) {
 					Zroam(zombies[i], current);
+				} else {
+					//Zwait();
 				}
 				
 				//draws the zombies
@@ -220,12 +209,14 @@ void renderZombie(Room current, Player player)
 				glRotatef(0.0f, 0.0f, 0.0f, 1.0f);
 				float size = 9.0f; // size of zombie
 				glBegin(GL_QUADS);
-					if (zombies[i].angle == 360.0f) {
-						glColor3f(0.0f, 0.0f, 1.0f); 	// blue color
-
-					}else {
-						glColor3f(0.0f, 1.0f, 0.0f); 	// green color
+					glColor3f(0.0f, 1.0f, 0.0f); 	// green color
+					if (Zfollow(zombies[i], player, current)) {
+						if (zombies[i].count < 50) {
+							glColor3f(0.0f, 0.0f, 1.0f); // blue color
+						}
+						glColor3f(1.0f, 0.0f, 0.0f); // red color
 					}
+					
 					glVertex3f(size, size, 0.0f); 		// top right
 					glVertex3f(size, -size, 0.0f); 		// bottom right
 					glVertex3f(-size, -size, 0.0f); 	// bottom left
@@ -236,7 +227,7 @@ void renderZombie(Room current, Player player)
 				glVertex2f(0.0f, 0.0f);
 				glEnd();
 				glPopMatrix();
-            		}
+            }
 		}
 	}
 }
