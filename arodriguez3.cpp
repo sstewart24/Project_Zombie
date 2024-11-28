@@ -50,8 +50,8 @@ bool Zcollision(float newPos[2], const Zombie& zombie)
 			float y = newPos[1] - zombies[i].pos[1];
 			float distance = sqrt(x * x + y * y);
 			
-			
-			if (distance < 18.0f) { // the threshold is 18.0f (2 * 9// If the distance is smaller than the threshold, it is a collision.0f)
+			// If the distance is smaller than the threshold, it is a collision
+			if (distance < 18.0f) { // the threshold is 18.0f (2 * 9.0f)
 				Zcol_count++;
 				if (!zombie.alive) {
 					return false;
@@ -121,16 +121,28 @@ bool Zfollow(Zombie& zombie, Player& player, Room current)
 				return true; 				// Zombie follows player
 			} else {
 				zombie.count++;
-				if (zombie.count > 1 && zombie.count < 50) {
+				if (zombie.count > 1 && zombie.count < 30) {
 					//printf("Counting: %i\n", zombie.count);
 					return false;
 				}
-				if (zombie.count == 50) {
+				if (zombie.count == 30) {
 					//printf("Count is now: %i\n", zombie.count);
 					zombie.waiting = 0;
 				}
 			}
 		}
+		if (zombie.waiting && distance > follow_range) {
+			// Resets timer when player leaves range
+			zombie.count = 0;
+			//printf("Out of range, Counter reset\n");
+		}
+	}
+	else if (!player.shown && zombie.following) { 
+		// Resets everything when player hides
+		zombie.count = 0;
+		zombie.waiting = 1;
+		zombie.following = false;
+		//printf("Counter reset\n");
 	}
 	return false; // Zombie does not follow player
 }
@@ -199,8 +211,6 @@ void renderZombie(Room current, Player player)
             if (zombies[i].alive == 1) {
 				if (!Zfollow(zombies[i], player, current)) {
 					Zroam(zombies[i], current);
-				} else {
-					//Zwait();
 				}
 				
 				//draws the zombies
