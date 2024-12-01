@@ -1,6 +1,6 @@
 #include "header.h"
 #define DOOR_WIDTH 60.0
-#define DOORMAT_WIDTH 25.0
+#define DOORMAT_WIDTH 64.0
 #define ITEM_INTERACT_WIDTH 45.0
 #define TUNNEL_WIDTH 45.0
 // Builds the room to be drawn for any objects in the room
@@ -8,55 +8,82 @@
 
 // World mapping
 // Includes walls and other objects
-Room rooms[] = { 
+Room defaultWorld[] = { 
     Room(0, {Wall(0.0f, 0.0f, 48.0f, 480.0f),
-             Wall(0.0f, 0.0f, 640.0f, 64.0f),
-             Wall(608.0f, 0.0f, 32.0f, 480.0f),
-             Wall(0.0f, 448.0f, 640.0f, 32.0f),
-             Wall(0.0f, 240.0f, 224.0f, 32.0f),
-             Wall(288.0f, 0.0f, 32.0f, 192.0f),
-             Wall(448.0f, 0.0f, 32.0f, 192.0f),
-             Wall(288.0f, 256.0f, 32.0f, 80.0f),
-             Wall(288.0f, 256.0f, 192.0f, 48.0f),
-             Wall(448.0f, 256.0f, 32.0f, 224.0f)},
+                Wall(0.0f, 0.0f, 640.0f, 64.0f),
+                Wall(608.0f, 0.0f, 32.0f, 480.0f),
+                Wall(0.0f, 448.0f, 640.0f, 32.0f),
+                Wall(0.0f, 240.0f, 224.0f, 32.0f),
+                Wall(288.0f, 0.0f, 32.0f, 192.0f),
+                Wall(448.0f, 0.0f, 32.0f, 192.0f),
+                Wall(288.0f, 272.0f, 32.0f, 80.0f),
+                Wall(288.0f, 272.0f, 192.0f, 32.0f),
+                Wall(448.0f, 272.0f, 32.0f, 224.0f)},
             {Eventspace(0, 0, 482.0f, 368.0f, Door(0, 2, 0, 0), 2),
-             Eventspace(1, 0, 98.0f, 368.0f, Door(0, 1, 0, 0), 2),
-             Eventspace(2, 0, 583.0f, 240.0f, Door(0, 2, 0, 0), 4),
-             Eventspace(3, 3, 304.0f, 80.0f, Hole(4, 0)),
-             Eventspace(4, 3, 272.0f, 80.0f, Hole(3, 0)),
-             Eventspace(5, 1, 50.0f, 320.0f, Storage(1, 1)),
-             Eventspace(6, 2, 272.0f, 320.0f)}, "./images/lab-entrance.png"), 
+                Eventspace(1, 0, 98.0f, 368.0f, Door(0, 1, 0, 0), 2),
+                Eventspace(2, 0, 583.0f, 240.0f, Door(0, 2, 0, 0), 4),
+                Eventspace(3, 3, 304.0f, 80.0f, Hole(4, 0)),
+                Eventspace(4, 3, 272.0f, 80.0f, Hole(3, 0)),
+                Eventspace(5, 1, 50.0f, 320.0f, Storage(1, 1)),
+                Eventspace(6, 2, 272.0f, 320.0f)}, 
+            "./images/lab-entrance.png"), 
     Room(1, {Wall(0.0f, 0.0f, 160.0f, 480.0f),
-             Wall(0.0f, 0.0f, 640.0f, 96.0f),
-             Wall(480.0f, 0.0f, 160.0f, 480.0f),
-             Wall(0.0f, 368.0f, 640.0f, 112.0f)},
-            {Eventspace(0, 0, 352.0f, 96.0f, Door(1, 0, 0, 0), 1)}, "./images/Lab-officeroom.png"),
+                Wall(0.0f, 0.0f, 640.0f, 96.0f),
+                Wall(480.0f, 0.0f, 160.0f, 480.0f),
+                Wall(0.0f, 368.0f, 640.0f, 112.0f)},
+            {Eventspace(0, 0, 352.0f, 96.0f, Door(1, 0, 0, 0), 1)}, 
+            "./images/Lab-officeroom.png"),
     Room(2, {Wall(0.0f, 0.0f, 64.0f, 480.0f),
-             Wall(0.0f, 0.0f, 640.0f, 80.0f),
-             Wall(0.0f, 416.0f, 640.0f, 64.0f),
-             Wall(576.0f, 0.0f, 64.0f, 480.0f),
-             Wall(256.0f, 80.0f, 320.0f, 64.0f)},
+                Wall(0.0f, 0.0f, 640.0f, 80.0f),
+                Wall(0.0f, 416.0f, 640.0f, 64.0f),
+                Wall(576.0f, 0.0f, 64.0f, 480.0f),
+                Wall(256.0f, 80.0f, 320.0f, 64.0f)},
             {Eventspace(0, 0, 130.0f, 80.0f, Door(0, 0, 0, 0), 1),
-             Eventspace(1, 0, 64.0f, 210.0f, Door(0, 3, 0, 0), 4),
-             Eventspace(2, 0, 386.0f, 311.0f, Door(0, 4, 0, 0), 1),
-             Eventspace(3, 0, 130.0f, 311.0f, Door(0, 5, 0, 0), 1)}, "./images/LabHall01.png"),
+                Eventspace(1, 0, 64.0f, 210.0f, Door(0, 3, 0, 0), 4),
+                Eventspace(2, 0, 386.0f, 311.0f, Door(0, 4, 0, 0), 1),
+                Eventspace(3, 0, 130.0f, 311.0f, Door(0, 5, 0, 0), 1)}, 
+            "./images/LabHall01.png"),
     Room(3, {Wall(0.0f, 0.0f, 256.0f, 480.0f),
-             Wall(0.0f, 0.0f, 640.0f, 80.0f),
-             Wall(384.0f, 0.0f, 256.0f, 480.0f),
-             Wall(0.0f, 352.0f, 640.0f, 128.0f)},
-            {Eventspace(0, 0, 358.0f, 146.0f, Door(1, 2, 0, 0), 4)}, "./images/Lab-closet.png"),
+                Wall(0.0f, 0.0f, 640.0f, 80.0f),
+                Wall(384.0f, 0.0f, 256.0f, 480.0f),
+                Wall(0.0f, 352.0f, 640.0f, 128.0f)},
+            {Eventspace(0, 0, 358.0f, 146.0f, Door(1, 2, 0, 0), 4)}, 
+            "./images/Lab-closet.png"),
     Room(4, {Wall(0.0f, 0.0f, 64.0f, 480.0f),
-             Wall(0.0f, 0.0f, 640.0f, 80.0f),
-             Wall(608.0f, 0.0f, 32.0f, 480.0f),
-             Wall(0.0f, 448.0f, 640.0f, 32.0f),
-             Wall(320.0f, 224.0f, 32.0f, 256.0f)},
-            {Eventspace(0, 0, 130.0f, 80.0f, Door(2, 2, 0, 0), 1)}, "./images/Lab-sidelab.png"),
+                Wall(0.0f, 0.0f, 640.0f, 80.0f),
+                Wall(608.0f, 0.0f, 32.0f, 480.0f),
+                Wall(0.0f, 448.0f, 640.0f, 32.0f),
+                Wall(320.0f, 224.0f, 32.0f, 256.0f)},
+            {Eventspace(0, 0, 130.0f, 80.0f, Door(2, 2, 0, 0), 1)}, 
+            "./images/Lab-sidelab.png"),
     Room(5, {Wall(0.0f, 0.0f, 176.0f, 480.0f),
-             Wall(0.0f, 0.0f, 640.0f, 80.0f),
-             Wall(432.0f, 0.0f, 208.0f, 480.0f),
-             Wall(0.0f, 352.0f, 640.0f, 128.0f)},
-            {Eventspace(0, 0, 370.0f, 80.0f, Door(3, 2, 0, 0), 1)}, "./images/Lab-restroom.png")
+                Wall(0.0f, 0.0f, 640.0f, 80.0f),
+                Wall(432.0f, 0.0f, 208.0f, 480.0f),
+                Wall(0.0f, 352.0f, 640.0f, 128.0f)},
+            {Eventspace(0, 0, 370.0f, 80.0f, Door(3, 2, 0, 0), 1)}, 
+            "./images/Lab-restroom.png")
 };
+
+std::vector<Room> rooms;
+int roomAmount = 6;
+// Helps have a default world in case the player dies and restarts
+void init_World()
+{
+    int i = 0;
+    while (i < roomAmount) {
+        rooms.push_back(defaultWorld[i]);
+        i++;
+    }
+}
+// Removes the rooms so that the index values stay consistent
+void clear_run()
+{
+    int i = 0;
+    while (i < roomAmount) {
+        rooms.pop_back();
+        i++;
+    }
+}
 
 float jumpPlayerPos_to[2];
 
@@ -70,7 +97,7 @@ public:
 
 Texture tex;
 std::vector<Texture> textures;
-int roomAmount = 6;
+
 void backGl()
 {
     int i = 0;
@@ -318,8 +345,8 @@ int checkWall(float newPos[2], Room room) {
     int blocked = 0;
     int i = 0;
     while (!blocked && i < (int)w.size()) {
-        if (newPos[0] > w[i].xPos && newPos[0] < w[i].xPos + w[i].xLen && 
-            newPos[1] > w[i].yPos && newPos[1] < w[i].yPos + w[i].yLen) {
+        if (newPos[0] + 16 > w[i].xPos && newPos[0] - 16 < w[i].xPos + w[i].xLen && 
+                newPos[1] > w[i].yPos && newPos[1] - 32 < w[i].yPos + w[i].yLen) {
             blocked = 1;
         }
         i++;

@@ -387,7 +387,7 @@ class Player {
             can_move = 1;
             up_walk = down_walk = left_walk = right_walk = 0;
 
-            sp.xres = 256;
+            sp.xres = 192;
             sp.yres = 64;
             sp.spriteFrame = 0;
             animationState = 0;    // Which frame

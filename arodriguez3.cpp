@@ -6,6 +6,17 @@ using namespace std;
 
 extern int checkWall(float*, Room);
 
+// Sprite the zombies will use
+extern void spriteInit(Sprite& ,std::string);
+Sprite zombieSprite = Sprite(192, 64, 0);
+std::string sprite_image_Z = "./images/Sprite-zombie.png";
+void init_Zombie_Image()
+{
+	spriteInit(zombieSprite, sprite_image_Z);
+	zombieSprite.delay = 0.2;
+}
+Timers ztimer;
+
 int Zcol_count = 0; // For zombie collision countdown
 
 // Vector for Zombies 
@@ -207,6 +218,16 @@ void Zroam(Zombie& zombie, Room current)
 //Drawing/Rendering Zombies
 void renderZombie(Room current, Player player)
 {
+	ztimer.recordTime(&ztimer.timeCurrent);
+		double timeSpan = ztimer.timeDiff(&ztimer.walkTime, &ztimer.timeCurrent);
+		if (timeSpan > zombieSprite.delay) {
+			//advance
+			++zombieSprite.spriteFrame;
+			if (zombieSprite.spriteFrame >= 8)
+				zombieSprite.spriteFrame = 0;
+			ztimer.recordTime(&ztimer.walkTime);
+		} 
+	//zombieSprite.spriteFrame += 1;
 	// Uses for loop to make zombies based on the size of the zombie vector
 	for (size_t i = 0; i < zombies.size(); i++) {
 		
@@ -243,6 +264,38 @@ void renderZombie(Room current, Player player)
 				glVertex2f(0.0f, 0.0f);
 				glEnd();
 				glPopMatrix();
+
+				float zPos = 0.0f;
+    			float cx = zombieSprite.xres/6.0;
+    			float cy = zombieSprite.yres;
+
+    			int ix = zombieSprite.spriteFrame % 6;
+    			int iy = 0;
+    			float tx = (float)ix / 6.0;
+    			float ty = (float)iy;
+
+    			glPushMatrix();
+    			glColor3f(1.0, 1.0, 1.0);
+    			glBindTexture(GL_TEXTURE_2D, zombieSprite.spTex.spriteTexture);
+    			//
+    			glEnable(GL_ALPHA_TEST);
+    			glAlphaFunc(GL_GREATER, 0.0f);
+    			glColor4ub(255,255,255,255);
+
+    			glTranslatef(zombies[i].pos[0], zombies[i].pos[1], zPos);
+    			//if (direction) {
+        		//	glRotatef(180.0f,1.0f,0.0f,0.0f);
+        		//	glRotatef(180.0f,0.0f,0.0f,1.0f);  
+    			//}
+    			glBegin(GL_QUADS);
+        			glTexCoord2f(tx, ty+1.0);      glVertex2i(-cx/2, -cy/2);
+					glTexCoord2f(tx, ty);         glVertex2i(-cx/2, cy/2);
+					glTexCoord2f(tx+0.1667, ty);    glVertex2i(cx/2,cy/2);
+					glTexCoord2f(tx+0.1667, ty+1.0); glVertex2i(cx/2, -cy/2);
+    			glEnd();
+    			glPopMatrix();
+    			glBindTexture(GL_TEXTURE_2D, 0);
+    			glDisable(GL_ALPHA_TEST);
             }
 		}
 	}

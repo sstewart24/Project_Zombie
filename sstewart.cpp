@@ -17,7 +17,7 @@ extern int getVectorSize();
 
 extern void spriteInit(Sprite& ,std::string);
 Sprite playerHealthy;
-std::string sprite_image = "./images/Player-sprite-ss.png";
+std::string sprite_image = "./images/Sprite-player.png";
 
 void init_Player_Images(Sprite &sp)
 {
@@ -123,16 +123,16 @@ bool pCollision(Player player, int rid) {
     return false;
 }
 
-void spritePlayerRender(Sprite sp, float xPos, float yPos)
+void spritePlayerRender(Sprite sp, float xPos, float yPos, int direction)
 {
 
     float zPos = 0.0f;
-    float cx = sp.xres/8.0;
+    float cx = sp.xres/6.0;
     float cy = sp.yres;
 
-    int ix = sp.spriteFrame % 8;
+    int ix = sp.spriteFrame % 6;
     int iy = 0;
-    float tx = (float)ix / 8.0;
+    float tx = (float)ix / 6.0;
     float ty = (float)iy;
 
     glPushMatrix();
@@ -149,12 +149,15 @@ void spritePlayerRender(Sprite sp, float xPos, float yPos)
        */
 
     glTranslatef(xPos, yPos, zPos);
-    glRotatef(0.0f,0.0f,0.0f,0.0f);
+    if (direction) {
+        glRotatef(180.0f,1.0f,0.0f,0.0f);
+        glRotatef(180.0f,0.0f,0.0f,1.0f);  
+    }
     glBegin(GL_QUADS);
-    glTexCoord2f(tx, ty+1.0);      glVertex2i(0, 0);
-    glTexCoord2f(tx, ty);         glVertex2i(0, cy);
-    glTexCoord2f(tx+0.125, ty);    glVertex2i(cx,cy);
-    glTexCoord2f(tx+0.125, ty+1.0); glVertex2i(cx, 0);
+        glTexCoord2f(tx, ty+1.0);      glVertex2i(-cx/2, -cy/2);
+		glTexCoord2f(tx, ty);         glVertex2i(-cx/2, cy/2);
+		glTexCoord2f(tx+0.1667, ty);    glVertex2i(cx/2,cy/2);
+		glTexCoord2f(tx+0.1667, ty+1.0); glVertex2i(cx/2, -cy/2);
     glEnd();
     glPopMatrix();
     glBindTexture(GL_TEXTURE_2D, 0);
