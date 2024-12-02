@@ -21,7 +21,7 @@ Room defaultWorld[] = {
                 Wall(448.0f, 272.0f, 32.0f, 224.0f)},
             {Eventspace(0, 0, 482.0f, 368.0f, Door(0, 2, 0, 0), 2),
                 Eventspace(1, 0, 98.0f, 368.0f, Door(0, 1, 0, 0), 2),
-                Eventspace(2, 0, 583.0f, 240.0f, Door(0, 2, 0, 0), 4),
+                Eventspace(2, 0, 583.0f, 240.0f, Door(0, 6, 0, 0), 3),
                 Eventspace(3, 3, 304.0f, 80.0f, Hole(4, 0)),
                 Eventspace(4, 3, 272.0f, 80.0f, Hole(3, 0)),
                 Eventspace(5, 1, 50.0f, 320.0f, Storage(1, 1)),
@@ -61,11 +61,26 @@ Room defaultWorld[] = {
                 Wall(432.0f, 0.0f, 208.0f, 480.0f),
                 Wall(0.0f, 352.0f, 640.0f, 128.0f)},
             {Eventspace(0, 0, 370.0f, 80.0f, Door(3, 2, 0, 0), 1)}, 
-            "./images/Lab-restroom.png", "./images/Lab-restroom-v2.png")
+            "./images/Lab-restroom.png", "./images/Lab-restroom-v2.png"),
+    Room(6, {Wall(0.0f, 0.0f, 64.0f, 480.0f),
+                Wall(0.0f, 0.0f, 640.0f, 64.0f),
+                Wall(608.0f, 0.0f, 32.0f, 480.0f),
+                Wall(0.0f, 448.0f, 640.0f, 32.0f),
+                Wall(160.0f, 0.0f, 64.0f, 176.0f),
+                Wall(384.0f, 0.0f, 64.0f, 176.0f)},
+            {Eventspace(0, 0, 64.0f, 180.0f, Door(2, 0, 0, 0), 4),
+                Eventspace(1, 0, 512.0f, 352.0f, Door(0, 7, 0, 0), 1)}, 
+            "./images/lab-testlab.png", "./images/lab-testlab-v2.png"),
+    Room(7, {Wall(0.0f, 0.0f, 288.0f, 480.0f),
+                Wall(0.0f, 0.0f, 640.0f, 176.0f),
+                Wall(352.0f, 0.0f, 288.0f, 480.0f),
+                Wall(0.0f, 320.0f, 640.0f, 160.0f)},
+            {Eventspace(0, 0, 288.0f, 176.0f, Door(1, 6, 0, 0), 1)}, 
+            "./images/Lab-vault.png", "./images/Lab-vault.png")
 };
 
 std::vector<Room> rooms;
-int roomAmount = 6;
+int roomAmount = 8;
 // Helps have a default world in case the player dies and restarts
 void init_World()
 {
