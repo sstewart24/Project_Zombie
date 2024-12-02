@@ -256,12 +256,13 @@ class Room {
         std::vector<Eventspace> ev;
         //std::vector<Door> doors;
         std::string imagefile;
+        std::string imagefile_g;
         //std::vector<Zombie> zombies;
 
     public:
         Room() {}
 
-        Room(int i, std::vector<Wall> w, std::vector<Eventspace> e, std::string f) {
+        Room(int i, std::vector<Wall> w, std::vector<Eventspace> e, std::string f, std::string g) {
             id = i;
             //while (i < size)
             //{
@@ -269,6 +270,7 @@ class Room {
             ev = e;
             //doors = d;
             imagefile = f;
+            imagefile_g = g;
             //zombies = z;
             //}
 

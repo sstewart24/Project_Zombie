@@ -26,13 +26,13 @@ Room defaultWorld[] = {
                 Eventspace(4, 3, 272.0f, 80.0f, Hole(3, 0)),
                 Eventspace(5, 1, 50.0f, 320.0f, Storage(1, 1)),
                 Eventspace(6, 2, 272.0f, 320.0f)}, 
-            "./images/lab-entrance.png"), 
+            "./images/lab-entrance.png", "./images/lab-entrance-v2.png"), 
     Room(1, {Wall(0.0f, 0.0f, 160.0f, 480.0f),
                 Wall(0.0f, 0.0f, 640.0f, 96.0f),
                 Wall(480.0f, 0.0f, 160.0f, 480.0f),
                 Wall(0.0f, 368.0f, 640.0f, 112.0f)},
             {Eventspace(0, 0, 352.0f, 96.0f, Door(1, 0, 0, 0), 1)}, 
-            "./images/Lab-officeroom.png"),
+            "./images/Lab-office.png", "./images/Lab-office-v2.png"),
     Room(2, {Wall(0.0f, 0.0f, 64.0f, 480.0f),
                 Wall(0.0f, 0.0f, 640.0f, 80.0f),
                 Wall(0.0f, 416.0f, 640.0f, 64.0f),
@@ -42,26 +42,26 @@ Room defaultWorld[] = {
                 Eventspace(1, 0, 64.0f, 210.0f, Door(0, 3, 0, 0), 4),
                 Eventspace(2, 0, 386.0f, 311.0f, Door(0, 4, 0, 0), 1),
                 Eventspace(3, 0, 130.0f, 311.0f, Door(0, 5, 0, 0), 1)}, 
-            "./images/LabHall01.png"),
+            "./images/Lab-Hall.png", "./images/Lab-Hall-v2.png"),
     Room(3, {Wall(0.0f, 0.0f, 256.0f, 480.0f),
                 Wall(0.0f, 0.0f, 640.0f, 80.0f),
                 Wall(384.0f, 0.0f, 256.0f, 480.0f),
                 Wall(0.0f, 352.0f, 640.0f, 128.0f)},
             {Eventspace(0, 0, 358.0f, 146.0f, Door(1, 2, 0, 0), 4)}, 
-            "./images/Lab-closet.png"),
+            "./images/Lab-closet.png", "./images/Lab-closet-v2.png"),
     Room(4, {Wall(0.0f, 0.0f, 64.0f, 480.0f),
                 Wall(0.0f, 0.0f, 640.0f, 80.0f),
                 Wall(608.0f, 0.0f, 32.0f, 480.0f),
                 Wall(0.0f, 448.0f, 640.0f, 32.0f),
                 Wall(320.0f, 224.0f, 32.0f, 256.0f)},
             {Eventspace(0, 0, 130.0f, 80.0f, Door(2, 2, 0, 0), 1)}, 
-            "./images/Lab-sidelab.png"),
+            "./images/lab-sidelab.png", "./images/lab-sidelab-v2.png"),
     Room(5, {Wall(0.0f, 0.0f, 176.0f, 480.0f),
                 Wall(0.0f, 0.0f, 640.0f, 80.0f),
                 Wall(432.0f, 0.0f, 208.0f, 480.0f),
                 Wall(0.0f, 352.0f, 640.0f, 128.0f)},
             {Eventspace(0, 0, 370.0f, 80.0f, Door(3, 2, 0, 0), 1)}, 
-            "./images/Lab-restroom.png")
+            "./images/Lab-restroom.png", "./images/Lab-restroom-v2.png")
 };
 
 std::vector<Room> rooms;
@@ -97,6 +97,8 @@ public:
 
 Texture tex;
 std::vector<Texture> textures;
+std::vector<Texture> textures_gory;
+
 
 void backGl()
 {
@@ -123,7 +125,32 @@ void backGl()
 	    tex.yc[1] = 1.0;  
         textures.push_back(tex);
         i++;
-    }  
+    }
+
+    i = 0;
+    while (i < roomAmount) {
+        const char *stringfile = rooms[i].imagefile_g.c_str();
+        Image img[1] = {stringfile};
+
+        //load the images file into a ppm structure.
+	    //
+	    tex.backImage = &img[0];
+	    //create opengl texture elements
+	    glGenTextures(1, &tex.backTexture);
+	    int w = tex.backImage->width;
+	    int h = tex.backImage->height;
+	    glBindTexture(GL_TEXTURE_2D, tex.backTexture);
+	    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_NEAREST);
+	    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
+	    glTexImage2D(GL_TEXTURE_2D, 0, 3, w, h, 0,
+							GL_RGB, GL_UNSIGNED_BYTE, tex.backImage->data);
+	    tex.xc[0] = 0.0;
+	    tex.xc[1] = 1.0;
+	    tex.yc[0] = 0.0;
+	    tex.yc[1] = 1.0;  
+        textures_gory.push_back(tex);
+        i++;
+    }   
 }
 
 SpriteTexture spr;
@@ -359,12 +386,15 @@ float movePlayerToRoom(int index) {
     return jumpPlayerPos_to[index];
 }
 
-void roomRender(int xres, int yres, int i) 
+void roomRender(int xres, int yres, int i, int gory) 
 {
     //glClear(GL_COLOR_BUFFER_BIT);
     glPushMatrix();
 	glColor3f(1.0, 1.0, 1.0);
-	glBindTexture(GL_TEXTURE_2D, textures[i].backTexture);
+    if (gory)
+        glBindTexture(GL_TEXTURE_2D, textures_gory[i].backTexture);
+    else
+	    glBindTexture(GL_TEXTURE_2D, textures[i].backTexture);
 	glBegin(GL_QUADS);
 		glTexCoord2f(tex.xc[0], tex.yc[1]); glVertex2i(0, 0);
 		glTexCoord2f(tex.xc[0], tex.yc[0]); glVertex2i(0, yres);

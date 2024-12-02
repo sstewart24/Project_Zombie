@@ -26,7 +26,7 @@ extern bool pCollision(Player, int);
 extern float increaseHealth(float);
 extern float damageHealth(float);
 extern void backGl();
-extern void roomRender(int, int, int);
+extern void roomRender(int, int, int, int);
 extern void renderLight(int, int);
 extern void renderItem(Player, Room);
 extern int storageInteract(int, Room);
@@ -135,6 +135,7 @@ public:
 
 	double animationDelay;
 	int player_direction;
+	int goryOn;
 public:
 	Game() {
 		ahead = NULL;
@@ -145,6 +146,7 @@ public:
         
 		animationDelay = 0.15;
 		player_direction = 0;
+		goryOn = 0;
 
 		//build 10 asteroids...
 		/*
@@ -573,7 +575,10 @@ int check_keys(XEvent *e)
                 pHealth = increaseHealth(pHealth);
             }
             renderHealth(g.hbox, pHealth);
-       }
+       	}
+		if (key == XK_g) {
+			g.goryOn = !g.goryOn; 
+		}
 	}
 	(void)shift;
 	
@@ -584,11 +589,11 @@ int check_keys(XEvent *e)
 			break;
 		case XK_l:
 			break;
-		case XK_g:
-			see_darkness = !see_darkness;
-			break;
-        case XK_h:
-            break;
+		//case XK_g:
+		//	see_darkness = !see_darkness;
+		//	break;
+        //case XK_h:
+        //    break;
         /*case XK_e:
             //will be used to collect items in the future
             //only works to toggle the axe on and off for now.
@@ -931,7 +936,7 @@ void render()
 	r.left = 450;
 	r.center = 0;
 
-	roomRender(gl.xres, gl.yres, g.room.id);
+	roomRender(gl.xres, gl.yres, g.room.id, g.goryOn);
 	
 	renderZombie(g.room, g.player);
 	
@@ -984,7 +989,10 @@ void render()
 	}
 
 	if (see_darkness) {
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glEnable(GL_BLEND);
 		renderLight(gl.xres, gl.yres);
+		glDisable(GL_BLEND);
 	}
 
 	/*
