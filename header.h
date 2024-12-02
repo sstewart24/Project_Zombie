@@ -499,7 +499,7 @@ class Axe {
             room = 0; //main lobby
         }
 };
-/*
+
 class Healthpack {
     public:
         int heal;
@@ -513,8 +513,8 @@ class Healthpack {
             pos[1] = 0; //480 / 2;
             w = 5;
             h = 5;
-            collected = false;
+            collected = true;
             heal = 0;
             available = 0;
         }
-};*/
+};

@@ -23,7 +23,8 @@ extern void renderZombie(Room, Player); // Renders Zombies
 extern void renderHealth(Health, float);
 extern void renderInventory();
 extern bool pCollision(Player, int);
-extern float updateHealth(float);
+extern float increaseHealth(float);
+extern float damageHealth(float);
 extern void backGl();
 extern void roomRender(int, int, int);
 extern void renderLight(int, int);
@@ -121,6 +122,7 @@ public:
     //Inventory ibox[IBOX];
     //Inventory iboxbg;
 	Health hbox;
+    Healthpack hPack;
     //Axe axe;
 
 	Asteroid *ahead;
@@ -565,6 +567,13 @@ int check_keys(XEvent *e)
 			// For me to see where wall colissions will be
 			see_wall = !see_wall;
 		}
+        if (key == XK_h) {
+            printf("h Key Pressed!\n");
+            if (g.hPack.collected) {
+                pHealth = increaseHealth(pHealth);
+            }
+            renderHealth(g.hbox, pHealth);
+       }
 	}
 	(void)shift;
 	
@@ -578,6 +587,8 @@ int check_keys(XEvent *e)
 		case XK_g:
 			see_darkness = !see_darkness;
 			break;
+        case XK_h:
+            break;
         /*case XK_e:
             //will be used to collect items in the future
             //only works to toggle the axe on and off for now.
@@ -857,7 +868,7 @@ void physics()
 
     
     if (pCollision(g.player, g.room.id)) {
-        pHealth = updateHealth(pHealth);
+        pHealth = damageHealth(pHealth);
     }
 
     renderHealth(g.hbox, pHealth);
