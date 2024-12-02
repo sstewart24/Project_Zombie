@@ -35,8 +35,8 @@ extern void init_Player_Images(Sprite&);
 extern void spritePlayerRender(Sprite, float, float, int);
 extern void init_Item_Images();
 extern void init_World();
-extern void init_Zombie_Image();
-int roomID = 0;
+extern void init_zomb_Sprites();
+int roomID = 6;
 int see_wall;
 int see_darkness;
 float pHealth = 180.0f;
@@ -333,8 +333,7 @@ void render();
 int main()
 {
 	see_wall = 1; // Shows the collision boxes of the walls
-	see_darkness = 0;
-	init_Zombie_Image();
+	init_zomb_Sprites();
 	init_Player_Images(g.player.sp);
 	init_Item_Images();
 	init_World();

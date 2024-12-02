@@ -10,10 +10,14 @@ extern int checkWall(float*, Room);
 extern void spriteInit(Sprite& ,std::string);
 Sprite zombieSprite = Sprite(192, 64, 0);
 std::string sprite_image_Z = "./images/Sprite-zombie.png";
-void init_Zombie_Image()
+Sprite detectionSprite = Sprite(16, 16, 0);
+std::string sprite_z_detect = "./images/Sprite-detection.png";
+
+void init_zomb_Sprites()
 {
 	spriteInit(zombieSprite, sprite_image_Z);
 	zombieSprite.delay = 0.2;
+	spriteInit(detectionSprite, sprite_z_detect);
 }
 Timers ztimer;
 
@@ -299,4 +303,38 @@ void renderZombie(Room current, Player player)
             }
 		}
 	}
+}
+
+// Takes the zombie position and puts this ontop of their head when within range of player for detection
+// 
+void renderZombieDetection(int detection_state, int xPos, int yPos)
+{
+	float zPos = 0.0f;
+    			float cx = detectionSprite.xres/3.0;
+    			float cy = detectionSprite.yres;
+
+    			int ix = detection_state % 3;
+    			int iy = 0;
+    			float tx = (float)ix / 3.0;
+    			float ty = (float)iy;
+
+    			glPushMatrix();
+    			glColor3f(1.0, 1.0, 1.0);
+    			glBindTexture(GL_TEXTURE_2D, detectionSprite.spTex.spriteTexture);
+    			//
+    			glEnable(GL_ALPHA_TEST);
+    			glAlphaFunc(GL_GREATER, 0.0f);
+    			glColor4ub(255,255,255,255);
+
+    			glTranslatef(xPos, yPos, zPos);
+    			// May need to mess with the Vertex cords to get them to be above the head
+    			glBegin(GL_QUADS);
+        			glTexCoord2f(tx, ty+1.0);      glVertex2i(-cx/2, -cy/2);
+					glTexCoord2f(tx, ty);         glVertex2i(-cx/2, cy/2);
+					glTexCoord2f(tx+0.33333, ty);    glVertex2i(cx/2,cy/2);
+					glTexCoord2f(tx+0.33333, ty+1.0); glVertex2i(cx/2, -cy/2);
+    			glEnd();
+    			glPopMatrix();
+    			glBindTexture(GL_TEXTURE_2D, 0);
+    			glDisable(GL_ALPHA_TEST);
 }

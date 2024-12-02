@@ -33,11 +33,15 @@ std::string hp_imagefile = "./images/Health-pack.png"; // string for where the
 Sprite axe_Inventory = Sprite(40, 40);
 std::string axeInv_imagefile = "./images/AxeSprite-Inventory.png";
 
+Sprite key_Inventory = Sprite(40, 40);
+std::string keyInv_imagefile = "./images/Sprite-key.png";
+
 // Initializing Images for render
 void init_Item_Images() {
     // One instance of an image for the inventory
     spriteInit(healthpack_img, hp_imagefile);
     spriteInit(axe_Inventory, axeInv_imagefile);
+    spriteInit(key_Inventory, keyInv_imagefile);
 }
 
 // Render the item into an inventory slot, called in renderInventory()
@@ -117,6 +121,8 @@ void renderInventory() {
             spriteItemRender(axe_Inventory, box[i].pos[0], box[i].pos[1]);
         if (i==1 /*&& healthpack.collected*/)
             spriteItemRender(healthpack_img, box[i].pos[0], box[i].pos[1]);
+        if (i==2)
+            spriteItemRender(key_Inventory, box[i].pos[0], box[i].pos[1]);
     }
 
 }
