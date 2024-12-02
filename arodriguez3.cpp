@@ -283,10 +283,10 @@ void renderZombie(Room current, Player player)
     			glColor4ub(255,255,255,255);
 
     			glTranslatef(zombies[i].pos[0], zombies[i].pos[1], zPos);
-    			//if (direction) {
-        		//	glRotatef(180.0f,1.0f,0.0f,0.0f);
-        		//	glRotatef(180.0f,0.0f,0.0f,1.0f);  
-    			//}
+    			if (zombies[i].direction == 3) {
+        			glRotatef(180.0f,1.0f,0.0f,0.0f);
+        			glRotatef(180.0f,0.0f,0.0f,1.0f);  
+    			}
     			glBegin(GL_QUADS);
         			glTexCoord2f(tx, ty+1.0);      glVertex2i(-cx/2, -cy/2);
 					glTexCoord2f(tx, ty);         glVertex2i(-cx/2, cy/2);
