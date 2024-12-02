@@ -6,11 +6,12 @@
 
 const float maxHealth = 180.0f;
 const float zAlertHit = 6.0f;
-const float hBuff = 60.0f;
+const float heal = 60.0f;
 int col_count = 0;
 
 //function defs
-float updateHealth(float pHealth);
+float increaseHealth(float pHealth);
+float damageHealth(float pHealth);
 void renderHealth(Health hbox, float pHealth);
 bool pCollision(Player player, int);
 extern int getVectorSize();
@@ -25,12 +26,23 @@ void init_Player_Images(Sprite &sp)
     sp.spTex = playerHealthy.spTex;
 }
 
-float updateHealth(float pHealth) // <-- Will need save state passed in
+float damageHealth(float pHealth) // <-- Will need save state passed in
 {
     pHealth = pHealth - zAlertHit;
 
     if (pHealth <= 0) {
         pHealth = 0;
+        return pHealth;
+    }
+
+    return pHealth;
+}
+
+float increaseHealth(float pHealth)
+{
+    pHealth = pHealth + heal;
+    if (pHealth >= 180.0f) {
+        pHealth = 180.0f;
         return pHealth;
     }
 
