@@ -162,14 +162,17 @@ class Storage {
 public:
     int hasItem;
     int type;
+    int collected; // for item render
 public:
     Storage(){
         hasItem = -1;
         type = -1;
+        collected = -1;
     }
     Storage(int h, int t){
         hasItem = h;
         type = t;
+        collected = -1;
     }     
 };
 
@@ -503,17 +506,17 @@ class Axe {
         float w,h;
         bool collected;
         int available;
-        int room;
+        //int room;
         Axe() {
             //name = "Axe";
-            pos[0] = 0; //640 / 2;
-            pos[1] = 0; //480 / 2;
+            pos[0] = 370.0f;
+            pos[1] = 240.0f;
             w = 5;
             h = 5;
             collected = false;
-            damage = 0;
+            damage = 10;
             available = 0;
-            room = 0; //main lobby
+            //room = 0; //main lobby
         }
 };
 
