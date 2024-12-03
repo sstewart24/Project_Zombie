@@ -465,6 +465,21 @@ class Health {
         }
 };
 
+class Pause {
+    public:
+        float pos[2];
+        int w, h;
+        int xres, yres;
+        Pause() {
+            xres = 680;
+            yres = 480;
+            w = xres;
+            h = yres;
+            pos[0] = 0;
+            pos[1] = 0;
+    }
+};
+
 class Inventory {
     public:
         float pos[2];

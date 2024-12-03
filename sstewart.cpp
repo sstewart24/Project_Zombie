@@ -9,14 +9,19 @@ const float zAlertHit = 6.0f;
 const float heal = 60.0f;
 int col_count = 0;
 
+extern Global gl;
+
 //function defs
 float increaseHealth(float pHealth);
 float damageHealth(float pHealth);
 void renderHealth(Health hbox, float pHealth);
+void renderPause(Pause p);
 bool pCollision(Player player, int);
 extern int getVectorSize();
-
+extern void renderLight(int, int);
 extern void spriteInit(Sprite& ,std::string);
+//extern void init_World();
+//extern void clear_run();
 Sprite playerHealthy;
 std::string sprite_image = "./images/Sprite-player.png";
 
@@ -32,7 +37,9 @@ float damageHealth(float pHealth) // <-- Will need save state passed in
 
     if (pHealth <= 0) {
         pHealth = 0;
-        return pHealth;
+        //init_World();
+        //clear_run();
+        //return pHealth;
     }
 
     return pHealth;
@@ -92,6 +99,41 @@ void renderHealth(Health hbox, float pHealth)
     glPopMatrix();
 }
 
+void renderPause(Pause p) 
+{
+    glPushMatrix();
+    glColor3ub(0, 0, 0);
+    glTranslatef(p.pos[0], p.pos[1], 0.0f);
+    glBegin(GL_QUADS);
+    glVertex2f(-p.w, -p.h);
+    glVertex2f(-p.w,  p.h);
+    glVertex2f( p.w,  p.h);
+    glVertex2f( p.w, -p.h);
+    glEnd();
+    glPopMatrix();
+    
+    Rect l, r;
+	glClear(GL_COLOR_BUFFER_BIT);
+	//
+	l.bot = p.yres - 20;
+	l.left = 10;
+	l.center = 0;
+
+	r.bot = p.yres - 20;
+	r.left = 450;
+	r.center = 0;
+
+    ggprint8b(&l, 420, 0x00ff0000, "3350 - Project_Zombie");
+	ggprint8b(&l, 16, 0x00000000, "F - Interact with event spaces");
+	ggprint8b(&l, 16, 0x00000000, "L - Remove border");
+	ggprint8b(&l, 16, 0x00000000, "E - Remove black square");
+
+	ggprint8b(&r, 420, 0x00000000, "");
+	ggprint8b(&r, 16, 0x00000000, "WASD - Move");
+	ggprint8b(&r, 16, 0x00000000, "ARROW KEYS - Move");
+	ggprint8b(&r, 16, 0x00000000, "SPACE - Swing axe?");
+}
+
 bool pCollision(Player player, int rid) {
     extern Zombie getZombies(int);
     extern int getVectorSize();
@@ -117,16 +159,16 @@ bool pCollision(Player player, int rid) {
 
                     //buffer to give player damage cooldown
                     if (col_count == 1) {
-                    return true;
+                        return true;
                     } 
 
                     if (col_count > 1 && col_count < 10) {
-                    return false;
+                        return false;
                     } 
 
                     if (col_count == 10) {
-                    col_count = 0;
-                    return true;
+                        col_count = 0;
+                        return true;
                     }
                 }
             }
@@ -166,10 +208,10 @@ void spritePlayerRender(Sprite sp, float xPos, float yPos, int direction)
         glRotatef(180.0f,0.0f,0.0f,1.0f);  
     }
     glBegin(GL_QUADS);
-        glTexCoord2f(tx, ty+1.0);      glVertex2i(-cx/2, -cy/2);
-		glTexCoord2f(tx, ty);         glVertex2i(-cx/2, cy/2);
-		glTexCoord2f(tx+0.1667, ty);    glVertex2i(cx/2,cy/2);
-		glTexCoord2f(tx+0.1667, ty+1.0); glVertex2i(cx/2, -cy/2);
+    glTexCoord2f(tx, ty+1.0);      glVertex2i(-cx/2, -cy/2);
+    glTexCoord2f(tx, ty);         glVertex2i(-cx/2, cy/2);
+    glTexCoord2f(tx+0.1667, ty);    glVertex2i(cx/2,cy/2);
+    glTexCoord2f(tx+0.1667, ty+1.0); glVertex2i(cx/2, -cy/2);
     glEnd();
     glPopMatrix();
     glBindTexture(GL_TEXTURE_2D, 0);

@@ -36,6 +36,8 @@ extern void spritePlayerRender(Sprite, float, float, int);
 extern void init_Item_Images();
 extern void init_World();
 extern void init_zomb_Sprites();
+extern void clear_run();
+extern void renderPause(Pause);
 int roomID = 6;
 int see_wall;
 int see_darkness;
@@ -118,7 +120,8 @@ class Game {
 public:
 	Player player;
 	Room room;
-	//Zombie zombie;
+    Pause p;
+    //Zombie zombie;
     //Inventory ibox[IBOX];
     //Inventory iboxbg;
 	Health hbox;
@@ -132,10 +135,10 @@ public:
 	struct timespec bulletTimer;
 	struct timespec mouseThrustTimer;
 	bool mouseThrustOn;
-
 	double animationDelay;
 	int player_direction;
 	int goryOn;
+    int pause;
 public:
 	Game() {
 		ahead = NULL;
@@ -147,7 +150,7 @@ public:
 		animationDelay = 0.15;
 		player_direction = 0;
 		goryOn = 0;
-
+        pause = 0;
 		//build 10 asteroids...
 		/*
         for (int j=0; j<10; j++) {
@@ -569,7 +572,6 @@ int check_keys(XEvent *e)
 			see_wall = !see_wall;
 		}
         if (key == XK_h) {
-            printf("h Key Pressed!\n");
             if (g.hPack.collected) {
                 pHealth = increaseHealth(pHealth);
             }
@@ -578,6 +580,9 @@ int check_keys(XEvent *e)
 		if (key == XK_g) {
 			g.goryOn = !g.goryOn; 
 		}
+        if (key == XK_p) {
+            g.pause = !g.pause;
+        }
 	}
 	(void)shift;
 	
@@ -873,6 +878,11 @@ void physics()
     
     if (pCollision(g.player, g.room.id)) {
         pHealth = damageHealth(pHealth);
+        //if (pHealth == 0) {
+            //g.room.id = 0;
+            //roomInit(g.room.id);
+            //roomRender(gl.xres, gl.yres, g.room.id, g.goryOn);
+        //}
     }
 
     renderHealth(g.hbox, pHealth);
@@ -924,7 +934,8 @@ void physics()
 
 void render()
 {
-	Rect l, r;
+	/*
+    Rect l, r;
 	glClear(GL_COLOR_BUFFER_BIT);
 	//
 	l.bot = gl.yres - 20;
@@ -934,6 +945,7 @@ void render()
 	r.bot = gl.yres - 20;
 	r.left = 450;
 	r.center = 0;
+    */
 
 	roomRender(gl.xres, gl.yres, g.room.id, g.goryOn);
 	
@@ -1019,6 +1031,10 @@ void render()
      //-------------------------------------------------------------------------
     //Draw Health Box
     renderHealth(g.hbox, pHealth);
+
+    if (g.pause) {
+        renderPause(g.p);
+    }
 
     /*
 	if (gl.keys[XK_Up] || g.mouseThrustOn) {
@@ -1113,7 +1129,7 @@ void render()
 		glVertex2f(b->pos[0]+1.0f, b->pos[1]+1.0f);
 		glEnd();
 	}
-	*/
+	
 	ggprint8b(&l, 420, 0x00ff0000, "3350 - Project_Zombie");
 	ggprint8b(&l, 16, 0x00ffff00, "F - Interact with event spaces");
 	ggprint8b(&l, 16, 0x00ffff00, "L - Remove border");
@@ -1123,5 +1139,6 @@ void render()
 	ggprint8b(&r, 16, 0x00ffff00, "WASD - Move");
 	ggprint8b(&r, 16, 0x00ffff00, "ARROW KEYS - Move");
 	ggprint8b(&r, 16, 0x00ffff00, "SPACE - Swing axe?");
+    */
 }
 
