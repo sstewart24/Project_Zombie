@@ -25,7 +25,7 @@ extern float damageHealth(float);
 extern void backGl();
 extern void roomRender(int, int, int, int);
 extern void renderLight(int, int);
-extern void renderItem(Player, Room);
+extern void renderItem(Eventspace);
 extern int storageInteract(int, Room);
 extern float holeInteract(int, Room, int);
 extern void init_Player_Images(Sprite&);
@@ -40,7 +40,7 @@ int roomID = 6;
 int see_wall;
 int see_darkness;
 float pHealth = 180.0f;
-
+int item = 1;
 Timers timer;
 
 class Bullet {
@@ -488,6 +488,7 @@ void playerInteract()
 				case 1:
 					printf("Grabbed axe\n");
 					g.room.ev[interact_index].stor.hasItem = 0;
+					g.room.ev[interact_index].stor.collected = 1;
 					break;
 			}
 		}
@@ -674,9 +675,16 @@ void render()
 	//Draw Inventory Box 
     renderInventory();
     //-------------------------------------------------------------------------
-    //Draw Items 
+    //Draw Items
     //renderItem(g.axe);
-    renderItem(g.player, g.room); 
+    //renderItem(g.player, g.room);
+    if (item) {
+    glBlendFunc(GL_ONE, GL_ZERO); //makes item opaque
+    glEnable(GL_BLEND);
+    for (int i=0; i!=(int)g.room.ev.size(); i++)
+        renderItem(g.room.ev[i]);
+    }
+    glDisable(GL_BLEND);
     //-------------------------------------------------------------------------
     //Draw Health Box
     
