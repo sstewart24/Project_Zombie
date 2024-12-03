@@ -102,36 +102,41 @@ void renderHealth(Health hbox, float pHealth)
 void renderPause(Pause p) 
 {
     glPushMatrix();
-    glColor3ub(0, 0, 0);
+    //glColor3ub(0, 0, 0);
     glTranslatef(p.pos[0], p.pos[1], 0.0f);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glBegin(GL_QUADS);
-    glVertex2f(-p.w, -p.h);
-    glVertex2f(-p.w,  p.h);
-    glVertex2f( p.w,  p.h);
-    glVertex2f( p.w, -p.h);
+        glColor4f(0.0f, 0.0f, 0.0f, 0.7f);
+        glVertex2f(-p.w, -p.h);
+        glVertex2f(-p.w,  p.h);
+        glVertex2f( p.w,  p.h);
+        glVertex2f( p.w, -p.h);
     glEnd();
     glPopMatrix();
+
+    glDisable(GL_BLEND);
     
     Rect l, r;
-	glClear(GL_COLOR_BUFFER_BIT);
-	//
-	l.bot = p.yres - 20;
-	l.left = 10;
-	l.center = 0;
+    //glClear(GL_COLOR_BUFFER_BIT);
+    //
+    l.bot = p.yres - 20;
+    l.left = 10;
+    l.center = 0;
 
-	r.bot = p.yres - 20;
-	r.left = 450;
-	r.center = 0;
+    r.bot = p.yres - 20;
+    r.left = 450;
+    r.center = 0;
 
     ggprint8b(&l, 420, 0x00ff0000, "3350 - Project_Zombie");
-	ggprint8b(&l, 16, 0x00000000, "F - Interact with event spaces");
-	ggprint8b(&l, 16, 0x00000000, "L - Remove border");
-	ggprint8b(&l, 16, 0x00000000, "E - Remove black square");
+    ggprint8b(&l, 16, 0x00ffff00, "F - Interact with event spaces");
+    ggprint8b(&l, 16, 0x00ffff00, "L - Remove border");
+    ggprint8b(&l, 16, 0x00ffff00, "E - Remove black square");
 
-	ggprint8b(&r, 420, 0x00000000, "");
-	ggprint8b(&r, 16, 0x00000000, "WASD - Move");
-	ggprint8b(&r, 16, 0x00000000, "ARROW KEYS - Move");
-	ggprint8b(&r, 16, 0x00000000, "SPACE - Swing axe?");
+    ggprint8b(&r, 420, 0x00ffff00, "");
+    ggprint8b(&r, 16, 0x00ffff00, "WASD - Move");
+    ggprint8b(&r, 16, 0x00ffff00, "ARROW KEYS - Move");
+    ggprint8b(&r, 16, 0x00ffff00, "SPACE - Swing axe?");
 }
 
 bool pCollision(Player player, int rid) {
