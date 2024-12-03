@@ -575,7 +575,6 @@ int check_keys(XEvent *e)
             if (g.hPack.collected) {
                 pHealth = increaseHealth(pHealth);
             }
-            renderHealth(g.hbox, pHealth);
        	}
 		if (key == XK_g) {
 			g.goryOn = !g.goryOn; 
@@ -885,7 +884,7 @@ void physics()
         //}
     }
 
-    renderHealth(g.hbox, pHealth);
+    //renderHealth(g.hbox, pHealth);
 	
     /*
 	if (gl.keys[XK_space]) {
@@ -1030,10 +1029,21 @@ void render()
     renderItem(g.player, g.room); 
      //-------------------------------------------------------------------------
     //Draw Health Box
-    renderHealth(g.hbox, pHealth);
+    
+    if (pHealth == 0) {
+        pHealth = 180.0f;
+        g.room.id = 0;
+        clear_run();
+        roomInit(g.room.id);
+        init_World();
+        renderHealth(g.hbox, pHealth);
+    } else {
+        renderHealth(g.hbox, pHealth);
+    }
 
     if (g.pause) {
         renderPause(g.p);
+        sleep(1);
     }
 
     /*

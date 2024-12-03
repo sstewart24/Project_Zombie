@@ -37,9 +37,6 @@ float damageHealth(float pHealth) // <-- Will need save state passed in
 
     if (pHealth <= 0) {
         pHealth = 0;
-        //init_World();
-        //clear_run();
-        //return pHealth;
     }
 
     return pHealth;
@@ -50,7 +47,6 @@ float increaseHealth(float pHealth)
     pHealth = pHealth + heal;
     if (pHealth >= 180.0f) {
         pHealth = 180.0f;
-        return pHealth;
     }
 
     return pHealth;
