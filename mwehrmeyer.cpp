@@ -24,7 +24,7 @@ Room defaultWorld[] = {
                 Eventspace(2, 0, 583.0f, 240.0f, Door(0, 6, 0, 0), 3),
                 Eventspace(3, 3, 304.0f, 80.0f, Hole(4, 0)),
                 Eventspace(4, 3, 272.0f, 80.0f, Hole(3, 0)),
-                Eventspace(5, 1, 50.0f, 320.0f, Storage(1, 1)),
+                Eventspace(5, 1, 360.0f, 220.0f, Storage(1, 1)),
                 Eventspace(6, 2, 272.0f, 320.0f)}, 
             "./images/lab-entrance.png", "./images/lab-entrance-v2.png"), 
     Room(1, {Wall(0.0f, 0.0f, 160.0f, 480.0f),
