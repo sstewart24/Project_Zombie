@@ -20,8 +20,6 @@ bool pCollision(Player player, int);
 extern int getVectorSize();
 extern void renderLight(int, int);
 extern void spriteInit(Sprite& ,std::string);
-//extern void init_World();
-//extern void clear_run();
 Sprite playerHealthy;
 std::string sprite_image = "./images/Sprite-player.png";
 
@@ -31,14 +29,12 @@ void init_Player_Images(Sprite &sp)
     sp.spTex = playerHealthy.spTex;
 }
 
-float damageHealth(float pHealth) // <-- Will need save state passed in
+float damageHealth(float pHealth)
 {
     pHealth = pHealth - zAlertHit;
-
     if (pHealth <= 0) {
         pHealth = 0;
     }
-
     return pHealth;
 }
 
@@ -48,7 +44,6 @@ float increaseHealth(float pHealth)
     if (pHealth >= 180.0f) {
         pHealth = 180.0f;
     }
-
     return pHealth;
 }
 
@@ -78,7 +73,6 @@ void renderHealth(Health hbox, float pHealth)
     glEnd();
     glPopMatrix();
 
-
     //updating health bar based on damage
     hbox.h = pHealth;
 
@@ -98,7 +92,6 @@ void renderHealth(Health hbox, float pHealth)
 void renderPause(Pause p) 
 {
     glPushMatrix();
-    //glColor3ub(0, 0, 0);
     glTranslatef(p.pos[0], p.pos[1], 0.0f);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -114,8 +107,7 @@ void renderPause(Pause p)
     glDisable(GL_BLEND);
     
     Rect l, r;
-    //glClear(GL_COLOR_BUFFER_BIT);
-    //
+    
     l.bot = p.yres - 20;
     l.left = 10;
     l.center = 0;
@@ -128,7 +120,6 @@ void renderPause(Pause p)
     ggprint8b(&l, 16, 0x00ffff00, "F - Interact with event spaces");
     ggprint8b(&l, 16, 0x00ffff00, "L - Remove border");
     ggprint8b(&l, 16, 0x00ffff00, "E - Remove black square");
-
     ggprint8b(&r, 420, 0x00ffff00, "");
     ggprint8b(&r, 16, 0x00ffff00, "WASD - Move");
     ggprint8b(&r, 16, 0x00ffff00, "ARROW KEYS - Move");
@@ -157,16 +148,13 @@ bool pCollision(Player player, int rid) {
                     if (!zom.alive) {
                         return false;
                     } 
-
                     //buffer to give player damage cooldown
                     if (col_count == 1) {
                         return true;
                     } 
-
                     if (col_count > 1 && col_count < 10) {
                         return false;
                     } 
-
                     if (col_count == 10) {
                         col_count = 0;
                         return true;
@@ -180,11 +168,9 @@ bool pCollision(Player player, int rid) {
 
 void spritePlayerRender(Sprite sp, float xPos, float yPos, int direction)
 {
-
     float zPos = 0.0f;
     float cx = sp.xres/6.0;
     float cy = sp.yres;
-
     int ix = sp.spriteFrame % 6;
     int iy = 0;
     float tx = (float)ix / 6.0;
@@ -193,21 +179,17 @@ void spritePlayerRender(Sprite sp, float xPos, float yPos, int direction)
     glPushMatrix();
     glColor3f(1.0, 1.0, 1.0);
     glBindTexture(GL_TEXTURE_2D, sp.spTex.spriteTexture);
-    //
     glEnable(GL_ALPHA_TEST);
     glAlphaFunc(GL_GREATER, 0.0f);
     glColor4ub(255,255,255,255);
 
-    /*
-       if (sp.spriteFrame >= 8)
-       iy = 1;
-       */
-
     glTranslatef(xPos, yPos, zPos);
+    
     if (direction) {
         glRotatef(180.0f,1.0f,0.0f,0.0f);
         glRotatef(180.0f,0.0f,0.0f,1.0f);  
     }
+    
     glBegin(GL_QUADS);
     glTexCoord2f(tx, ty+1.0);      glVertex2i(-cx/2, -cy/2);
     glTexCoord2f(tx, ty);         glVertex2i(-cx/2, cy/2);

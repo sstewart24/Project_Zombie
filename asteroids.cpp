@@ -1,11 +1,8 @@
-//
 //program: asteroids.cpp
 //author:  Gordon Griesel
 //date:    2014 - 2021
 //mod spring 2015: added constructors
 //This program is a game starting point for a 3350 project.
-//
-//
 
 #include "header.h"
 Global gl;
@@ -38,51 +35,11 @@ extern void init_World();
 extern void init_zomb_Sprites();
 extern void clear_run();
 extern void renderPause(Pause);
+extern Zombie getZombies(int);
 int roomID = 6;
 int see_wall;
 int see_darkness;
 float pHealth = 180.0f;
-
-//const int IBOX = 4;
-/*class Global {
-public:
-	int xres, yres;
-	char keys[65536];
-	Global() {
-		xres = 640;
-		yres = 480;
-		memset(keys, 0, 65536);
-	}
-} gl;*/
-
-/*class Player {
-public:
-	Vec pos;
-	Vec dir;
-	Vec vel;
-	Vec acc;
-	float angle;
-	float color[3];
-    float colorAlt[3];
-
-    // Determining facing up or down
-    int pFlip;
-
-public:
-	Player() {
-		pos[0] = (Flt)(gl.xres/2);
-		pos[1] = (Flt)(gl.yres/2);
-		pos[2] = 0.0f;
-		VecZero(dir);
-		VecZero(vel);
-		VecZero(acc);
-		angle = 0.0;
-		color[0] = color[1] = color[2] = 1.0;
-		colorAlt[0] = colorAlt[1] = colorAlt[2] = 0.658824;
-    
-        pFlip = 0;
-	}
-};*/
 
 Timers timer;
 
@@ -151,39 +108,6 @@ public:
 		player_direction = 0;
 		goryOn = 0;
         pause = 0;
-		//build 10 asteroids...
-		/*
-        for (int j=0; j<10; j++) {
-			Asteroid *a = new Asteroid;
-			a->nverts = 8;
-			a->radius = rnd()*80.0 + 40.0;
-			Flt r2 = a->radius / 2.0;
-			Flt angle = 0.0f;
-			Flt inc = (PI * 2.0) / (Flt)a->nverts;
-			for (int i=0; i<a->nverts; i++) {
-				a->vert[i][0] = sin(angle) * (r2 + rnd() * a->radius);
-				a->vert[i][1] = cos(angle) * (r2 + rnd() * a->radius);
-				angle += inc;
-			}
-			a->pos[0] = (Flt)(rand() % gl.xres);
-			a->pos[1] = (Flt)(rand() % gl.yres);
-			a->pos[2] = 0.0f;
-			a->angle = 0.0;
-			a->rotate = rnd() * 4.0 - 2.0;
-			a->color[0] = 0.8;
-			a->color[1] = 0.8;
-			a->color[2] = 0.7;
-			a->vel[0] = (Flt)(rnd()*2.0-1.0);
-			a->vel[1] = (Flt)(rnd()*2.0-1.0);
-			//std::cout << "asteroid" << std::endl;
-			//add to front of linked list
-			a->next = ahead;
-			if (ahead != NULL)
-				ahead->prev = a;
-			ahead = a;
-			++nasteroids;
-		}
-        */
 		clock_gettime(CLOCK_REALTIME, &bulletTimer);
 	}
 	~Game() {
@@ -427,92 +351,14 @@ void check_mouse(XEvent *e)
 		return;
 	}
 	if (e->type == ButtonPress) {
-		if (e->xbutton.button==1) {
-			//Left button is down
-			//a little time between each bullet
-			//struct timespec bt;
-			//clock_gettime(CLOCK_REALTIME, &bt);
-			//double ts = timeDiff(&g.bulletTimer, &bt);
-			/**
-			if (ts > 0.1) {
-				//timeCopy(&g.bulletTimer, &bt);
-				//shoot a bullet...
-				if (g.nbullets < MAX_BULLETS) {
-					Bullet *b = &g.barr[g.nbullets];
-					//timeCopy(&b->time, &bt);
-					b->pos[0] = g.player.pos[0];
-					b->pos[1] = g.player.pos[1];
-					b->vel[0] = g.player.vel[0];
-					b->vel[1] = g.player.vel[1];
-					//convert player angle to radians
-					Flt rad = ((g.player.angle+90.0) / 360.0f) * PI * 2.0;
-					//convert angle to a vector
-					Flt xdir = cos(rad);
-					Flt ydir = sin(rad);
-					b->pos[0] += xdir*20.0f;
-					b->pos[1] += ydir*20.0f;
-					b->vel[0] += xdir*6.0f + rnd()*0.1;
-					b->vel[1] += ydir*6.0f + rnd()*0.1;
-					b->color[0] = 1.0f;
-					b->color[1] = 1.0f;
-					b->color[2] = 1.0f;
-					++g.nbullets;
-				}
-			}
-			*/
-		}
+		if (e->xbutton.button==1) {}
 		if (e->xbutton.button==3) {
 			//Right button is down
 		}
 	}
 	//keys[XK_Up] = 0;
 	if (savex != e->xbutton.x || savey != e->xbutton.y) {
-		//Mouse moved
-		//int xdiff = savex - e->xbutton.x;
-		//int ydiff = savey - e->xbutton.y;
-		//if (++ct < 10)
-			//return;		
-		//std::cout << "savex: " << savex << std::endl << std::flush;
-		//std::cout << "e->xbutton.x: " << e->xbutton.x << std::endl <<
-		//std::flush;
-        /*
-		if (xdiff > 0) {
-			//std::cout << "xdiff: " << xdiff << std::endl << std::flush;
-			g.player.angle += 0.05f * (float)xdiff;
-			if (g.player.angle >= 360.0f)
-				g.player.angle -= 360.0f;
 		}
-		else if (xdiff < 0) {
-			//std::cout << "xdiff: " << xdiff << std::endl << std::flush;
-			g.player.angle += 0.05f * (float)xdiff;
-			if (g.player.angle < 0.0f)
-				g.player.angle += 360.0f;
-		}
-		if (ydiff > 0) {
-			//apply thrust
-			//convert player angle to radians
-			Flt rad = ((g.player.angle+90.0) / 360.0f) * PI * 2.0;
-			//convert angle to a vector
-			Flt xdir = cos(rad);
-			Flt ydir = sin(rad);
-			g.player.vel[0] += xdir * (float)ydiff * 0.01f;
-			g.player.vel[1] += ydir * (float)ydiff * 0.01f;
-			Flt speed = sqrt(g.player.vel[0]*g.player.vel[0]+
-												g.player.vel[1]*g.player.vel[1]);
-			if (speed > 10.0f) {
-				speed = 10.0f;
-				normalize2d(g.player.vel);
-				g.player.vel[0] *= speed;
-				g.player.vel[1] *= speed;
-			}
-			g.mouseThrustOn = true;
-			clock_gettime(CLOCK_REALTIME, &g.mouseThrustTimer);
-		}
-		x11.set_mouse_position(100,100);
-		savex = 100;
-		savey = 100;
-        */
-	}
 }
 
 void playerInteract();
@@ -710,8 +556,310 @@ void physics()
 		g.player.pos[1] -= (float)gl.yres;
 	}
 	
+	//---------------------------------------------------
+	//check keys pressed now with either: arrow keys or wasd
+	if(g.player.can_move) {
+		if (gl.keys[XK_Up] || gl.keys[XK_w]) {
+	   		// player movement ~ upwards
+        	ymove = 1.0;
+        	g.player.angle = 360.0f;
+        	g.player.pFlip = 1;
+    	}
+		if (gl.keys[XK_Down] || gl.keys[XK_s]) {
+	    	// player movement ~ downwards
+        	ymove = -1.0;
+        	g.player.angle = 180.0f;
+        	g.player.pFlip = 0;
+    	}
+		if (gl.keys[XK_Left] || gl.keys[XK_a]) {
+	    	// player movement ~ left
+        	xmove = -1.0;
+        	g.player.angle = 90.0f;
+			g.player_direction = 1;
+		}
+		if (gl.keys[XK_Right] || gl.keys[XK_d]) {
+	    	// player movement ~ right
+        	xmove = 1.0;
+        	g.player.angle = 270.0f;
+			g.player_direction = 0;
+		}
+	}
+	
+    // Makes sure diagnol movement is not faster than if you were to go
+    // horizontal (left/right) OR vertical (up/down)
+    // xmove/ymove determine state of direction of movement
+    // gameSpeed determines base speed of player
+    // newSpeed reduces speed of player for going diagnol
+    if (pow(xmove, 2) + pow(ymove, 2) > 1) {
+        newPos[0] = g.player.pos[0] + (1.0f * xmove * gameSpeed * newSpeed);
+        newPos[1] = g.player.pos[1] + (1.0f * ymove * gameSpeed * newSpeed);
+    } else {
+        newPos[0] = g.player.pos[0] + (1.0f * xmove * gameSpeed);
+        newPos[1] = g.player.pos[1] + (1.0f * ymove * gameSpeed);
+    }
+    if (!(checkWall(newPos, g.room))) { 
+        g.player.pos[0] = newPos[0];
+        g.player.pos[1] = newPos[1];
+        
+    }
+    
+    if (pCollision(g.player, g.room.id)) {
+        pHealth = damageHealth(pHealth);
+    }
+	
+}
 
-	/*
+void render()
+{
+	roomRender(gl.xres, gl.yres, g.room.id, g.goryOn);
+	
+	renderZombie(g.room, g.player);
+	
+	//-------------------------------------------------------------------------
+	//Draw the player
+
+    // Placeholder to test character sprite variations
+    // if going up/down probably have character actually looking in that
+    // direction
+	if(g.player.shown) {
+    	if (g.player.pFlip) {
+	    	glColor3fv(g.player.colorAlt);
+    	} else {
+	    	glColor3fv(g.player.color);
+    	}
+		glPushMatrix();
+		glTranslatef(g.player.pos[0], g.player.pos[1], g.player.pos[2]);
+		//float angle = atan2(player.dir[1], player.dir[0]);
+		glRotatef(g.player.angle, 0.0f, 0.0f, 1.0f);
+		glBegin(GL_TRIANGLES);
+		//glVertex2f(-10.0f, -10.0f);
+		//glVertex2f(  0.0f, 20.0f);
+		//glVertex2f( 10.0f, -10.0f);
+		glVertex2f(-12.0f, -10.0f);
+		glVertex2f(  0.0f,  20.0f);
+		glVertex2f(  0.0f,  -6.0f);
+		glVertex2f(  0.0f,  -6.0f);
+		glVertex2f(  0.0f,  20.0f);
+		glVertex2f( 12.0f, -10.0f);
+		glEnd();
+		glColor3f(1.0f, 0.0f, 0.0f);
+		glBegin(GL_POINTS);
+		glVertex2f(0.0f, 0.0f);
+		glEnd();
+		glPopMatrix();
+
+		spritePlayerRender(g.player.sp, g.player.pos[0], g.player.pos[1], g.player_direction);
+	}
+	if (see_wall) {
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glEnable(GL_BLEND);
+		for (int i = 0; i != (int)g.room.walls.size(); i++) {
+        	renderWall(g.room.walls[i]);
+    	}
+
+		for (int i=0; i != (int)g.room.ev.size(); i++) {
+			renderEvent(g.room.ev[i]);
+		}
+		glDisable(GL_BLEND);
+	}
+
+	if (see_darkness) {
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glEnable(GL_BLEND);
+		renderLight(gl.xres, gl.yres);
+		glDisable(GL_BLEND);
+	}
+
+	//-------------------------------------------------------------------------
+	//Draw Inventory Box 
+    renderInventory();
+    //-------------------------------------------------------------------------
+    //Draw Items 
+    //renderItem(g.axe);
+    renderItem(g.player, g.room); 
+    //-------------------------------------------------------------------------
+    //Draw Health Box
+    
+    if (pHealth == 0) {
+        clear_run();
+        g.player.pos[0] = (Flt)(gl.xres/2);
+		g.player.pos[1] = (Flt)(gl.yres/2);
+        pHealth = 180.0f;
+        g.room.id = 6;
+        roomInit(g.room.id);
+        init_World();
+        render();
+    } else {
+        renderHealth(g.hbox, pHealth);
+    }
+
+    if (g.pause) {
+        renderPause(g.p);
+        sleep(1);
+    }
+}
+
+//originally at line 43
+//const int IBOX = 4;
+/*class Global {
+public:
+	int xres, yres;
+	char keys[65536];
+	Global() {
+		xres = 640;
+		yres = 480;
+		memset(keys, 0, 65536);
+	}
+} gl;*/
+
+/*class Player {
+public:
+	Vec pos;
+	Vec dir;
+	Vec vel;
+	Vec acc;
+	float angle;
+	float color[3];
+    float colorAlt[3];
+
+    // Determining facing up or down
+    int pFlip;
+
+public:
+	Player() {
+		pos[0] = (Flt)(gl.xres/2);
+		pos[1] = (Flt)(gl.yres/2);
+		pos[2] = 0.0f;
+		VecZero(dir);
+		VecZero(vel);
+		VecZero(acc);
+		angle = 0.0;
+		color[0] = color[1] = color[2] = 1.0;
+		colorAlt[0] = colorAlt[1] = colorAlt[2] = 0.658824;
+    
+        pFlip = 0;
+	}
+};*/
+
+//originally at line 110
+//build 10 asteroids...
+		/*
+        for (int j=0; j<10; j++) {
+			Asteroid *a = new Asteroid;
+			a->nverts = 8;
+			a->radius = rnd()*80.0 + 40.0;
+			Flt r2 = a->radius / 2.0;
+			Flt angle = 0.0f;
+			Flt inc = (PI * 2.0) / (Flt)a->nverts;
+			for (int i=0; i<a->nverts; i++) {
+				a->vert[i][0] = sin(angle) * (r2 + rnd() * a->radius);
+				a->vert[i][1] = cos(angle) * (r2 + rnd() * a->radius);
+				angle += inc;
+			}
+			a->pos[0] = (Flt)(rand() % gl.xres);
+			a->pos[1] = (Flt)(rand() % gl.yres);
+			a->pos[2] = 0.0f;
+			a->angle = 0.0;
+			a->rotate = rnd() * 4.0 - 2.0;
+			a->color[0] = 0.8;
+			a->color[1] = 0.8;
+			a->color[2] = 0.7;
+			a->vel[0] = (Flt)(rnd()*2.0-1.0);
+			a->vel[1] = (Flt)(rnd()*2.0-1.0);
+			//std::cout << "asteroid" << std::endl;
+			//add to front of linked list
+			a->next = ahead;
+			if (ahead != NULL)
+				ahead->prev = a;
+			ahead = a;
+			++nasteroids;
+		}
+        */
+
+//originally at line 335
+//Left button is down
+			//a little time between each bullet
+			//struct timespec bt;
+			//clock_gettime(CLOCK_REALTIME, &bt);
+			//double ts = timeDiff(&g.bulletTimer, &bt);
+			/**
+			if (ts > 0.1) {
+				//timeCopy(&g.bulletTimer, &bt);
+				//shoot a bullet...
+				if (g.nbullets < MAX_BULLETS) {
+					Bullet *b = &g.barr[g.nbullets];
+					//timeCopy(&b->time, &bt);
+					b->pos[0] = g.player.pos[0];
+					b->pos[1] = g.player.pos[1];
+        init_World();
+					b->vel[0] = g.player.vel[0];
+					b->vel[1] = g.player.vel[1];
+					//convert player angle to radians
+					Flt rad = ((g.player.angle+90.0) / 360.0f) * PI * 2.0;
+					//convert angle to a vector
+					Flt xdir = cos(rad);
+					Flt ydir = sin(rad);
+					b->pos[0] += xdir*20.0f;
+					b->pos[1] += ydir*20.0f;
+					b->vel[0] += xdir*6.0f + rnd()*0.1;
+					b->vel[1] += ydir*6.0f + rnd()*0.1;
+					b->color[0] = 1.0f;
+					b->color[1] = 1.0f;
+					b->color[2] = 1.0f;
+					++g.nbullets;
+				}
+			}
+			*/
+
+//oringinally at line 360
+//Mouse moved
+		//int xdiff = savex - e->xbutton.x;
+		//int ydiff = savey - e->xbutton.y;
+		//if (++ct < 10)
+			//return;		
+		//std::cout << "savex: " << savex << std::endl << std::flush;
+		//std::cout << "e->xbutton.x: " << e->xbutton.x << std::endl <<
+		//std::flush;
+        /*
+		if (xdiff > 0) {
+			//std::cout << "xdiff: " << xdiff << std::endl << std::flush;
+			g.player.angle += 0.05f * (float)xdiff;
+			if (g.player.angle >= 360.0f)
+				g.player.angle -= 360.0f;
+		}
+		else if (xdiff < 0) {
+			//std::cout << "xdiff: " << xdiff << std::endl << std::flush;
+			g.player.angle += 0.05f * (float)xdiff;
+			if (g.player.angle < 0.0f)
+				g.player.angle += 360.0f;
+		}
+		if (ydiff > 0) {
+			//apply thrust
+			//convert player angle to radians
+			Flt rad = ((g.player.angle+90.0) / 360.0f) * PI * 2.0;
+			//convert angle to a vector
+			Flt xdir = cos(rad);
+			Flt ydir = sin(rad);
+			g.player.vel[0] += xdir * (float)ydiff * 0.01f;
+			g.player.vel[1] += ydir * (float)ydiff * 0.01f;
+			Flt speed = sqrt(g.player.vel[0]*g.player.vel[0]+
+												g.player.vel[1]*g.player.vel[1]);
+			if (speed > 10.0f) {
+				speed = 10.0f;
+				normalize2d(g.player.vel);
+				g.player.vel[0] *= speed;
+				g.player.vel[1] *= speed;
+			}
+			g.mouseThrustOn = true;
+			clock_gettime(CLOCK_REALTIME, &g.mouseThrustTimer);
+		}
+		x11.set_mouse_position(100,100);
+		savex = 100;
+		savey = 100;
+        */
+
+//originally at line 537
+/*
     //Update bullet positions
 	struct timespec bt;
 	clock_gettime(CLOCK_REALTIME, &bt);
@@ -827,65 +975,8 @@ void physics()
 		a = a->next;
 	}
 	*/
-	//---------------------------------------------------
-	//check keys pressed now with either: arrow keys or wasd
-	if(g.player.can_move) {
-		if (gl.keys[XK_Up] || gl.keys[XK_w]) {
-	   		// player movement ~ upwards
-        	ymove = 1.0;
-        	g.player.angle = 360.0f;
-        	g.player.pFlip = 1;
-    	}
-		if (gl.keys[XK_Down] || gl.keys[XK_s]) {
-	    	// player movement ~ downwards
-        	ymove = -1.0;
-        	g.player.angle = 180.0f;
-        	g.player.pFlip = 0;
-    	}
-		if (gl.keys[XK_Left] || gl.keys[XK_a]) {
-	    	// player movement ~ left
-        	xmove = -1.0;
-        	g.player.angle = 90.0f;
-			g.player_direction = 1;
-		}
-		if (gl.keys[XK_Right] || gl.keys[XK_d]) {
-	    	// player movement ~ right
-        	xmove = 1.0;
-        	g.player.angle = 270.0f;
-			g.player_direction = 0;
-		}
-	}
-	
-    // Makes sure diagnol movement is not faster than if you were to go
-    // horizontal (left/right) OR vertical (up/down)
-    // xmove/ymove determine state of direction of movement
-    // gameSpeed determines base speed of player
-    // newSpeed reduces speed of player for going diagnol
-    if (pow(xmove, 2) + pow(ymove, 2) > 1) {
-        newPos[0] = g.player.pos[0] + (1.0f * xmove * gameSpeed * newSpeed);
-        newPos[1] = g.player.pos[1] + (1.0f * ymove * gameSpeed * newSpeed);
-    } else {
-        newPos[0] = g.player.pos[0] + (1.0f * xmove * gameSpeed);
-        newPos[1] = g.player.pos[1] + (1.0f * ymove * gameSpeed);
-    }
-    if (!(checkWall(newPos, g.room))) { 
-        g.player.pos[0] = newPos[0];
-        g.player.pos[1] = newPos[1];
-        
-    }
 
-    
-    if (pCollision(g.player, g.room.id)) {
-        pHealth = damageHealth(pHealth);
-        //if (pHealth == 0) {
-            //g.room.id = 0;
-            //roomInit(g.room.id);
-            //roomRender(gl.xres, gl.yres, g.room.id, g.goryOn);
-        //}
-    }
-
-    //renderHealth(g.hbox, pHealth);
-	
+//orginally at line 609
     /*
 	if (gl.keys[XK_space]) {
 		//a little time between each bullet
@@ -929,123 +1020,15 @@ void physics()
 			g.mouseThrustOn = false;
 	}
 	*/
-}
-
-void render()
-{
-	/*
-    Rect l, r;
-	glClear(GL_COLOR_BUFFER_BIT);
-	//
-	l.bot = gl.yres - 20;
-	l.left = 10;
-	l.center = 0;
-
-	r.bot = gl.yres - 20;
-	r.left = 450;
-	r.center = 0;
-    */
-
-	roomRender(gl.xres, gl.yres, g.room.id, g.goryOn);
 	
-	renderZombie(g.room, g.player);
-	
-	//-------------------------------------------------------------------------
-	//Draw the player
-
-    // Placeholder to test character sprite variations
-    // if going up/down probably have character actually looking in that
-    // direction
-	if(g.player.shown) {
-    	if (g.player.pFlip) {
-	    	glColor3fv(g.player.colorAlt);
-    	} else {
-	    	glColor3fv(g.player.color);
-    	}
-		glPushMatrix();
-		glTranslatef(g.player.pos[0], g.player.pos[1], g.player.pos[2]);
-		//float angle = atan2(player.dir[1], player.dir[0]);
-		glRotatef(g.player.angle, 0.0f, 0.0f, 1.0f);
-		glBegin(GL_TRIANGLES);
-		//glVertex2f(-10.0f, -10.0f);
-		//glVertex2f(  0.0f, 20.0f);
-		//glVertex2f( 10.0f, -10.0f);
-		glVertex2f(-12.0f, -10.0f);
-		glVertex2f(  0.0f,  20.0f);
-		glVertex2f(  0.0f,  -6.0f);
-		glVertex2f(  0.0f,  -6.0f);
-		glVertex2f(  0.0f,  20.0f);
-		glVertex2f( 12.0f, -10.0f);
-		glEnd();
-		glColor3f(1.0f, 0.0f, 0.0f);
-		glBegin(GL_POINTS);
-		glVertex2f(0.0f, 0.0f);
-		glEnd();
-		glPopMatrix();
-
-		spritePlayerRender(g.player.sp, g.player.pos[0], g.player.pos[1], g.player_direction);
-	}
-	if (see_wall) {
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        glEnable(GL_BLEND);
-		for (int i = 0; i != (int)g.room.walls.size(); i++) {
-        	renderWall(g.room.walls[i]);
-    	}
-
-		for (int i=0; i != (int)g.room.ev.size(); i++) {
-			renderEvent(g.room.ev[i]);
-		}
-		glDisable(GL_BLEND);
-	}
-
-	if (see_darkness) {
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        glEnable(GL_BLEND);
-		renderLight(gl.xres, gl.yres);
-		glDisable(GL_BLEND);
-	}
-
-	/*
+//line 672
+    /*
 	for (int i=0; i != (int)g.room.zombies.size(); i++) {
 		renderZombie(g.room.zombies[i]);
 	} 
     */
-	//-------------------------------------------------------------------------
-	//Draw Inventory Box 
-    renderInventory();
-    /*g.iboxbg.pos[0] = g.iboxbg.xres / 2;
-    renderInventory(g.iboxbg,IBOX+1, g.iboxbg.pos[0], IBOX);
-    for (int i=0; i<IBOX; i++) {
-        float iboxX = g.ibox[i].pos[0];
-        iboxX = (g.ibox[i].xres / 2.75) + (iboxX / 2) + (i * 60);
-        g.ibox[i].h = 20;
-        g.ibox[i].w = 20;
 
-        renderInventory(g.ibox[i], i, iboxX, IBOX);
-    }*/
-    //-------------------------------------------------------------------------
-    //Draw Items 
-    //renderItem(g.axe);
-    renderItem(g.player, g.room); 
-     //-------------------------------------------------------------------------
-    //Draw Health Box
-    
-    if (pHealth == 0) {
-        pHealth = 180.0f;
-        g.room.id = 0;
-        clear_run();
-        roomInit(g.room.id);
-        init_World();
-        renderHealth(g.hbox, pHealth);
-    } else {
-        renderHealth(g.hbox, pHealth);
-    }
-
-    if (g.pause) {
-        renderPause(g.p);
-        sleep(1);
-    }
-
+//line 708
     /*
 	if (gl.keys[XK_Up] || g.mouseThrustOn) {
 		int i;
@@ -1140,15 +1123,17 @@ void render()
 		glEnd();
 	}
 	
-	ggprint8b(&l, 420, 0x00ff0000, "3350 - Project_Zombie");
-	ggprint8b(&l, 16, 0x00ffff00, "F - Interact with event spaces");
-	ggprint8b(&l, 16, 0x00ffff00, "L - Remove border");
-	ggprint8b(&l, 16, 0x00ffff00, "E - Remove black square");
-
-	ggprint8b(&r, 420, 0x00ff0000, "");
-	ggprint8b(&r, 16, 0x00ffff00, "WASD - Move");
-	ggprint8b(&r, 16, 0x00ffff00, "ARROW KEYS - Move");
-	ggprint8b(&r, 16, 0x00ffff00, "SPACE - Swing axe?");
     */
-}
+
+//line 672
+    /*g.iboxbg.pos[0] = g.iboxbg.xres / 2;
+    renderInventory(g.iboxbg,IBOX+1, g.iboxbg.pos[0], IBOX);
+    for (int i=0; i<IBOX; i++) {
+        float iboxX = g.ibox[i].pos[0];
+        iboxX = (g.ibox[i].xres / 2.75) + (iboxX / 2) + (i * 60);
+        g.ibox[i].h = 20;
+        g.ibox[i].w = 20;
+
+        renderInventory(g.ibox[i], i, iboxX, IBOX);
+    }*/
 
