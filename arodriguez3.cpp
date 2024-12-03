@@ -1,16 +1,21 @@
+/*
+ *=================================================================
+ * Adrian's source file
+ *=================================================================
+ */
 #include "header.h"
 using namespace std;
 
 #define MOVESTEP 1.0f // How fast the zombie moves
-//#define FOLLOW_RANGE 100.0f // The following range between zombie and player
 
+void renderZombieDetection(int, int, int);
 extern int checkWall(float*, Room);
 
 // Sprite the zombies will use
 extern void spriteInit(Sprite& ,std::string);
 Sprite zombieSprite = Sprite(192, 64, 0);
 std::string sprite_image_Z = "./images/Sprite-zombie.png";
-Sprite detectionSprite = Sprite(16, 16, 0);
+Sprite detectionSprite = Sprite(48, 16, 0);
 std::string sprite_z_detect = "./images/Sprite-detection.png";
 
 void init_zomb_Sprites()
@@ -27,7 +32,7 @@ int Zcol_count = 0; // For zombie collision countdown
 std::vector<Zombie> zombies = {
 	Zombie(0, 575.0f, 400.0f, 0, 1, 0), // Entrance
 	Zombie(1, 75.0f, 100.0f, 0, 1, 0),
-	Zombie(2, 575.0f, 200.0f, 0, 1, 0),
+	Zombie(2, 575.0f, 100.0f, 0, 1, 0),
 	Zombie(3, 75.0f, 150.0f, 0, 1, 0),
 	
 	Zombie(4, 200.0f, 280.0f, 0, 1, 1), // Office
@@ -37,7 +42,11 @@ std::vector<Zombie> zombies = {
 	Zombie(6, 555.0f, 350.0f, 0, 1, 4), // Lab
 	Zombie(7, 120.0f, 350.0f, 0, 1, 4),
 	
-	Zombie(8, 200.0f, 260.0f, 0, 1, 5) // Restroom
+	Zombie(8, 200.0f, 260.0f, 0, 1, 5),	// Restroom
+
+	Zombie(9, 575.0f, 400.0f, 0, 1, 6), // Testlab/Starting room
+	Zombie(10, 80.0f, 100.0f, 0, 1, 6),
+	Zombie(11, 90.0f, 380.0f, 0, 1, 6)
 };
 
 int getVectorSize()
@@ -132,15 +141,17 @@ bool Zfollow(Zombie& zombie, Player& player, Room current)
 					zombie.pos[1] = NewZpos[1];
 
 				}
+				renderZombieDetection(2, zombie.pos[0], zombie.pos[1] + 50);
 				zombie.following = true; 	// marked as following
 				return true; 				// Zombie follows player
 			} else {
 				zombie.count++;
-				if (zombie.count > 1 && zombie.count < 30) {
+				if (zombie.count > 1 && zombie.count < 50) {
 					//printf("Counting: %i\n", zombie.count);
+					renderZombieDetection(1, zombie.pos[0], zombie.pos[1] + 50);
 					return false;
 				}
-				if (zombie.count == 30) {
+				if (zombie.count == 50) {
 					//printf("Count is now: %i\n", zombie.count);
 					zombie.waiting = 0;
 				}
@@ -232,6 +243,7 @@ void renderZombie(Room current, Player player)
 			ztimer.recordTime(&ztimer.walkTime);
 		} 
 	//zombieSprite.spriteFrame += 1;
+
 	// Uses for loop to make zombies based on the size of the zombie vector
 	for (size_t i = 0; i < zombies.size(); i++) {
 		
@@ -247,17 +259,10 @@ void renderZombie(Room current, Player player)
 				glTranslatef(zombies[i].pos[0], zombies[i].pos[1], 0.0f);
 				glRotatef(0.0f, 0.0f, 0.0f, 1.0f);
 				float size = 9.0f; // size of zombie
+				glEnable(GL_BLEND);
+				glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 				glBegin(GL_QUADS);
-					if (Zfollow(zombies[i], player, current)) {
-						// When following player (red)
-						glColor3f(1.0f, 0.0f, 0.0f);
-					} else if (zombies[i].count > 0) {
-						// When Zombie is suspicious of player (blue)
-						glColor3f(0.0f, 0.0f, 1.0f);
-					} else {
-						// When Zombie is just roaming (green)
-						glColor3f(0.0f, 1.0f, 0.0f);
-					}
+					glColor4f(0.0f, 0.0f, 0.0f, 0.0f);
 					glVertex3f(size, size, 0.0f); 	// top right
 					glVertex3f(size, -size, 0.0f); 	// bottom right
 					glVertex3f(-size, -size, 0.0f); // bottom left
@@ -268,6 +273,8 @@ void renderZombie(Room current, Player player)
 				glVertex2f(0.0f, 0.0f);
 				glEnd();
 				glPopMatrix();
+
+				glDisable(GL_BLEND);
 
 				float zPos = 0.0f;
     			float cx = zombieSprite.xres/6.0;
@@ -305,36 +312,37 @@ void renderZombie(Room current, Player player)
 	}
 }
 
-// Takes the zombie position and puts this ontop of their head when within range of player for detection
+// Takes the zombie position and puts this ontop of 
+// their head when within range of player for detection
 // 
 void renderZombieDetection(int detection_state, int xPos, int yPos)
 {
 	float zPos = 0.0f;
-    			float cx = detectionSprite.xres/3.0;
-    			float cy = detectionSprite.yres;
+    float cx = detectionSprite.xres/3.0f;
+    float cy = detectionSprite.yres;
 
-    			int ix = detection_state % 3;
-    			int iy = 0;
-    			float tx = (float)ix / 3.0;
-    			float ty = (float)iy;
+	int ix = detection_state % 3;
+	int iy = 0;
+	float tx = (float)ix / 3.0f;
+	float ty = (float)iy;
 
-    			glPushMatrix();
-    			glColor3f(1.0, 1.0, 1.0);
-    			glBindTexture(GL_TEXTURE_2D, detectionSprite.spTex.spriteTexture);
-    			//
-    			glEnable(GL_ALPHA_TEST);
-    			glAlphaFunc(GL_GREATER, 0.0f);
-    			glColor4ub(255,255,255,255);
+	glPushMatrix();
+	glColor3f(1.0, 1.0, 1.0);
+	glBindTexture(GL_TEXTURE_2D, detectionSprite.spTex.spriteTexture);
+	//
+	glEnable(GL_ALPHA_TEST);
+	glAlphaFunc(GL_GREATER, 0.0f);
+	glColor4ub(255,255,255,255);
 
-    			glTranslatef(xPos, yPos, zPos);
-    			// May need to mess with the Vertex cords to get them to be above the head
-    			glBegin(GL_QUADS);
-        			glTexCoord2f(tx, ty+1.0);      glVertex2i(-cx/2, -cy/2);
-					glTexCoord2f(tx, ty);         glVertex2i(-cx/2, cy/2);
-					glTexCoord2f(tx+0.33333, ty);    glVertex2i(cx/2,cy/2);
-					glTexCoord2f(tx+0.33333, ty+1.0); glVertex2i(cx/2, -cy/2);
-    			glEnd();
-    			glPopMatrix();
-    			glBindTexture(GL_TEXTURE_2D, 0);
-    			glDisable(GL_ALPHA_TEST);
+	glTranslatef(xPos, yPos, zPos);
+	// May need to mess with the Vertex cords to get them to be above the head
+	glBegin(GL_QUADS);
+		glTexCoord2f(tx, ty+1.0);      glVertex2i(-cx/2, -cy/2);
+		glTexCoord2f(tx, ty);         glVertex2i(-cx/2, cy/2);
+		glTexCoord2f(tx+0.33333, ty);    glVertex2i(cx/2,cy/2);
+		glTexCoord2f(tx+0.33333, ty+1.0); glVertex2i(cx/2, -cy/2);
+	glEnd();
+	glPopMatrix();
+	glBindTexture(GL_TEXTURE_2D, 0);
+	glDisable(GL_ALPHA_TEST);
 }
