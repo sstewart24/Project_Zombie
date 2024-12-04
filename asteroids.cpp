@@ -36,6 +36,8 @@ extern void init_zomb_Sprites();
 extern void clear_run();
 extern void renderPause(Pause);
 extern Zombie getZombies(int);
+extern void init_zombie();
+extern void clear_zombie();
 int roomID = 6;
 int see_wall;
 int see_darkness;
@@ -264,6 +266,7 @@ int main()
 	init_Player_Images(g.player.sp);
 	init_Item_Images();
 	init_World();
+	init_zombie();
 	roomInit(roomID);
 
 	logOpen();
@@ -690,12 +693,14 @@ void render()
     
     if (pHealth == 0) {
         clear_run();
+	clear_zombie();
         g.player.pos[0] = (Flt)(gl.xres/2);
-		g.player.pos[1] = (Flt)(gl.yres/2);
+	g.player.pos[1] = (Flt)(gl.yres/2);
         pHealth = 180.0f;
         g.room.id = 6;
         roomInit(g.room.id);
         init_World();
+	init_zombie();
         render();
     } else {
         renderHealth(g.hbox, pHealth);
