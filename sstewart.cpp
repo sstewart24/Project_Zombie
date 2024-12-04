@@ -117,13 +117,12 @@ void renderPause(Pause p)
     r.center = 0;
 
     ggprint8b(&l, 420, 0x00ff0000, "3350 - Project_Zombie");
-    ggprint8b(&l, 16, 0x00ffff00, "F - Interact with event spaces");
-    ggprint8b(&l, 16, 0x00ffff00, "L - Remove border");
-    ggprint8b(&l, 16, 0x00ffff00, "E - Remove black square");
+    ggprint8b(&l, 16, 0x00ffff00, "F - Interact");
+    ggprint8b(&l, 16, 0x00ffff00, "H - Heal");
     ggprint8b(&r, 420, 0x00ffff00, "");
-    ggprint8b(&r, 16, 0x00ffff00, "WASD - Move");
+    ggprint8b(&r, 16, 0x00ffff00, "W - A - S - D - Move");
     ggprint8b(&r, 16, 0x00ffff00, "ARROW KEYS - Move");
-    ggprint8b(&r, 16, 0x00ffff00, "SPACE - Swing axe?");
+    //ggprint8b(&r, 16, 0x00ffff00, "SPACE - Swing axe");
 }
 
 bool pCollision(Player player, int rid) {
