@@ -6,7 +6,7 @@
 #include "header.h"
 using namespace std;
 
-#define MOVESTEP 1.0f // How fast the zombie moves
+#define MOVESTEP 0.5f // How fast the zombie moves
 
 void renderZombieDetection(int, int, int);
 extern int checkWall(float*, Room);
@@ -29,7 +29,7 @@ Timers ztimer;
 int Zcol_count = 0; // For zombie collision countdown
 
 // Vector for Zombies 
-std::vector<Zombie> zombies = {
+std::vector<Zombie> default_zombies = {
 	Zombie(0, 575.0f, 400.0f, 0, 1, 0), // Entrance
 	Zombie(1, 75.0f, 100.0f, 0, 1, 0),
 	Zombie(2, 575.0f, 100.0f, 0, 1, 0),
@@ -48,6 +48,26 @@ std::vector<Zombie> zombies = {
 	Zombie(10, 80.0f, 100.0f, 0, 1, 6),
 	Zombie(11, 90.0f, 380.0f, 0, 1, 6)
 };
+
+std::vector<Zombie> zombies;
+int zombieamount = 12;
+void init_zombie()
+{
+	int i = 0;
+	while (i < zombieamount) {
+		zombies.push_back(default_zombies[i]);
+		i++;
+	}
+}
+
+void clear_zombie ()
+{
+	int i = 0;
+	while (i < zombieamount) {
+		zombies.pop_back();
+		i++;
+	}
+}
 
 int getVectorSize()
 { // function for Sophia
@@ -146,12 +166,12 @@ bool Zfollow(Zombie& zombie, Player& player, Room current)
 				return true; 				// Zombie follows player
 			} else {
 				zombie.count++;
-				if (zombie.count > 1 && zombie.count < 50) {
+				if (zombie.count > 1 && zombie.count < 30) {
 					//printf("Counting: %i\n", zombie.count);
 					renderZombieDetection(1, zombie.pos[0], zombie.pos[1] + 50);
 					return false;
 				}
-				if (zombie.count == 50) {
+				if (zombie.count == 30) {
 					//printf("Count is now: %i\n", zombie.count);
 					zombie.waiting = 0;
 				}
