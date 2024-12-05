@@ -493,7 +493,19 @@ void playerInteract()
 					g.room.ev[interact_index].stor.hasItem = 0;
 					g.room.ev[interact_index].stor.collected = 1;
 					break;
-			}
+                case 2:
+                    printf("Grabbed Health Pack\n");
+                    g.room.ev[interact_index].stor.hasItem = 0;
+                    g.room.ev[interact_index].stor.collected = 1;
+                    g.hPack.collected = true;
+                    g.hPack.available += 1;
+                    break;
+                case 3:
+                    printf("Grabbed Key\n");
+                    g.room.ev[interact_index].stor.hasItem = 0;
+                    g.room.ev[interact_index].stor.collected = 1;
+                    break;
+            }
 		}
 		fflush(stdout);
 		// Calls second function with item type integer and increases the value of that item
