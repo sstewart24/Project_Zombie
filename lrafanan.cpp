@@ -1,15 +1,13 @@
 /* Lyanne Rafanan's Source File
- * last updated: 03 DEC 24
+ * last updated: 04 DEC 24
  * What's in here?
  *  - Render and initialize values for Inventory Box
  *  - Render Collectable Items:
  *      - axe(1): stun/kill zombies
- *      - healthpack(in progress, multiple around the map): incr player health
+ *      - healthpack(multiple around the map): incr player health
+ *      - key(1) : used to win the game
  * TODO:
- * - add more items:
- *      - cure: unzombie the zombies
- *      - map pieces? : collect to find the cure
- * - fix item alignment inside of inventory slots
+ * - Hit box for axe and zombie collision
  * */
 #include "header.h"
 // Funtion Prototypes:
@@ -21,8 +19,9 @@ void renderInventory(Eventspace);
 void renderItem(Eventspace);
 
 //Globals
-//Healthpack healthpack;
-Axe axe;
+Key key (240.0f, 200.0f);
+Healthpack healthpack (70.0f, 350.0f);
+Axe axe (370.0f, 240.0f);
 const int MAXINVENTORY = 4;
 Inventory box[MAXINVENTORY];
 Inventory bg;
@@ -116,9 +115,9 @@ void renderInventory() {
        // i = inventory slot
         if (i==0 && axe.collected == 1)
             spriteItemRender(axe_img, box[i].pos[0], box[i].pos[1]);
-        if (i==1 /*&& healthpack.collected*/)
+        if (i==1 && healthpack.collected == 1)
             spriteItemRender(healthpack_img, box[i].pos[0], box[i].pos[1]);
-        if (i==2)
+        if (i==2 && key.collected == 1)
             spriteItemRender(key_img, box[i].pos[0], box[i].pos[1]);
     }
 
@@ -126,27 +125,33 @@ void renderInventory() {
 
 // Rendering Items to Collect on the Map
 void renderItem(Eventspace e) {
-    //Axe - inside of main lobby
-    if (e.stor.hasItem != -1 && e.stor.collected != 1) {
+    //Axe - one inside of main lobby
+    if (e.stor.hasItem != -1 && e.stor.collected != 1 &&
+        e.stor.type == 1) {
         spriteItemRender(axe_img, axe.pos[0] , axe.pos[1]);
     }
-    else if (e.stor.collected == 1){
-        axe.collected = 1;
+    else if (e.stor.collected == 1 && e.stor.type == 1){
+        axe.collected = 1; //used to update inventory slot render
     }
-    //Health packs - Multiple around the maps
-    /*if (!healthpack.collected) {
-        healthpack.pos[0] = (640 / 2) + 50;
-        healthpack.pos[1] = (480 / 2) - 30;
+
+    //Health packs - Multiple around different rooms
+    if (e.stor.hasItem != -1 && e.stor.collected != 1 &&
+        e.stor.type == 2) {
         spriteItemRender(healthpack_img, healthpack.pos[0],
                          healthpack.pos[1]);
-           }
-    if ((player.pos[0] == healthpack.pos[0]) &&
-         (player.pos[1] == healthpack.pos[1])) {
-        healthpack.collected = true;
-        healthpack.available += 1;
-        printf("health pack collected\n");
     }
-    */
-    //Key -
+    else if (e.stor.collected == 1 && e.stor.type == 2){
+        healthpack.collected = 1; //used to update inventory slot render
+    }
+
+    //Key - one inside the office
+    if (e.stor.hasItem != -1 && e.stor.collected != 1 &&
+        e.stor.type == 3) {
+        spriteItemRender(key_img, key.pos[0],
+                         key.pos[1]);
+    }
+    else if (e.stor.collected == 1 && e.stor.type == 3){
+        key.collected = 1; //used to update inventory slot render
+    }
 
 }
