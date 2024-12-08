@@ -451,7 +451,6 @@ int check_keys(XEvent *e)
             	} 
 	}
         }
-	}
 	(void)shift;
 	
 	switch (key) {
