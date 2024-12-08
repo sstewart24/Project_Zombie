@@ -7,6 +7,8 @@
 using namespace std;
 
 #define MOVESTEP 0.5f // How fast the zombie moves
+//#define MOVESTEP 1.0f // For personal testing
+
 
 void renderZombieDetection(int, int, int);
 extern int checkWall(float*, Room);
@@ -31,9 +33,9 @@ int Zcol_count = 0; // For zombie collision countdown
 
 // Vector for Zombies 
 std::vector<Zombie> default_zombies = {
-	Zombie(0, 575.0f, 400.0f, 0, 1, 0), // Entrance
+	Zombie(0, 555.0f, 370.0f, 0, 1, 0), // Entrance
 	Zombie(1, 75.0f, 100.0f, 0, 1, 0),
-	Zombie(2, 575.0f, 100.0f, 0, 1, 0),
+	Zombie(2, 100.0f, 370.0f, 0, 1, 0),
 	Zombie(3, 75.0f, 150.0f, 0, 1, 0),
 	
 	Zombie(4, 200.0f, 280.0f, 0, 1, 1), // Office
@@ -43,10 +45,10 @@ std::vector<Zombie> default_zombies = {
 	Zombie(6, 555.0f, 350.0f, 0, 1, 4), // Lab
 	Zombie(7, 120.0f, 350.0f, 0, 1, 4),
 	
-	Zombie(8, 200.0f, 260.0f, 0, 1, 5),	// Restroom
+	Zombie(8, 210.0f, 250.0f, 0, 1, 5),	// Restroom
 
 	Zombie(9, 575.0f, 400.0f, 0, 1, 6), // Testlab/Starting room
-	Zombie(10, 80.0f, 100.0f, 0, 1, 6),
+	Zombie(10, 575.0f, 200.0f, 0, 1, 6),
 	Zombie(11, 90.0f, 380.0f, 0, 1, 6)
 };
 
