@@ -38,6 +38,9 @@ extern void renderPause(Pause);
 extern Zombie getZombies(int);
 extern void init_zombie();
 extern void clear_zombie();
+extern void renderPlayerItem(float,float);
+extern bool zombieAxeCollision(int,int,int);
+extern void resetItems();
 int roomID = 6;
 int see_wall;
 int see_darkness;
@@ -85,7 +88,7 @@ public:
     //Inventory iboxbg;
 	Health hbox;
     Healthpack hPack;
-    //Axe axe;
+    Axe axe;
 
 	Asteroid *ahead;
 	Bullet *barr;
@@ -431,6 +434,16 @@ int check_keys(XEvent *e)
         if (key == XK_p) {
             g.pause = !g.pause;
         }
+        if (key == XK_space) {
+            if (g.axe.collected) {
+                bool zac = zombieAxeCollision(g.player.pos[0],g.player.pos[1],g.room.id);
+                if (zac) {
+                    printf("Player attacking Zombie\n");
+                } else {
+                    printf("Player is too far too attack\n");
+                }
+            } 
+        }
 	}
 	(void)shift;
 	
@@ -492,6 +505,7 @@ void playerInteract()
 					printf("Grabbed axe\n");
 					g.room.ev[interact_index].stor.hasItem = 0;
 					g.room.ev[interact_index].stor.collected = 1;
+                    g.axe.collected = true;
 					break;
                 case 2:
                     printf("Grabbed Health Pack\n");
@@ -665,6 +679,7 @@ void render()
 		glPopMatrix();
 
 		spritePlayerRender(g.player.sp, g.player.pos[0], g.player.pos[1], g.player_direction);
+        renderPlayerItem(g.player.pos[0], g.player.pos[1]);
 	}
 	if (see_wall) {
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -706,6 +721,7 @@ void render()
     if (pHealth == 0) {
         clear_run();
 	clear_zombie();
+    resetItems();
         g.player.pos[0] = (Flt)(gl.xres/2);
 	g.player.pos[1] = (Flt)(gl.yres/2);
         pHealth = 180.0f;
