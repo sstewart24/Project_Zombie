@@ -162,7 +162,7 @@ void renderItem(Eventspace e) {
 //Render the Item next to the player
 void renderPlayerItem(float playerX, float playerY) {
     if (axe.collected) {
-        spriteItemRender(axe_img, itemX, itemY);
+        spriteItemRender(axe_img, playerX, playerY);
         //axe range
        /* glPushMatrix();
         glColor3ub(220, 220, 0);
