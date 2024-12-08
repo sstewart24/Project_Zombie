@@ -6,7 +6,7 @@
 #include "header.h"
 using namespace std;
 
-#define MOVESTEP 1.0f // How fast the zombie moves
+#define MOVESTEP 0.5f // How fast the zombie moves
 
 void renderZombieDetection(int, int, int);
 extern int checkWall(float*, Room);
