@@ -13,7 +13,7 @@
  * */
 #include "header.h"
 // Funtion Prototypes:
-extern void spriteInit(Sprite& ,std::string); // loads images into the ppm files opengl uses
+extern void spriteInit(Sprite&, std::string);
 void init_Item_Images();
 void spriteItemRender(Sprite sp, float xPos, float yPos);
 void init_inventory();
@@ -31,15 +31,12 @@ const int MAXINVENTORY = 4;
 Inventory box[MAXINVENTORY];
 Inventory bg;
 
-Sprite healthpack_img = Sprite(40, 40); // setup for the item sprites
-std::string hp_imagefile = "./images/Health-pack.png"; // string for image
-                                                       //
+Sprite healthpack_img = Sprite(40, 40);
+std::string hp_imagefile = "./images/Health-pack.png"; 
 Sprite axe_img = Sprite(40, 40);
 std::string axeInv_imagefile = "./images/AxeSprite-Inventory.png";
-
 Sprite key_img = Sprite(40, 40);
 std::string keyInv_imagefile = "./images/Sprite-key.png";
-Eventspace ev(1, 1, 50.0f, 320.0f, Storage(1,1));
 
 // Initializing Images for render
 void init_Item_Images() {
@@ -55,25 +52,23 @@ void spriteItemRender(Sprite sp, float xPos, float yPos) {
     float cy = sp.yres / 2;
     float tx = 0.0;
     float ty = 0.0;
-        glPushMatrix();
-        glColor3f(1.0, 1.0, 1.0);
-        glBindTexture(GL_TEXTURE_2D, sp.spTex.spriteTexture);
-        //
-        glEnable(GL_ALPHA_TEST);
-        glAlphaFunc(GL_GREATER, 0.0f);
-        glColor4ub(255,255,255,255);
+    glPushMatrix();
+    glColor3f(1.0, 1.0, 1.0);
+    glBindTexture(GL_TEXTURE_2D, sp.spTex.spriteTexture);
+    glEnable(GL_ALPHA_TEST);
+    glAlphaFunc(GL_GREATER, 0.0f);
+    glColor4ub(255,255,255,255);
 
     glTranslatef(xPos, yPos, zPos);
-    //glRotatef(0.0f,0.0f,0.0f,0.0f);
         glBegin(GL_QUADS);
-                glTexCoord2f(tx, ty+1.0);      glVertex2i(-cx, -cy);
-                glTexCoord2f(tx, ty);         glVertex2i(-cx, cy);
-                glTexCoord2f(tx+1.0, ty);    glVertex2i(cx, cy);
-                glTexCoord2f(tx+1.0, ty+1.0); glVertex2i(cx, -cy);
-        glEnd();
-        glPopMatrix();
-        glBindTexture(GL_TEXTURE_2D, 0);
-        glDisable(GL_ALPHA_TEST);
+        glTexCoord2f(tx, ty+1.0);     glVertex2i(-cx, -cy);
+        glTexCoord2f(tx, ty);         glVertex2i(-cx, cy);
+        glTexCoord2f(tx+1.0, ty);     glVertex2i(cx, cy);
+        glTexCoord2f(tx+1.0, ty+1.0); glVertex2i(cx, -cy);
+   glEnd();
+   glPopMatrix();
+   glBindTexture(GL_TEXTURE_2D, 0);
+   glDisable(GL_ALPHA_TEST);
 }
 
 // Initializing Positions for the Inventory Box
@@ -81,6 +76,7 @@ void init_inventory() {
     bg.pos[0] = bg.xres / 2;
     bg.w = 100;
     bg.h = 20;
+
     for (int i=0; i<MAXINVENTORY; i++) {
         box[i].pos[0] = (box[i].xres / 2.75) + (i * 120) / 2;
         box[i].h = 20;
@@ -91,17 +87,18 @@ void init_inventory() {
 // Rendering the inventory box and its slots for collectable items
 void renderInventory() {
     init_inventory();
+
     //background box
     glPushMatrix();
-        glColor3ub(74, 78, 105);
-        glTranslatef(bg.pos[0], bg.pos[1], 0.0f);
-        glBegin(GL_QUADS);
-            glVertex2f(-bg.w, -bg.h);
-            glVertex2f(-bg.w,  bg.h);
-            glVertex2f( bg.w,  bg.h);
-            glVertex2f( bg.w, -bg.h);
-       glEnd();
-       glPopMatrix();
+    glColor3ub(74, 78, 105);
+    glTranslatef(bg.pos[0], bg.pos[1], 0.0f);
+    glBegin(GL_QUADS);
+        glVertex2f(-bg.w, -bg.h);
+        glVertex2f(-bg.w,  bg.h);
+        glVertex2f( bg.w,  bg.h);
+        glVertex2f( bg.w, -bg.h);
+    glEnd();
+    glPopMatrix();
 
     //inventory slots
     for (int i=0; i<MAXINVENTORY; i++) {
@@ -115,21 +112,22 @@ void renderInventory() {
             glVertex2f( box[i].w, -box[i].h);
        glEnd();
        glPopMatrix();
-       // i = inventory slot
-        if (i==0 && axe.collected == 1)
-            spriteItemRender(axe_img, box[i].pos[0], box[i].pos[1]);
-        if (i==1 && healthpack.collected == 1)
-            spriteItemRender(healthpack_img, box[i].pos[0], box[i].pos[1]);
-        if (i==2 && key.collected == 1)
-            spriteItemRender(key_img, box[i].pos[0], box[i].pos[1]);
-    }
 
+    // Adding Items into inventory slots
+    if (i==0 && axe.collected == 1)
+        spriteItemRender(axe_img, box[i].pos[0], box[i].pos[1]);
+    if (i==1 && healthpack.collected == 1)
+        spriteItemRender(healthpack_img, box[i].pos[0], box[i].pos[1]);
+    if (i==2 && key.collected == 1)
+        spriteItemRender(key_img, box[i].pos[0], box[i].pos[1]);
+    }
 }
 
 // Rendering Items to Collect on the Map
 void renderItem(Eventspace e) {
     //Axe - one inside of main lobby
-    if (e.stor.hasItem != -1 && e.stor.collected != 1 &&
+    if (e.stor.hasItem != -1 &&
+        e.stor.collected != 1 &&
         e.stor.type == 1) {
         spriteItemRender(axe_img, axe.pos[0] , axe.pos[1]);
     }
@@ -138,7 +136,8 @@ void renderItem(Eventspace e) {
     }
 
     //Health packs - Multiple around different rooms
-    if (e.stor.hasItem != -1 && e.stor.collected != 1 &&
+    if (e.stor.hasItem != -1 &&
+        e.stor.collected != 1 &&
         e.stor.type == 2) {
         spriteItemRender(healthpack_img, healthpack.pos[0],
                          healthpack.pos[1]);
@@ -148,7 +147,8 @@ void renderItem(Eventspace e) {
     }
 
     //Key - one inside the office
-    if (e.stor.hasItem != -1 && e.stor.collected != 1 &&
+    if (e.stor.hasItem != -1 &&
+        e.stor.collected != 1 &&
         e.stor.type == 3) {
         spriteItemRender(key_img, key.pos[0],
                          key.pos[1]);
@@ -156,7 +156,6 @@ void renderItem(Eventspace e) {
     else if (e.stor.collected == 1 && e.stor.type == 3){
         key.collected = 1; //used to update inventory slot render
     }
-
 }
 
 //Render the Item next to the player
@@ -164,7 +163,8 @@ void renderPlayerItem(float playerX, float playerY) {
     if (axe.collected) {
         spriteItemRender(axe_img, playerX, playerY);
         //axe range
-       /* glPushMatrix();
+       /* uncomment to visualize the axe range
+        * glPushMatrix();
         glColor3ub(220, 220, 0);
         glTranslatef(itemX, itemY, 0.0f);
         glBegin(GL_QUADS);
@@ -197,8 +197,6 @@ bool zombieAxeCollision(int playerX,int playerY, int id) {
         // Zombie rectangle position and dimensions
         int zPosX = zombie.pos[0];
         int zPosY = zombie.pos[1];
-       // int zombieWidth = 30;  // Example zombie width
-        //int zombieHeight = 50; // Example zombie height
         int zLeft = zPosX;
         int zRight = zPosX + zombie.w;
         int zTop = zPosY;
@@ -221,5 +219,4 @@ void resetItems() {
     axe.collected = false;
     healthpack.collected = false;
     key.collected = false;
-    //hitbox.active = false;
 }
