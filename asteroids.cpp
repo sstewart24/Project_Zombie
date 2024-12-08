@@ -41,7 +41,7 @@ extern void clear_zombie();
 extern void renderPlayerItem(float,float);
 extern bool zombieAxeCollision(int,int,int);
 extern void resetItems();
-int roomID = 6;
+int roomID = 0;
 int see_wall;
 int see_darkness;
 float pHealth = 180.0f;

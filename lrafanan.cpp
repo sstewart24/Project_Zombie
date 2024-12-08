@@ -129,7 +129,8 @@ void renderItem(Eventspace e) {
     if (e.stor.hasItem != -1 &&
         e.stor.collected != 1 &&
         e.stor.type == 1) {
-        spriteItemRender(axe_img, axe.pos[0] , axe.pos[1]);
+        spriteItemRender(axe_img, e.stor.item_xPos, 
+                                    e.stor.item_yPos);
     }
     else if (e.stor.collected == 1 && e.stor.type == 1){
         axe.collected = 1; //used to update inventory slot render
@@ -139,8 +140,8 @@ void renderItem(Eventspace e) {
     if (e.stor.hasItem != -1 &&
         e.stor.collected != 1 &&
         e.stor.type == 2) {
-        spriteItemRender(healthpack_img, healthpack.pos[0],
-                         healthpack.pos[1]);
+        spriteItemRender(healthpack_img, e.stor.item_xPos, 
+                                            e.stor.item_yPos);
     }
     else if (e.stor.collected == 1 && e.stor.type == 2){
         healthpack.collected = 1; //used to update inventory slot render
@@ -150,8 +151,8 @@ void renderItem(Eventspace e) {
     if (e.stor.hasItem != -1 &&
         e.stor.collected != 1 &&
         e.stor.type == 3) {
-        spriteItemRender(key_img, key.pos[0],
-                         key.pos[1]);
+        spriteItemRender(key_img, e.stor.item_xPos, 
+                                    e.stor.item_yPos);
     }
     else if (e.stor.collected == 1 && e.stor.type == 3){
         key.collected = 1; //used to update inventory slot render

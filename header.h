@@ -128,20 +128,20 @@ public:
     int toRoom;
     int toDoor;
     int locked;
-    int isDouble;
+    int blocked;
 
 public:
     Door() {
         toRoom = -1;
         toDoor = -1;
         locked = -1;
-        isDouble = -1;
+        blocked = -1;
     }
-    Door(int dID, int rID, int l, int d) {
+    Door(int dID, int rID, int l, int b) {
         toRoom = rID;
         toDoor = dID;
         locked = l;
-        isDouble = d;
+        blocked = b;
     }
 };
 
@@ -165,16 +165,22 @@ public:
     int hasItem;
     int type;
     int collected; // for item render
+    float item_xPos;
+    float item_yPos;
 public:
     Storage(){
         hasItem = -1;
         type = -1;
         collected = -1;
     }
-    Storage(int h, int t){
+    Storage(int h, int t, float x, float y){
         hasItem = h;
         type = t;
         collected = -1;
+        // To be able to place items inspecific spots
+        // Without needing to move the eventspace
+        item_xPos = x;
+        item_yPos = y;
     }     
 };
 
@@ -188,8 +194,9 @@ public:
     int etype;
     float xPos;
     float yPos;
+    float xDis;
+    float yDis;
     float color[4];
-    int facing = -1;
     
     // For door
     Door door;
@@ -203,12 +210,13 @@ public:
     Storage stor;
 public:
     // For door
-    Eventspace(int i, int t, float x, float y, Door dr, int f){
+    Eventspace(int i, int t, float x, float y, float xD, float yD, Door dr){
         id = i;
         etype = t;
         xPos = x;
         yPos = y;
-        facing = f;
+        xDis = xD;
+        yDis = yD;
         door = dr;
         color[0] = 0.647059f;
         color[1] = color[2] = 0.164706f;
@@ -216,11 +224,13 @@ public:
     }
 
     // For Hiding
-    Eventspace(int i, int t, float x, float y) {
+    Eventspace(int i, int t, float x, float y, float xD, float yD) {
         id = i;
         etype = t;
         xPos = x;
         yPos = y;
+        xDis = xD;
+        yDis = yD;
         color[0] = 0.8f;
         color[1] = 0.498039f;
         color[2] = 0.196078f;
@@ -228,11 +238,13 @@ public:
     }
 
     // For Item
-    Eventspace(int i, int t, float x, float y, Storage s) {
+    Eventspace(int i, int t, float x, float y, float xD, float yD, Storage s) {
         id = i;
         etype = t;
         xPos = x;
         yPos = y;
+        xDis = xD;
+        yDis = yD;
         stor = s;
         color[0] = 1.0f;
         color[1] = 0.5f;
@@ -241,11 +253,13 @@ public:
     }
 
     // For tunnels in room
-    Eventspace(int i, int t, float x, float y, Hole h){
+    Eventspace(int i, int t, float x, float y, float xD, float yD, Hole h){
         id = i;
         etype = t;
         xPos = x;
         yPos = y;
+        xDis = xD;
+        yDis = yD;
         hole = h;
         color[0] = 0.164706f;
         color[1] = color[2] = 0.647059f;

@@ -12,72 +12,141 @@ Room defaultWorld[] = {
     Room(0, {Wall(0.0f, 0.0f, 48.0f, 480.0f),
                 Wall(0.0f, 0.0f, 640.0f, 64.0f),
                 Wall(608.0f, 0.0f, 32.0f, 480.0f),
-                Wall(0.0f, 448.0f, 640.0f, 32.0f),
-                Wall(0.0f, 240.0f, 224.0f, 32.0f),
+                Wall(0.0f, 400.0f, 640.0f, 80.0f),
+                Wall(0.0f, 192.0f, 224.0f, 80.0f),
                 Wall(288.0f, 0.0f, 32.0f, 192.0f),
+                Wall(288.0f, 128.0f, 64.0f, 64.0f),
                 Wall(448.0f, 0.0f, 32.0f, 192.0f),
-                Wall(288.0f, 272.0f, 32.0f, 80.0f),
+                Wall(416.0f, 128.0f, 64.0f, 64.0f),
+                Wall(288.0f, 272.0f, 32.0f, 64.0f),
                 Wall(288.0f, 272.0f, 192.0f, 32.0f),
-                Wall(448.0f, 272.0f, 32.0f, 224.0f)},
-            {Eventspace(0, 0, 482.0f, 368.0f, Door(0, 2, 0, 0), 2),
-                Eventspace(1, 0, 98.0f, 368.0f, Door(0, 1, 0, 0), 2),
-                Eventspace(2, 0, 583.0f, 240.0f, Door(0, 6, 0, 0), 3),
-                Eventspace(3, 3, 304.0f, 80.0f, Hole(4, 0)),
-                Eventspace(4, 3, 272.0f, 80.0f, Hole(3, 0)),
-                Eventspace(5, 1, 360.0f, 220.0f, Storage(1, 1)),
-                Eventspace(6, 1, 50.0f, 320.0f, Storage(1, 2)),
-                Eventspace(7, 2, 272.0f, 320.0f)}, 
+                Wall(448.0f, 272.0f, 32.0f, 224.0f),
+                Wall(0.0f, 256.0f, 80.0f, 224.0f),
+                Wall(528.0f, 144.0f, 112.0f, 32.0f),
+                Wall(464.0f, 64.0f, 96.0f, 16.0f),
+                Wall(544.0f, 64.0f, 96.0f, 32.0f),
+                Wall(576.0f, 326.0f, 64.0f, 156.0f),
+                Wall(352.0f, 376.0f, 64.0f, 96.0f)},
+            {Eventspace(0, 0, 482.0f, 352.0f, 60.0f, 64.0f, Door(0, 2, 0, 0)),
+                Eventspace(1, 0, 98.0f, 352.0f, 60.0f, 64.0f, Door(0, 1, 0, 0)),
+                Eventspace(2, 0, 560.0f, 180.0f, 64.0f, 120.0f, Door(0, 6, 0, 0)),
+                Eventspace(3, 3, 320.0f, 64.0f, 32.0f, 64.0f, Hole(4, 0)),
+                Eventspace(4, 3, 256.0f, 64.0f, 32.0f, 64.0f, Hole(3, 0)),
+                Eventspace(5, 2, 352.0f, 336.0f, 64.0f, 48.0f),
+                Eventspace(6, 2, 96.0f, 80.0f, 96.0f, 64.0f),
+                Eventspace(7, 2, 80.0f, 272.0f, 80.0f, 48.0f),
+                Eventspace(8, 2, 480.0f, 80.0f, 64.0f, 40.0f),
+                Eventspace(9, 1, 256.0f, 304.0f, 96.0f, 48.0f, Storage(1, 2, 304.0f, 320.0f)),
+                Eventspace(10, 1, 560.0f, 96.0f, 48.0f, 48.0f,Storage(1, 2, 592.0f, 80.0f))}, 
             "./images/lab-entrance.png", "./images/lab-entrance-v2.png"), 
     Room(1, {Wall(0.0f, 0.0f, 160.0f, 480.0f),
                 Wall(0.0f, 0.0f, 640.0f, 96.0f),
                 Wall(480.0f, 0.0f, 160.0f, 480.0f),
-                Wall(0.0f, 368.0f, 640.0f, 112.0f)},
-            {Eventspace(0, 0, 352.0f, 96.0f, Door(1, 0, 0, 0), 1),
-                Eventspace(1, 1, 225.0f, 170.0f, Storage(1, 3))},
+                Wall(0.0f, 320.0f, 640.0f, 160.0f),
+                Wall(224.0f, 160.0f, 48.0f, 80.0f),
+                Wall(144.0f, 304.0f, 272.0f, 64.0f)},
+                //Wall(320.0f, 80.0f, 112.0f, 48.0f)},
+            {Eventspace(0, 0, 352.0f, 96.0f, 60.0f, 64.0f, Door(1, 0, 0, 0)),
+                Eventspace(1, 0, 416.0f, 256.0f, 60.0f, 64.0f, Door(1, 3, 0, 0)),
+                Eventspace(2, 2, 352.0f, 256.0f, 64.0f, 48.0f),
+                Eventspace(3, 1, 192.0f, 128.0f, 112.0f, 64.0f, Storage(1, 3, 248.0f, 176.0f))},
             "./images/Lab-office.png", "./images/Lab-office-v2.png"),
     Room(2, {Wall(0.0f, 0.0f, 64.0f, 480.0f),
                 Wall(0.0f, 0.0f, 640.0f, 80.0f),
-                Wall(0.0f, 416.0f, 640.0f, 64.0f),
+                Wall(0.0f, 368.0f, 640.0f, 112.0f),
                 Wall(576.0f, 0.0f, 64.0f, 480.0f),
-                Wall(256.0f, 80.0f, 320.0f, 64.0f)},
-            {Eventspace(0, 0, 130.0f, 80.0f, Door(0, 0, 0, 0), 1),
-                Eventspace(1, 0, 64.0f, 210.0f, Door(0, 3, 0, 0), 4),
-                Eventspace(2, 0, 386.0f, 311.0f, Door(0, 4, 0, 0), 1),
-                Eventspace(3, 0, 130.0f, 311.0f, Door(0, 5, 0, 0), 1)}, 
+                Wall(256.0f, 80.0f, 320.0f, 64.0f),
+                Wall(64.0f, 352.0f, 64.0f, 128.0f),
+                Wall(224.0f, 352.0f, 64.0f, 128.0f),
+                Wall(512.0f, 352.0f, 64.0f, 128.0f),
+                Wall(288.0f, 246.0f, 36.0f, 234.0f),
+                Wall(320.0f, 290.0f , 48.0f, 186.0f),
+                Wall(256.0f, 144.0f, 64.0f, 16.0f),
+                Wall(351.0f, 144.0f, 64.0f, 16.0f)},
+            {Eventspace(0, 0, 130.0f, 80.0f, 60.0f, 64.0f, Door(0, 0, 0, 0)),
+                Eventspace(1, 0, 64.0f, 210.0f, 48.0f, 60.0f, Door(0, 3, 0, 0)),
+                Eventspace(2, 0, 386.0f, 311.0f, 60.0f, 64.0f, Door(0, 4, 0, 0)),
+                Eventspace(3, 0, 130.0f, 311.0f, 60.0f, 64.0f, Door(0, 5, 0, 0)),
+                Eventspace(4, 2, 64.0f, 288.0f, 64.0f, 64.0f),
+                Eventspace(5, 2, 224.0f, 288.0f, 64.0f, 64.0f),
+                Eventspace(6, 2, 512.0f, 288.0f, 64.0f, 64.0f),
+                Eventspace(7, 2, 432.0f, 144.0f, 144.0f, 48.0f)}, 
             "./images/Lab-Hall.png", "./images/Lab-Hall-v2.png"),
     Room(3, {Wall(0.0f, 0.0f, 256.0f, 480.0f),
-                Wall(0.0f, 0.0f, 640.0f, 80.0f),
+                Wall(0.0f, 0.0f, 640.0f, 96.0f),
                 Wall(384.0f, 0.0f, 256.0f, 480.0f),
-                Wall(0.0f, 352.0f, 640.0f, 128.0f)},
-            {Eventspace(0, 0, 358.0f, 146.0f, Door(1, 2, 0, 0), 4)}, 
+                Wall(0.0f, 304.0f, 640.0f, 156.0f),
+                Wall(304.0f, 254.0f, 16.0f, 208.0f),
+                Wall(368.0f, 254.0f, 16.0f, 208.0f),
+                Wall(240.0f, 144.0f, 64.0f, 48.0f)},
+            {Eventspace(0, 0, 342.0f, 146.0f, 48.0f, 60.0f, Door(1, 2, 0, 0)),
+                Eventspace(1, 0, 256.0f, 240.0f, 48.0f, 64.0f, Door(1, 1, 0, 0)),
+                Eventspace(2, 1, 320.0f, 240.0f, 48.0f, 64.0f, Storage(1, 1, 344.0f, 288.0f))}, 
             "./images/Lab-closet.png", "./images/Lab-closet-v2.png"),
     Room(4, {Wall(0.0f, 0.0f, 64.0f, 480.0f),
                 Wall(0.0f, 0.0f, 640.0f, 80.0f),
                 Wall(608.0f, 0.0f, 32.0f, 480.0f),
-                Wall(0.0f, 448.0f, 640.0f, 32.0f),
-                Wall(320.0f, 224.0f, 32.0f, 256.0f)},
-            {Eventspace(0, 0, 130.0f, 80.0f, Door(2, 2, 0, 0), 1)}, 
+                Wall(0.0f, 400.0f, 640.0f, 80.0f),
+                Wall(288.0f, 176.0f, 96.0f, 256.0f),
+                Wall(64.0f, 176.0f, 32.0f, 256.0f),
+                Wall(160.0f, 176.0f, 64.0f, 128.0f),
+                Wall(352.0f, 176.0f, 128.0f, 32.0f),
+                Wall(448.0f, 176.0f, 32.0f, 128.0f),
+                Wall(576.0f, 176.0f, 64.0f, 256.0f),
+                Wall(352.0f, 360.0f, 128.0f, 32.0f),
+                Wall(127.0f, 384.0f, 130.0f, 80.0f),
+                Wall(480.0f, 384.0f, 64.0f, 80.0f)},
+            {Eventspace(0, 0, 130.0f, 80.0f, 60.0f, 64.0f, Door(2, 2, 0, 0)),
+                Eventspace(1, 3, 384.0f, 128.0f, 64.0f, 48.0f, Hole(2, 0)),
+                Eventspace(2, 3, 384.0f, 208.0f, 64.0f, 64.0f, Hole(1, 0)),
+                Eventspace(3, 2, 528.0f, 80.0f, 80.0f, 48.0f),
+                Eventspace(4, 2, 128.0f, 336.0f, 64.0f, 64.0f),
+                Eventspace(5, 2, 480.0f, 336.0f, 64.0f, 64.0f),
+                Eventspace(6, 1, 384.0f, 320.0f, 64.0f, 64.0f, Storage(1, 3, 416.0f, 376.0f)),
+                Eventspace(7, 1, 192.0f, 266.0f, 64.0f, 72.0f, Storage(1, 2, 208.0f, 282.0f)),
+                Eventspace(7, 1, 544.0f, 250.0f, 64.0f, 64.0f, Storage(1, 2, 592.0f, 282.0f))}, 
             "./images/lab-sidelab.png", "./images/lab-sidelab-v2.png"),
-    Room(5, {Wall(0.0f, 0.0f, 176.0f, 480.0f),
+    Room(5, {Wall(0.0f, 0.0f, 192.0f, 480.0f),
                 Wall(0.0f, 0.0f, 640.0f, 80.0f),
-                Wall(432.0f, 0.0f, 208.0f, 480.0f),
-                Wall(0.0f, 352.0f, 640.0f, 128.0f)},
-            {Eventspace(0, 0, 370.0f, 80.0f, Door(3, 2, 0, 0), 1)}, 
+                Wall(448.0f, 0.0f, 192.0f, 480.0f),
+                Wall(0.0f, 272.0f, 640.0f, 208.0f),
+                Wall(176.0f, 80.0f, 112.0f, 64.0f),
+                Wall(336.0f, 80.0f, 48.0f, 64.0f),
+                Wall(240.0f, 144.0f, 48.0f, 16.0f),
+                Wall(269.0f, 144.0f, 19.0f, 44.0f)},
+            {Eventspace(0, 0, 386.0f, 80.0f, 60.0f, 64.0f, Door(3, 2, 0, 0)),
+                Eventspace(1, 2, 288.0f, 80.0f, 48.0f, 64.0f),
+                Eventspace(2, 1, 352.0f, 240.0f, 48.0f, 64.0f, Storage(1, 3, 376.0f, 288.0f))}, 
             "./images/Lab-restroom.png", "./images/Lab-restroom-v2.png"),
     Room(6, {Wall(0.0f, 0.0f, 64.0f, 480.0f),
                 Wall(0.0f, 0.0f, 640.0f, 64.0f),
                 Wall(608.0f, 0.0f, 32.0f, 480.0f),
-                Wall(0.0f, 448.0f, 640.0f, 32.0f),
+                Wall(0.0f, 400.0f, 640.0f, 80.0f),
                 Wall(160.0f, 0.0f, 64.0f, 176.0f),
-                Wall(384.0f, 0.0f, 64.0f, 176.0f)},
-            {Eventspace(0, 0, 64.0f, 180.0f, Door(2, 0, 0, 0), 4),
-                Eventspace(1, 0, 512.0f, 352.0f, Door(0, 7, 0, 0), 1)}, 
+                Wall(384.0f, 0.0f, 64.0f, 176.0f),
+                Wall(64.0f, 384.0f, 64.0f, 96.0f),
+                Wall(128.0f, 364.0f, 352.0f, 48.0f),
+                Wall(128.0f, 272.0f, 352.0f, 32.0f),
+                Wall(224.0f, 112.0f, 60.0f, 32.0f),
+                Wall(324.0f, 112.0f, 184.0f, 32.0f),
+                Wall(548.0f, 112.0f, 64.0f, 32.0f),
+                Wall(64.0f, 64.0f, 16.0f, 64.0f),
+                Wall(144.0f, 64.0f, 16.0f, 64.0f)},
+            {Eventspace(0, 0, 64.0f, 180.0f, 64.0f, 120.0f, Door(2, 0, 0, 0)),
+                Eventspace(1, 0, 512.0f, 352.0f, 60.0f, 64.0f, Door(0, 7, 0, 0)),
+                Eventspace(2, 3, 336.0f, 64.0f, 48.0f, 64.0f, Hole(3, 0)),
+                Eventspace(3, 3, 448.0f, 64.0f, 48.0f, 64.0f, Hole(2, 0)),
+                Eventspace(4, 2, 80.0f, 64.0f, 64.0f, 64.0f),
+                Eventspace(5, 2, 224.0f, 64.0f, 64.0f, 120.0f),
+                Eventspace(6, 2, 544.0f, 64.0f, 64.0f, 120.0f),
+                Eventspace(7, 2, 64.0f, 336.0f, 64.0f, 64.0f),
+                Eventspace(7, 1, 208.0f, 304.0f, 64.0f, 72.0f, Storage(1, 2, 240.0f, 376.0f))}, 
             "./images/lab-testlab.png", "./images/lab-testlab-v2.png"),
     Room(7, {Wall(0.0f, 0.0f, 288.0f, 480.0f),
                 Wall(0.0f, 0.0f, 640.0f, 176.0f),
                 Wall(352.0f, 0.0f, 288.0f, 480.0f),
-                Wall(0.0f, 320.0f, 640.0f, 160.0f)},
-            {Eventspace(0, 0, 288.0f, 176.0f, Door(1, 6, 0, 0), 1)}, 
+                Wall(0.0f, 256.0f, 640.0f, 160.0f)},
+            {Eventspace(0, 0, 288.0f, 176.0f, 60.0f, 64.0f, Door(1, 6, 0, 0))}, 
             "./images/Lab-vault.png", "./images/Lab-vault.png")
 };
 
@@ -249,48 +318,12 @@ public:
     float yy;
 
 public:
-    Doormat(int facing, float door_x, float door_y)
+    Doormat(float dm_x, float dm_y, float dm_xDis, float dm_yDis)
     {
-        // Simplify facing to be to different directions: up-down & left-right
-        // . - Just need to tweak positions of where door interactions are
-        // .
-        // .
-        // North - South, facing = 1 (North) or 2 (South)
-        // West - East, facing = 3 (West) or 4 (East)
-        if(facing > 0) {
-            if (facing < 3) {
-                x = door_x;
-                xx = door_x + DOOR_WIDTH;
-                switch (facing) {
-                    case 1:
-                        y = door_y;
-                        yy = door_y + DOORMAT_WIDTH;
-                        break;
-                    case 2:
-                        y = door_y - DOORMAT_WIDTH;
-                        yy = door_y;
-                        break;
-                }
-            } else {
-                y = door_y;
-                yy = door_y + DOOR_WIDTH;
-                switch (facing) {
-                    case 3:
-                        x = door_x - DOORMAT_WIDTH;
-                        xx = door_x;
-                        break;
-                    case 4:
-                        x = door_x;
-                        xx = door_x + DOORMAT_WIDTH;
-                        break;
-                }
-            }
-        } else {
-            y = door_y;
-            x = door_x;
-            xx = door_x + TUNNEL_WIDTH;
-            yy = door_y + TUNNEL_WIDTH;
-        }
+        x = dm_x;
+        y = dm_y;
+        xx = dm_x + dm_xDis;
+        yy = dm_y + dm_yDis;
     }
 };
 // Initializes first room to make
@@ -309,7 +342,8 @@ void roomSave(Room cur)
 void findDoor(int nextDoor, int nextRoom) 
 {
     Room next_room = rooms[nextRoom];
-    Doormat next_door = Doormat(next_room.ev[nextDoor].facing, next_room.ev[nextDoor].xPos, next_room.ev[nextDoor].yPos);
+    Doormat next_door = Doormat(next_room.ev[nextDoor].xPos, next_room.ev[nextDoor].yPos,
+                                next_room.ev[nextDoor].xDis, next_room.ev[nextDoor].yDis);
     jumpPlayerPos_to[0] = next_door.x + (next_door.xx - next_door.x)/2;
     jumpPlayerPos_to[1] = next_door.y + (next_door.yy - next_door.y)/2;
 }
@@ -338,7 +372,8 @@ int storageInteract(int storageID, Room current)
 }
 
 void findHole(int nextHole, int rid) {
-    Doormat next_hole = Doormat(rooms[rid].ev[nextHole].facing, rooms[rid].ev[nextHole].xPos, rooms[rid].ev[nextHole].yPos);
+    Doormat next_hole = Doormat(rooms[rid].ev[nextHole].xPos, rooms[rid].ev[nextHole].yPos, 
+                            rooms[rid].ev[nextHole].xDis, rooms[rid].ev[nextHole].yDis);
     jumpPlayerPos_to[0] = next_hole.x + (next_hole.xx - next_hole.x)/2;
     jumpPlayerPos_to[1] = next_hole.y + (next_hole.yy - next_hole.y)/2;
 }
@@ -368,7 +403,7 @@ int* checkEventSpace(Room current, float pl_pos[2]) {
     interaction[1] = -1;
 
     while (i < size && !act) {
-        Doormat area = Doormat(current.ev[i].facing, current.ev[i].xPos, current.ev[i].yPos);//, current.ev[i].width, current.ev[i].height);
+        Doormat area = Doormat(current.ev[i].xPos, current.ev[i].yPos, current.ev[i].xDis, current.ev[i].yDis);
 
         if (pl_pos[0] > area.x && pl_pos[0] < area.xx && 
                 pl_pos[1] > area.y && pl_pos[1] < area.yy) {
@@ -440,7 +475,7 @@ void renderWall(Wall wall) {
 
 void renderEvent(Eventspace e)
 {
-    Doormat door_mat = Doormat(e.facing, e.xPos, e.yPos);
+    Doormat door_mat = Doormat(e.xPos, e.yPos, e.xDis, e.yDis);
     glPushMatrix();
         glColor4fv(e.color);
         glBegin(GL_TRIANGLES);
