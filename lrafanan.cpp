@@ -1,13 +1,15 @@
 /* Lyanne Rafanan's Source File
- * last updated: 04 DEC 24
+ * last updated: 07 DEC 24
  * What's in here?
  *  - Render and initialize values for Inventory Box
  *  - Render Collectable Items:
  *      - axe(1): stun/kill zombies
  *      - healthpack(multiple around the map): incr player health
- *      - key(1) : used to win the game
- * TODO:
- * - Hit box for axe and zombie collision
+ *      - key(1) : used to win the game maybe lol
+ *  - Zombie axe Collision check
+ *  - Item reset function when player dies
+ *  - Render axe next to player if player collects the item
+ *
  * */
 #include "header.h"
 // Funtion Prototypes:
@@ -17,6 +19,9 @@ void spriteItemRender(Sprite sp, float xPos, float yPos);
 void init_inventory();
 void renderInventory(Eventspace);
 void renderItem(Eventspace);
+void renderPlayerItem(float playerX, float playerY);
+bool zombieAxeCollision(int playerX,int playerY, int id);
+void resetItems();
 
 //Globals
 Key key (240.0f, 200.0f);
@@ -47,11 +52,9 @@ void init_Item_Images() {
 void spriteItemRender(Sprite sp, float xPos, float yPos) {
     float zPos = 0.0f;
     float cx = sp.xres / 2;
-        float cy = sp.yres / 2;
-
+    float cy = sp.yres / 2;
     float tx = 0.0;
-        float ty = 0.0;
-
+    float ty = 0.0;
         glPushMatrix();
         glColor3f(1.0, 1.0, 1.0);
         glBindTexture(GL_TEXTURE_2D, sp.spTex.spriteTexture);
@@ -154,4 +157,69 @@ void renderItem(Eventspace e) {
         key.collected = 1; //used to update inventory slot render
     }
 
+}
+
+//Render the Item next to the player
+void renderPlayerItem(float playerX, float playerY) {
+    if (axe.collected) {
+        spriteItemRender(axe_img, itemX, itemY);
+        //axe range
+       /* glPushMatrix();
+        glColor3ub(220, 220, 0);
+        glTranslatef(itemX, itemY, 0.0f);
+        glBegin(GL_QUADS);
+            glVertex2f(-axe.w, -axe.h);
+            glVertex2f(-axe.w,  axe.h);
+            glVertex2f( axe.w,  axe.h);
+            glVertex2f( axe.w, -axe.h);
+       glEnd();
+       glPopMatrix();
+       renderZombieHitbox();*/
+    }
+}
+
+//Check if axe is within range to attack zombie
+bool zombieAxeCollision(int playerX,int playerY, int id) {
+    int hbLeft = playerX;
+    int hbRight = playerX + axe.w;
+    int hbTop = playerY;
+    int hbBottom = playerY + axe.h;
+
+    // External zombie getter and total zombie count
+    extern Zombie getZombies(int);
+    extern int getVectorSize();
+    int zombieTotal = getVectorSize();
+
+    // Iterate through all zombies
+    for (int i = 0; i < zombieTotal; i++) {
+        Zombie zombie = getZombies(i);
+
+        // Zombie rectangle position and dimensions
+        int zPosX = zombie.pos[0];
+        int zPosY = zombie.pos[1];
+       // int zombieWidth = 30;  // Example zombie width
+        //int zombieHeight = 50; // Example zombie height
+        int zLeft = zPosX;
+        int zRight = zPosX + zombie.w;
+        int zTop = zPosY;
+        int zBottom = zPosY + zombie.h;
+
+        // Check if the zombie is in the same room
+        if (zombie.room == id) {
+            // Check if the rectangles overlap
+            if (hbRight >= zLeft && hbLeft <= zRight &&
+                hbBottom >= zTop && hbTop <= zBottom) {
+                return true; // Collision detected
+            }
+        }
+    }
+    return false; // No collision
+}
+
+//reset items if player dies
+void resetItems() {
+    axe.collected = false;
+    healthpack.collected = false;
+    key.collected = false;
+    //hitbox.active = false;
 }
