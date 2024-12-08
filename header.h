@@ -410,6 +410,7 @@ class Zombie {
         float angle;
         int alive;
         float color[3];
+        float w,h; //used to check if item/player hits zombie
 
         float moveDistance; // Distance moved so far
         float maxDistance; // Maximum distance before turning
@@ -434,6 +435,8 @@ class Zombie {
                 color[0] = 0.0f;
                 color[1] = 1.0f;
                 color[2] = 0.0f;
+                w = 30.0f;
+                h = 50.0f;
             }
         ~Zombie() {}
 };
@@ -502,19 +505,23 @@ class Axe {
     public:
         int damage;
         float pos[2];
-       // float w,h;
+        float w,h;
         bool collected;
         Axe() {
             pos[0] = 370.0f;
             pos[1] = 240.0f;
             collected = false; //for item to render in slots
             damage = 10;
+            w = 40.0f;
+            h = 10.0f;
         }
         Axe(float posX, float posY) {
             pos[0] = posX;
             pos[1] = posY;
             collected = false; //for item to render in slots
             damage = 10;
+            w = 40.0f;
+            h = 10.0f;
         }
 
 };
