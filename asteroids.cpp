@@ -435,14 +435,21 @@ int check_keys(XEvent *e)
             g.pause = !g.pause;
         }
         if (key == XK_space) {
-            if (g.axe.collected) {
-                bool zac = zombieAxeCollision(g.player.pos[0],g.player.pos[1],g.room.id);
-                if (zac) {
-                    printf("Player attacking Zombie\n");
-                } else {
-                    printf("Player is too far too attack\n");
-                }
-            } 
+		gl.pressed = true;
+		gl.stun = false;
+            	if (g.axe.collected) {
+                	bool zac = zombieAxeCollision(g.player.pos[0],g.player.pos[1],g.room.id);
+                	if (zac) {
+                    		printf("Player attacking Zombie\n");
+				gl.pressed = false;
+				gl.stun = true;
+                	} else {
+                    		printf("Player is too far too attack\n");
+				gl.pressed = false;
+				gl.stun = false;
+                	}
+            	} 
+	}
         }
 	}
 	(void)shift;
