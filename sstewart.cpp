@@ -119,7 +119,9 @@ void renderPause(Pause p)
     ggprint8b(&l, 420, 0x00ff0000, "3350 - Project_Zombie");
     ggprint8b(&l, 16, 0x00ffff00, "F - Interact");
     ggprint8b(&l, 16, 0x00ffff00, "H - Heal");
+    ggprint8b(&l, 16, 0x00ffff00, "SPACE - Attack");
     ggprint8b(&r, 420, 0x00ffff00, "");
+    ggprint8b(&r, 16, 0x00ffff00, "P - Unpause");
     ggprint8b(&r, 16, 0x00ffff00, "W - A - S - D - Move");
     ggprint8b(&r, 16, 0x00ffff00, "ARROW KEYS - Move");
     //ggprint8b(&r, 16, 0x00ffff00, "SPACE - Swing axe");
