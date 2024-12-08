@@ -88,6 +88,8 @@ class Global {
     public:
         int xres, yres;
         int see_wall;
+	bool pressed = false;
+        bool stun = false;
         char keys[65536];
         Global() {
             xres = 640;
