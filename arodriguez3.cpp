@@ -6,10 +6,11 @@
 #include "header.h"
 using namespace std;
 
-#define MOVESTEP 0.5f // How fast the zombie moves
+#define MOVESTEP 1.0f // How fast the zombie moves
 
 void renderZombieDetection(int, int, int);
 extern int checkWall(float*, Room);
+extern bool zombieAxeCollision(int, int, int);
 
 // Sprite the zombies will use
 extern void spriteInit(Sprite& ,std::string);
@@ -107,7 +108,6 @@ bool Zcollision(float newPos[2], const Zombie& zombie)
 					return true;
 				}
 				if (Zcol_count >= 1 && Zcol_count < 30) {
-					//printf("Counting: %i\n", count);
 					return false;
 				}
 				if (Zcol_count == 30) {
@@ -161,6 +161,15 @@ bool Zfollow(Zombie& zombie, Player& player, Room current)
 					zombie.pos[1] = NewZpos[1];
 
 				}
+				if (zombieAxeCollision(Ppos[0], Ppos[1], current.id) && gl.stun) {
+					printf("Zombie Stunned\n");
+					zombie.waiting = 1;
+					zombie.count = 0;
+					zombie.following = false;
+					gl.stun = false;
+					return false;
+				}
+
 				renderZombieDetection(2, zombie.pos[0], zombie.pos[1] + 50);
 				zombie.following = true; 	// marked as following
 				return true; 				// Zombie follows player
@@ -201,7 +210,6 @@ void Zroam(Zombie& zombie, Room current)
     // Update position based on current direction
     switch (zombie.direction) {
         case 0: // Moving up
-			//Zwait();
             newPos[1] += MOVESTEP;
 			zombie.angle = 360.0f;
             break;
@@ -242,8 +250,8 @@ void Zroam(Zombie& zombie, Room current)
 	} else if (zombie.count != 0) {
 		// Check if zombie is suspicious of player, stop moving
 		zombie.moveDistance = 0;
-		//printf("Zombie paused\n");
-	} else {
+
+	}else {
         // Update position only if there's no collision
         zombie.pos[0] = newPos[0];
         zombie.pos[1] = newPos[1];
