@@ -1,5 +1,5 @@
 /* Lyanne Rafanan's Source File
- * last updated: 07 DEC 24
+ * last updated: 08 DEC 24
  * What's in here?
  *  - Render and initialize values for Inventory Box
  *  - Render Collectable Items:
@@ -9,6 +9,7 @@
  *  - Zombie axe Collision check
  *  - Item reset function when player dies
  *  - Render axe next to player if player collects the item
+ *  - Update item inventory when player uses as item
  *
  * */
 #include "header.h"
@@ -17,11 +18,12 @@ extern void spriteInit(Sprite&, std::string);
 void init_Item_Images();
 void spriteItemRender(Sprite sp, float xPos, float yPos);
 void init_inventory();
-void renderInventory(Eventspace);
+void renderInventory();
 void renderItem(Eventspace);
 void renderPlayerItem(float playerX, float playerY);
 bool zombieAxeCollision(int playerX,int playerY, int id);
 void resetItems();
+void updateInventory (int update);
 
 //Globals
 Key key (240.0f, 200.0f);
@@ -32,7 +34,7 @@ Inventory box[MAXINVENTORY];
 Inventory bg;
 
 Sprite healthpack_img = Sprite(40, 40);
-std::string hp_imagefile = "./images/Health-pack.png"; 
+std::string hp_imagefile = "./images/Health-pack.png";
 Sprite axe_img = Sprite(40, 40);
 std::string axeInv_imagefile = "./images/AxeSprite-Inventory.png";
 Sprite key_img = Sprite(40, 40);
@@ -83,6 +85,12 @@ void init_inventory() {
         box[i].w = 20;
     }
 }
+// Used to update inventory slots if player uses an item
+void updateInventory (int update) {
+    //only relevant to the healthpack to simulate reality
+    //you can only use a bandaid once.
+    healthpack.collected = update;
+}
 
 // Rendering the inventory box and its slots for collectable items
 void renderInventory() {
@@ -112,12 +120,21 @@ void renderInventory() {
             glVertex2f( box[i].w, -box[i].h);
        glEnd();
        glPopMatrix();
+   /* Rect r;
+    r.bot = box[i].pos[1] - (box[i].h / 2) - 10;
+    r.left = box[i].pos[0] + (box[i].w / 2) + 5;
+    r.center = 0;*/
 
     // Adding Items into inventory slots
     if (i==0 && axe.collected == 1)
         spriteItemRender(axe_img, box[i].pos[0], box[i].pos[1]);
-    if (i==1 && healthpack.collected == 1)
+    if (i==1 && healthpack.collected == 1) {
         spriteItemRender(healthpack_img, box[i].pos[0], box[i].pos[1]);
+       /* if (healthpack.available == 1)
+            ggprint8b(&r, 16, 0xf2e9e4, "1");
+        if (healthpack.available == 2)
+            ggprint8b(&r, 16, 0xf2e9e4, "2");*/
+    }
     if (i==2 && key.collected == 1)
         spriteItemRender(key_img, box[i].pos[0], box[i].pos[1]);
     }
@@ -129,7 +146,7 @@ void renderItem(Eventspace e) {
     if (e.stor.hasItem != -1 &&
         e.stor.collected != 1 &&
         e.stor.type == 1) {
-        spriteItemRender(axe_img, e.stor.item_xPos, 
+        spriteItemRender(axe_img, e.stor.item_xPos,
                                     e.stor.item_yPos);
     }
     else if (e.stor.collected == 1 && e.stor.type == 1){
@@ -140,7 +157,7 @@ void renderItem(Eventspace e) {
     if (e.stor.hasItem != -1 &&
         e.stor.collected != 1 &&
         e.stor.type == 2) {
-        spriteItemRender(healthpack_img, e.stor.item_xPos, 
+        spriteItemRender(healthpack_img, e.stor.item_xPos,
                                             e.stor.item_yPos);
     }
     else if (e.stor.collected == 1 && e.stor.type == 2){
@@ -151,7 +168,7 @@ void renderItem(Eventspace e) {
     if (e.stor.hasItem != -1 &&
         e.stor.collected != 1 &&
         e.stor.type == 3) {
-        spriteItemRender(key_img, e.stor.item_xPos, 
+        spriteItemRender(key_img, e.stor.item_xPos,
                                     e.stor.item_yPos);
     }
     else if (e.stor.collected == 1 && e.stor.type == 3){
