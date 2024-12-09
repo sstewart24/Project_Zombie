@@ -9,7 +9,6 @@
  *  - Zombie axe Collision check
  *  - Item reset function when player dies
  *  - Render axe next to player if player collects the item
- *  - Update item inventory when player uses as item
  *
  * */
 #include "header.h"
@@ -18,12 +17,11 @@ extern void spriteInit(Sprite&, std::string);
 void init_Item_Images();
 void spriteItemRender(Sprite sp, float xPos, float yPos);
 void init_inventory();
-void renderInventory();
+void renderInventory(Healthpack, Key, Axe);
 void renderItem(Eventspace);
 void renderPlayerItem(float playerX, float playerY);
 bool zombieAxeCollision(int playerX,int playerY, int id);
 void resetItems();
-void updateInventory (int update);
 
 //Globals
 Key key (240.0f, 200.0f);
@@ -85,15 +83,9 @@ void init_inventory() {
         box[i].w = 20;
     }
 }
-// Used to update inventory slots if player uses an item
-void updateInventory (int update) {
-    //only relevant to the healthpack to simulate reality
-    //you can only use a bandaid once.
-    healthpack.collected = update;
-}
 
 // Rendering the inventory box and its slots for collectable items
-void renderInventory() {
+void renderInventory(Healthpack hp, Key ke, Axe ax) {
     init_inventory();
 
     //background box
@@ -110,39 +102,52 @@ void renderInventory() {
 
     //inventory slots
     for (int i=0; i<MAXINVENTORY; i++) {
-    glPushMatrix();
-        glColor3ub(34, 34, 59);
-        glTranslatef(box[i].pos[0], box[i].pos[1], 0.0f);
-        glBegin(GL_QUADS);
-            glVertex2f(-box[i].w, -box[i].h);
-            glVertex2f(-box[i].w,  box[i].h);
-            glVertex2f( box[i].w,  box[i].h);
-            glVertex2f( box[i].w, -box[i].h);
-       glEnd();
-       glPopMatrix();
-   /* Rect r;
-    r.bot = box[i].pos[1] - (box[i].h / 2) - 10;
-    r.left = box[i].pos[0] + (box[i].w / 2) + 5;
-    r.center = 0;*/
+        glPushMatrix();
+            glColor3ub(34, 34, 59);
+            glTranslatef(box[i].pos[0], box[i].pos[1], 0.0f);
+            glBegin(GL_QUADS);
+                glVertex2f(-box[i].w, -box[i].h);
+                glVertex2f(-box[i].w,  box[i].h);
+                glVertex2f( box[i].w,  box[i].h);
+                glVertex2f( box[i].w, -box[i].h);
+        glEnd();
+        glPopMatrix();
+        Rect r;
+        r.bot = box[i].pos[1] - (box[i].h / 2) - 10;
+        r.left = box[i].pos[0] + (box[i].w / 2) + 5;
+        r.center = 0;
 
     // Adding Items into inventory slots
-    if (i==0 && axe.collected == 1)
-        spriteItemRender(axe_img, box[i].pos[0], box[i].pos[1]);
-    if (i==1 && healthpack.collected == 1) {
-        spriteItemRender(healthpack_img, box[i].pos[0], box[i].pos[1]);
-       /* if (healthpack.available == 1)
-            ggprint8b(&r, 16, 0xf2e9e4, "1");
-        if (healthpack.available == 2)
-            ggprint8b(&r, 16, 0xf2e9e4, "2");*/
-    }
-    if (i==2 && key.collected == 1)
-        spriteItemRender(key_img, box[i].pos[0], box[i].pos[1]);
+        if (i==0 && ax.collected == 1)
+            spriteItemRender(axe_img, box[i].pos[0], box[i].pos[1]);
+        if (i==1 && hp.collected == 1 && hp.available > 0) {
+            spriteItemRender(healthpack_img, box[i].pos[0], box[i].pos[1]);
+            if (hp.available == 1)
+                ggprint08(&r, 16, 0xf2e9e4, "1");
+            if (hp.available == 2)
+                ggprint08(&r, 16, 0xf2e9e4, "2");
+            if (hp.available == 3)
+                ggprint08(&r, 16, 0xf2e9e4, "3");
+            if (hp.available == 4)
+                ggprint08(&r, 16, 0xf2e9e4, "4");
+            if (hp.available == 5)
+                ggprint08(&r, 16, 0xf2e9e4, "5");
+        }
+        if (i==2 && ke.collected == 1 && ke.available > 0) {
+            spriteItemRender(key_img, box[i].pos[0], box[i].pos[1]);
+            if (ke.available == 1)
+                ggprint08(&r, 16, 0xf2e9e4, "1");
+            if (ke.available == 2)
+                ggprint08(&r, 16, 0xf2e9e4, "2");
+            if (ke.available == 3)
+                ggprint08(&r, 16, 0xf2e9e4, "3");
+        }
     }
 }
 
 // Rendering Items to Collect on the Map
 void renderItem(Eventspace e) {
-    //Axe - one inside of main lobby
+    //Axe - one hidden in a room
     if (e.stor.hasItem != -1 &&
         e.stor.collected != 1 &&
         e.stor.type == 1) {
@@ -164,7 +169,7 @@ void renderItem(Eventspace e) {
         healthpack.collected = 1; //used to update inventory slot render
     }
 
-    //Key - one inside the office
+    //Key - three hidden in different rooms
     if (e.stor.hasItem != -1 &&
         e.stor.collected != 1 &&
         e.stor.type == 3) {
