@@ -18,7 +18,7 @@ extern void renderEvent(Eventspace);
 extern void renderWall(Wall);
 extern void renderZombie(Room, Player); // Renders Zombies
 extern void renderHealth(Health, float);
-extern void renderInventory();
+extern void renderInventory(Healthpack,Key,Axe);
 extern bool pCollision(Player, int);
 extern float increaseHealth(float);
 extern float damageHealth(float);
@@ -90,6 +90,7 @@ public:
 	Health hbox;
     Healthpack hPack;
     Axe axe;
+    Key key;
 
 	Asteroid *ahead;
 	Bullet *barr;
@@ -425,12 +426,11 @@ int check_keys(XEvent *e)
 			see_wall = !see_wall;
 		}
         if (key == XK_h) {
-            if (g.hPack.collected) {
+            if (g.hPack.collected && g.hPack.available > 0) {
                 pHealth = increaseHealth(pHealth);
-                g.hPack.collected = 0;
-                updateInventory(g.hPack.collected);
-            }
-       	}
+                g.hPack.available -= 1;
+                printf("player health increased\n");
+            }       	}
 		if (key == XK_g) {
 			g.goryOn = !g.goryOn; 
 		}
@@ -515,17 +515,21 @@ void playerInteract()
 					g.room.ev[interact_index].stor.hasItem = 0;
 					g.room.ev[interact_index].stor.collected = 1;
                     g.axe.collected = true;
+                    g.hPack.available += 1;
 					break;
                 case 2:
                     printf("Grabbed Health Pack\n");
                     g.room.ev[interact_index].stor.hasItem = 0;
                     g.room.ev[interact_index].stor.collected = 1;
                     g.hPack.collected = true;
+                    g.hPack.available += 1;
                     break;
                 case 3:
                     printf("Grabbed Key\n");
                     g.room.ev[interact_index].stor.hasItem = 0;
                     g.room.ev[interact_index].stor.collected = 1;
+                    g.key.collected = true;
+                    g.key.available += 1;
                     break;
             }
 		}
@@ -711,8 +715,9 @@ void render()
 
 	//-------------------------------------------------------------------------
 	//Draw Inventory Box 
-    updateInventory(g.hPack.collected);
-    renderInventory();
+    //updateInventory(g.hPack.collected);
+    //renderinventory();
+    renderInventory(g.hPack, g.key, g.axe);
     //-------------------------------------------------------------------------
     //Draw Items
     //renderItem(g.axe);
