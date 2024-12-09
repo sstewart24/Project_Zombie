@@ -41,6 +41,7 @@ extern void clear_zombie();
 extern void renderPlayerItem(float,float);
 extern bool zombieAxeCollision(int,int,int);
 extern void resetItems();
+extern void updateInventory(int);
 int roomID = 0;
 int see_wall;
 int see_darkness;
@@ -426,6 +427,8 @@ int check_keys(XEvent *e)
         if (key == XK_h) {
             if (g.hPack.collected) {
                 pHealth = increaseHealth(pHealth);
+                g.hPack.collected = 0;
+                updateInventory(g.hPack.collected);
             }
        	}
 		if (key == XK_g) {
@@ -518,7 +521,6 @@ void playerInteract()
                     g.room.ev[interact_index].stor.hasItem = 0;
                     g.room.ev[interact_index].stor.collected = 1;
                     g.hPack.collected = true;
-                    g.hPack.available += 1;
                     break;
                 case 3:
                     printf("Grabbed Key\n");
@@ -709,6 +711,7 @@ void render()
 
 	//-------------------------------------------------------------------------
 	//Draw Inventory Box 
+    updateInventory(g.hPack.collected);
     renderInventory();
     //-------------------------------------------------------------------------
     //Draw Items
