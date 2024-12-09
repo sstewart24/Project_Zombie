@@ -151,33 +151,19 @@ void renderItem(Eventspace e) {
     if (e.stor.hasItem != -1 &&
         e.stor.collected != 1 &&
         e.stor.type == 1) {
-        spriteItemRender(axe_img, e.stor.item_xPos,
-                                    e.stor.item_yPos);
+        spriteItemRender(axe_img, e.stor.item_xPos, e.stor.item_yPos);
     }
-    else if (e.stor.collected == 1 && e.stor.type == 1){
-        axe.collected = 1; //used to update inventory slot render
-    }
-
     //Health packs - Multiple around different rooms
     if (e.stor.hasItem != -1 &&
         e.stor.collected != 1 &&
         e.stor.type == 2) {
-        spriteItemRender(healthpack_img, e.stor.item_xPos,
-                                            e.stor.item_yPos);
+        spriteItemRender(healthpack_img, e.stor.item_xPos, e.stor.item_yPos);
     }
-    else if (e.stor.collected == 1 && e.stor.type == 2){
-        healthpack.collected = 1; //used to update inventory slot render
-    }
-
     //Key - three hidden in different rooms
     if (e.stor.hasItem != -1 &&
         e.stor.collected != 1 &&
         e.stor.type == 3) {
-        spriteItemRender(key_img, e.stor.item_xPos,
-                                    e.stor.item_yPos);
-    }
-    else if (e.stor.collected == 1 && e.stor.type == 3){
-        key.collected = 1; //used to update inventory slot render
+        spriteItemRender(key_img, e.stor.item_xPos, e.stor.item_yPos);
     }
 }
 
